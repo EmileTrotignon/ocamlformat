@@ -1074,7 +1074,7 @@ end
 
 (* Flags that can be modified in the config file that don't affect
    formatting *)
-
+let kind = C.Operational
 
 let docs = C.section_name kind `Valid
 
@@ -1169,7 +1169,6 @@ let ( (* disable_outside_detected_project *) ) =
   let names = ["disable-outside-detected-project"] in
   C.removed_option ~names ~since:V.v0_22 ~msg
 
-
 let config =
   let doc =
     "Aggregate options. Options are specified as a comma-separated list of \
@@ -1183,7 +1182,6 @@ let config =
   mk ~default
     Arg.(
       value & opt list_assoc default & info ["c"; "config"] ~doc ~docs ~env )
-
 
 type file = Stdin | File of string
 
@@ -1225,7 +1223,6 @@ let ocp_indent_config =
   in
   let default = false in
   mk ~default Arg.(value & flag & info ["ocp-indent-config"] ~doc ~docs)
-
 
 let no_version_check =
   let doc =
@@ -1725,9 +1722,6 @@ type action =
   | Check of input list
   | Print_config of t
   | Numeric of input
-
-
-
 
 open Parsetree
 
