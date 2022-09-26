@@ -93,7 +93,7 @@ let run_action action =
       Ok ()
 ;;
 
-match Conf.action () with
+match Bin_conf.action () with
 | Ok (`Ok action) -> (
   match run_action action with
   | Ok () -> Caml.exit 0

@@ -9,16 +9,50 @@
 ;                                                                        ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
+(library
+ (name bin_conf)
+ (modules bin_conf)
+ (flags
+  (:standard
+   -open
+   Ocaml_common
+   -open
+   Parser_extended
+   -open
+   Ocamlformat_stdlib
+   -open
+   Ocamlformat_result.Global_scope))
+ (instrumentation
+  (backend bisect_ppx))
+ (libraries
+  ocamlformat
+  format_
+  ocaml_common
+  parser_standard
+  parser_extended
+  parser_recovery
+  ocamlformat_result
+  ocamlformat_stdlib
+  ocaml-version
+  ocp-indent.lib
+  odoc-parser
+  re
+  uuseg
+  uuseg.string
+  dune-build-info))
+
+
 (executable
  (name main)
  (public_name ocamlformat)
  (package ocamlformat)
- (modules main)
+ (modules main )
  (flags
   (:standard -open Ocamlformat_stdlib))
  (instrumentation
   (backend bisect_ppx))
- (libraries ocamlformat))
+ (libraries ocamlformat bin_conf))
 
 (rule
  (with-stdout-to
