@@ -85,7 +85,8 @@ type opr_opts =
   ; ocaml_version: Ocaml_version.t
   ; quiet: bool
   ; range: string -> Range.t
-  ; disable_conf_attrs: bool }
+  ; disable_conf_attrs: bool
+  ; no_version_check: bool }
 
 type t = {fmt_opts: fmt_opts; opr_opts: opr_opts}
 
@@ -1158,6 +1159,16 @@ module Operational = struct
       (fun conf x _ ->
         update conf ~f:(fun f -> {f with disable_conf_attrs= x}) )
       (fun conf -> conf.opr_opts.disable_conf_attrs)
+
+  let no_version_check =
+    let doc =
+      "Do not check that the version matches the one specified in \
+       .ocamlformat."
+    in
+    let default = false in
+    C.flag ~default ~names:["no-version-check"] ~doc ~kind
+      (fun conf x _ -> update conf ~f:(fun f -> {f with no_version_check= x}))
+      (fun conf -> conf.opr_opts.no_version_check)
 end
 
 let ( (* disable_outside_detected_project *) ) =
@@ -1169,14 +1180,6 @@ let ( (* disable_outside_detected_project *) ) =
   C.removed_option ~names ~since:V.v0_22 ~msg
 
 type file = Stdin | File of string
-
-let no_version_check =
-  let doc =
-    "Do not check that the version matches the one specified in \
-     .ocamlformat."
-  in
-  let default = false in
-  mk ~default Arg.(value & flag & info ["no-version-check"] ~doc ~docs)
 
 let ocamlformat_profile =
   { align_pattern_matching_bar= `Paren
@@ -1425,8 +1428,10 @@ let parse_line config ~from s =
     let value = String.strip value in
     match (name, from) with
     | "version", `File _ ->
-        if String.equal Version.current value || no_version_check () then
-          Ok config
+        if
+          String.equal Version.current value
+          || config.opr_opts.no_version_check
+        then Ok config
         else
           Error
             (Config_option.Error.Version_mismatch
@@ -1473,7 +1478,8 @@ let default =
       ; ocaml_version= C.default Operational.ocaml_version
       ; quiet= C.default Operational.quiet
       ; range= C.default Operational.range
-      ; disable_conf_attrs= C.default Operational.disable_conf_attrs } }
+      ; disable_conf_attrs= C.default Operational.disable_conf_attrs
+      ; no_version_check= C.default Operational.no_version_check } }
 
 type input = {kind: Syntax.t; name: string; file: file; conf: t}
 
