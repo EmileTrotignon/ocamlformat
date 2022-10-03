@@ -1160,11 +1160,6 @@ module Operational = struct
       (fun conf -> conf.opr_opts.disable_conf_attrs)
 end
 
-let disable_conf_files =
-  let doc = "Disable .ocamlformat configuration files." in
-  mk ~default:false
-    Arg.(value & flag & info ["disable-conf-files"] ~doc ~docs)
-
 let ( (* disable_outside_detected_project *) ) =
   let msg =
     "OCamlFormat is disabled outside of a detected project by default, to \
@@ -1173,60 +1168,7 @@ let ( (* disable_outside_detected_project *) ) =
   let names = ["disable-outside-detected-project"] in
   C.removed_option ~names ~since:V.v0_22 ~msg
 
-let config =
-  let doc =
-    "Aggregate options. Options are specified as a comma-separated list of \
-     pairs: \
-     $(i,option)$(b,=)$(i,VAL)$(b,,)...$(b,,)$(i,option)$(b,=)$(i,VAL)."
-  in
-  let env = Cmd.Env.info "OCAMLFORMAT" in
-  let default = [] in
-  let assoc = Arg.(pair ~sep:'=' string string) in
-  let list_assoc = Arg.(list ~sep:',' assoc) in
-  mk ~default
-    Arg.(
-      value & opt list_assoc default & info ["c"; "config"] ~doc ~docs ~env )
-
 type file = Stdin | File of string
-
-let ocp_indent_options_doc =
-  let alias ocp_indent ocamlformat =
-    Printf.sprintf "$(b,%s) is an alias for $(b,%s)." ocp_indent ocamlformat
-  in
-  let multi_alias ocp_indent l_ocamlformat =
-    Format.asprintf "$(b,%s) sets %a." ocp_indent
-      (Format.pp_print_list
-         ~pp_sep:(fun fs () -> Format.fprintf fs " and ")
-         (fun fs x -> Format.fprintf fs "$(b,%s)" x) )
-      l_ocamlformat
-  in
-  [ alias "base" "let-binding-indent"
-  ; alias "type" "type-decl-indent"
-  ; alias "in" "indent-after-in"
-  ; multi_alias "with" ["function-indent"; "match-indent"]
-  ; alias "match_clause" "cases-exp-indent"
-  ; alias "ppx_stritem_ext" "stritem-extension-indent"
-  ; alias "max_indent" "max-indent"
-  ; multi_alias "strict_with"
-      ["function-indent-nested"; "match-indent-nested"] ]
-
-let ocp_indent_config =
-  let doc =
-    let open Format in
-    let supported =
-      match ocp_indent_options_doc with
-      | [] -> ""
-      | docs ->
-          asprintf " %a"
-            (pp_print_list
-               ~pp_sep:(fun fs () -> fprintf fs "@ ")
-               (fun fs s -> fprintf fs "%s" s) )
-            docs
-    in
-    asprintf "Read .ocp-indent configuration files.%s" supported
-  in
-  let default = false in
-  mk ~default Arg.(value & flag & info ["ocp-indent-config"] ~doc ~docs)
 
 let no_version_check =
   let doc =
@@ -1235,11 +1177,6 @@ let no_version_check =
   in
   let default = false in
   mk ~default Arg.(value & flag & info ["no-version-check"] ~doc ~docs)
-
-let ignore_invalid_options =
-  let doc = "Ignore invalid options (e.g. in .ocamlformat)." in
-  let default = false in
-  mk ~default Arg.(value & flag & info ["ignore-invalid-option"] ~doc ~docs)
 
 let ocamlformat_profile =
   { align_pattern_matching_bar= `Paren
@@ -1525,133 +1462,6 @@ let parse_line config ~from s =
     | name -> update ~config ~from ~name ~value:"true" )
   | _ -> Error (Config_option.Error.Malformed s)
 
-(** Do not escape from [build_config] *)
-exception Conf_error of string
-
-let failwith_user_errors ~from errors =
-  let open Format in
-  let pp_error pp e = pp_print_string pp (Config_option.Error.to_string e) in
-  let pp_errors = pp_print_list ~pp_sep:pp_print_newline pp_error in
-  let msg = asprintf "Error while parsing %s:@ %a" from pp_errors errors in
-  raise (Conf_error msg)
-
-let update_from_ocp_indent c (oic : IndentConfig.t) =
-  let convert_threechoices = function
-    | IndentConfig.Always -> `Always
-    | Never -> `Never
-    | Auto -> `Auto
-  in
-  { c with
-    fmt_opts=
-      { c.fmt_opts with
-        let_binding_indent= oic.i_base
-      ; type_decl_indent= oic.i_type
-      ; indent_after_in= oic.i_in
-      ; function_indent= oic.i_with
-      ; match_indent= oic.i_with
-      ; cases_exp_indent= oic.i_match_clause
-      ; stritem_extension_indent= oic.i_ppx_stritem_ext
-      ; max_indent= oic.i_max_indent
-      ; function_indent_nested= convert_threechoices oic.i_strict_with
-      ; match_indent_nested= convert_threechoices oic.i_strict_with } }
-
-let read_config_file conf = function
-  | File_system.Ocp_indent file -> (
-      let filename = Fpath.to_string file in
-      try
-        let ocp_indent_conf = IndentConfig.default in
-        In_channel.with_file filename ~f:(fun ic ->
-            let lines =
-              In_channel.input_lines ic |> Location.of_lines ~filename
-            in
-            let ocp_indent_conf, errors =
-              List.fold_left lines ~init:(ocp_indent_conf, [])
-                ~f:(fun (conf, errors) {txt= line; loc} ->
-                  try
-                    ( IndentConfig.update_from_string ocp_indent_conf line
-                    , errors )
-                  with
-                  | Invalid_argument e when ignore_invalid_options () ->
-                      warn ~loc "%s" e ; (conf, errors)
-                  | Invalid_argument e ->
-                      (conf, Config_option.Error.Unknown (e, None) :: errors) )
-            in
-            match List.rev errors with
-            | [] -> update_from_ocp_indent conf ocp_indent_conf
-            | l -> failwith_user_errors ~from:filename l )
-      with Sys_error _ -> conf )
-  | File_system.Ocamlformat file -> (
-      let filename = Fpath.to_string file in
-      try
-        In_channel.with_file filename ~f:(fun ic ->
-            let lines =
-              In_channel.input_lines ic |> Location.of_lines ~filename
-            in
-            let c, errors =
-              List.fold_left lines ~init:(conf, [])
-                ~f:(fun (conf, errors) {txt= line; loc} ->
-                  let from = `File loc in
-                  match parse_line conf ~from line with
-                  | Ok conf -> (conf, errors)
-                  | Error _ when ignore_invalid_options () ->
-                      warn ~loc "ignoring invalid options %S" line ;
-                      (conf, errors)
-                  | Error e -> (conf, e :: errors) )
-            in
-            match List.rev errors with
-            | [] -> c
-            | l -> failwith_user_errors ~from:filename l )
-      with Sys_error _ -> conf )
-
-let update_using_env conf =
-  let f (config, errors) (name, value) =
-    match C.update ~config ~from:`Env ~name ~value ~inline:false with
-    | Ok c -> (c, errors)
-    | Error e -> (config, e :: errors)
-  in
-  let conf, errors = List.fold_left (config ()) ~init:(conf, []) ~f in
-  match List.rev errors with
-  | [] -> conf
-  | l -> failwith_user_errors ~from:"OCAMLFORMAT environment variable" l
-
-let is_in_listing_file ~listings ~filename =
-  let drop_line l = String.is_empty l || String.is_prefix l ~prefix:"#" in
-  (* process deeper files first *)
-  let listings = List.rev listings in
-  List.find_map listings ~f:(fun listing_file ->
-      let dir, _ = Fpath.split_base listing_file in
-      let listing_filename = Fpath.to_string listing_file in
-      try
-        In_channel.with_file listing_filename ~f:(fun ch ->
-            let lines =
-              In_channel.input_lines ch
-              |> Location.of_lines ~filename:listing_filename
-              |> List.filter ~f:(fun Location.{txt= l; _} ->
-                     not (drop_line l) )
-            in
-            List.find_map lines ~f:(fun {txt= line; loc} ->
-                match Fpath.of_string line with
-                | Ok file_on_current_line -> (
-                    let f = Fpath.(dir // file_on_current_line) in
-                    if Fpath.equal filename f then Some loc
-                    else
-                      try
-                        let filename = Fpath.to_string filename in
-                        let re =
-                          let pathname = true and anchored = true in
-                          let f = Fpath.to_string f in
-                          Re.(Glob.glob ~pathname ~anchored f |> compile)
-                        in
-                        Option.some_if (Re.execp re filename) loc
-                      with Re.Glob.Parse_error ->
-                        warn ~loc "pattern %s cannot be parsed." line ;
-                        None )
-                | Error (`Msg msg) -> warn ~loc "%s." msg ; None ) )
-      with Sys_error err ->
-        let loc = Location.in_file listing_filename in
-        warn ~loc "%s. Ignoring file." err ;
-        None )
-
 let default =
   { fmt_opts= default_profile
   ; opr_opts=
@@ -1664,60 +1474,6 @@ let default =
       ; quiet= C.default Operational.quiet
       ; range= C.default Operational.range
       ; disable_conf_attrs= C.default Operational.disable_conf_attrs } }
-
-let build_config ~enable_outside_detected_project ~root ~file ~is_stdin =
-  let vfile = Fpath.v file in
-  let file_abs = Fpath.(vfile |> to_absolute |> normalize) in
-  let fs =
-    File_system.make ~enable_outside_detected_project
-      ~disable_conf_files:(disable_conf_files ())
-      ~ocp_indent_config:(ocp_indent_config ()) ~root ~file:file_abs
-  in
-  let conf =
-    List.fold fs.configuration_files ~init:default ~f:read_config_file
-    |> update_using_env |> C.update_using_cmdline
-  in
-  if
-    (not is_stdin)
-    && (not (File_system.has_ocamlformat_file fs))
-    && not enable_outside_detected_project
-  then (
-    (let why =
-       match fs.project_root with
-       | Some root ->
-           Format.sprintf
-             "no [.ocamlformat] was found within the project (root: %s)"
-             (Fpath.to_string ~relativize:true root)
-       | None -> "no project root was found"
-     in
-     warn ~loc:(Location.in_file file)
-       "Ocamlformat disabled because [--enable-outside-detected-project] is \
-        not set and %s"
-       why ) ;
-    Operational.update conf ~f:(fun f -> {f with disable= true}) )
-  else
-    let listings =
-      if conf.opr_opts.disable then fs.enable_files else fs.ignore_files
-    in
-    match is_in_listing_file ~listings ~filename:file_abs with
-    | Some loc ->
-        let status =
-          if conf.opr_opts.disable then "enabled" else "ignored"
-        in
-        if conf.opr_opts.debug then
-          warn ~loc "%a is %s." Fpath.pp file_abs status ;
-        Operational.update conf ~f:(fun f -> {f with disable= not f.disable})
-    | None -> conf
-
-let build_config ~enable_outside_detected_project ~root ~file ~is_stdin =
-  try
-    let conf, warn_now =
-      collect_warnings (fun () ->
-          build_config ~enable_outside_detected_project ~root ~file ~is_stdin )
-    in
-    if not conf.opr_opts.quiet then warn_now () ;
-    Ok conf
-  with Conf_error msg -> Error msg
 
 type input = {kind: Syntax.t; name: string; file: file; conf: t}
 

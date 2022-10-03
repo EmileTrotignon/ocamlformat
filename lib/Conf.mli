@@ -102,13 +102,6 @@ val default : t
 
 type input = {kind: Syntax.t; name: string; file: file; conf: t}
 
-val build_config :
-     enable_outside_detected_project:bool
-  -> root:Ocamlformat_stdlib.Fpath.t option
-  -> file:string
-  -> is_stdin:bool
-  -> (t, string) Result.t
-
 type action =
   | In_out of input * string option
       (** Format input file (or [-] for stdin) of given kind to output file,
@@ -129,8 +122,22 @@ val update_value :
   t -> name:string -> value:string -> (t, Config_option.Error.t) Result.t
 
 val update_state : t -> [`Enable | `Disable] -> t
+val parse_line :
+     t
+  -> from:[< `Attribute of Warnings.loc | `File of Warnings.loc]
+  -> string
+  -> (t, Config_option.Error.t) Result.t
 
 val print_config : t -> unit
+
+val profile_option_names : string list
+
+val collect_warnings : (unit -> t) -> t * (unit -> unit)
+
+val warn :
+  loc:Warnings.loc -> ('a, Format.formatter, unit, unit) format4 -> 'a
+
+val docs : string
 
 module UI : sig
   val profile : t Config_option.UI.t
@@ -138,4 +145,28 @@ module UI : sig
   val fmt_opts : t Config_option.UI.t list
 
   val opr_opts : t Config_option.UI.t list
+end
+
+module C : Config_option.S with type config = t
+
+module Operational : sig
+  val update : f:(opr_opts -> opr_opts) -> t -> t
+
+  val comment_check : bool C.t
+
+  val debug : bool C.t
+
+  val disable : bool C.t
+
+  val margin_check : bool C.t
+
+  val max_iters : int C.t
+
+  val ocaml_version : Ocaml_version.t C.t
+
+  val quiet : bool C.t
+
+  val range : (string -> Range.t) C.t
+
+  val disable_conf_attrs : bool C.t
 end

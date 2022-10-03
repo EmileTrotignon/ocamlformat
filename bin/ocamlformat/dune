@@ -9,8 +9,8 @@
 ;                                                                        ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 (library
+ (public_name ocamlformat.ocamlformat_conf)
  (name bin_conf)
  (modules bin_conf)
  (flags
@@ -42,12 +42,11 @@
   uuseg.string
   dune-build-info))
 
-
 (executable
  (name main)
  (public_name ocamlformat)
  (package ocamlformat)
- (modules main )
+ (modules main)
  (flags
   (:standard -open Ocamlformat_stdlib))
  (instrumentation
