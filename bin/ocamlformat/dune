@@ -12,7 +12,7 @@
 (library
  (public_name ocamlformat.ocamlformat_conf)
  (name bin_conf)
- (modules bin_conf)
+ (modules bin_conf File_system)
  (flags
   (:standard
    -open
