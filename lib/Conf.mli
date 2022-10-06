@@ -78,8 +78,6 @@ type fmt_opts =
 
 val default_profile : fmt_opts
 
-type file = Stdin | File of string
-
 (** Options changing the tool's behavior *)
 type opr_opts =
   { comment_check: bool
@@ -100,20 +98,6 @@ type opr_opts =
 type t = {fmt_opts: fmt_opts; opr_opts: opr_opts}
 
 val default : t
-
-type input = {kind: Syntax.t; name: string; file: file; conf: t}
-
-type action =
-  | In_out of input * string option
-      (** Format input file (or [-] for stdin) of given kind to output file,
-          or stdout if None. *)
-  | Inplace of input list  (** Format in-place, overwriting input file(s). *)
-  | Check of input list
-      (** Check whether the input files already are formatted. *)
-  | Print_config of t  (** Print the configuration and exit. *)
-  | Numeric of input
-
-(** Formatting action: input type and source, and output destination. *)
 
 val update : ?quiet:bool -> t -> Parsetree.attribute -> t
 (** [update ?quiet c a] updates configuration [c] after reading attribute

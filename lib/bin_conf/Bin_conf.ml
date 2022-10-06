@@ -104,6 +104,8 @@ let check =
   in
   mk ~default:false Arg.(value & flag & info ["check"] ~doc ~docs)
 
+type file = Stdin | File of string
+
 let inputs =
   let docv = "SRC" in
   let file_or_dash =
@@ -453,6 +455,15 @@ let build_config ~enable_outside_detected_project ~root ~file ~is_stdin =
     if not conf.opr_opts.quiet then warn_now () ;
     Ok conf
   with Conf_error msg -> Error msg
+
+type input = {kind: Syntax.t; name: string; file: file; conf: t}
+
+type action =
+  | In_out of input * string option
+  | Inplace of input list
+  | Check of input list
+  | Print_config of t
+  | Numeric of input
 
 let make_action ~enable_outside_detected_project ~root action inputs =
   let make_file ?name kind file =

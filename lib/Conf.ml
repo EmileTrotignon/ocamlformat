@@ -1179,8 +1179,6 @@ let ( (* disable_outside_detected_project *) ) =
   let names = ["disable-outside-detected-project"] in
   C.removed_option ~names ~since:V.v0_22 ~msg
 
-type file = Stdin | File of string
-
 let ocamlformat_profile =
   { align_pattern_matching_bar= `Paren
   ; assignment_operator= `End_line
@@ -1480,15 +1478,6 @@ let default =
       ; range= C.default Operational.range
       ; disable_conf_attrs= C.default Operational.disable_conf_attrs
       ; no_version_check= C.default Operational.no_version_check } }
-
-type input = {kind: Syntax.t; name: string; file: file; conf: t}
-
-type action =
-  | In_out of input * string option
-  | Inplace of input list
-  | Check of input list
-  | Print_config of t
-  | Numeric of input
 
 open Parsetree
 
