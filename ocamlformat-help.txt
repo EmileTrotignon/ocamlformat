@@ -591,9 +591,6 @@ OPTIONS
        --no-margin-check
            Unset margin-check.
 
-       --no-no-version-check
-           Unset no-version-check.
-
        --no-quiet
            Unset quiet.
 
