@@ -39,7 +39,7 @@
   ocaml-version
   ocp-indent.lib
   odoc-parser
-  re
-  uuseg
+  ;re
+  ;uuseg
   uuseg.string
   dune-build-info))
