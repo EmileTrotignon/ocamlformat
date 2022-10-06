@@ -1419,16 +1419,15 @@ let profile =
       {conf with fmt_opts= new_fmt_opts} )
     (fun _ -> !selected_profile_ref)
 
-let parse_line config ~from s =
+let parse_line config ?(version_check = config.opr_opts.version_check)
+    ?(disable_conf_attrs = config.opr_opts.disable_conf_attrs) ~from s =
   let update ~config ~from ~name ~value =
     let name = String.strip name in
     let value = String.strip value in
     match (name, from) with
     | "version", `File _ ->
-        if
-          String.equal Version.current value
-          || not config.opr_opts.version_check
-        then Ok config
+        if String.equal Version.current value || not version_check then
+          Ok config
         else
           Error
             (Config_option.Error.Version_mismatch
@@ -1436,7 +1435,7 @@ let parse_line config ~from s =
     | name, `File x ->
         C.update ~config ~from:(`Parsed (`File x)) ~name ~value ~inline:false
     | name, `Attribute loc ->
-        if config.opr_opts.disable_conf_attrs then (
+        if disable_conf_attrs then (
           warn ~loc "Configuration in attribute %S ignored." s ;
           Ok config )
         else

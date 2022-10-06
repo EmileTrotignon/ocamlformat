@@ -303,7 +303,7 @@ let update_from_ocp_indent c (oic : IndentConfig.t) =
       ; function_indent_nested= convert_threechoices oic.i_strict_with
       ; match_indent_nested= convert_threechoices oic.i_strict_with } }
 
-let read_config_file conf = function
+let read_config_file ?version_check ?disable_conf_attrs conf = function
   | File_system.Ocp_indent file -> (
       let filename = Fpath.to_string file in
       try
@@ -341,7 +341,10 @@ let read_config_file conf = function
               List.fold_left lines ~init:(conf, [])
                 ~f:(fun (conf, errors) {txt= line; loc} ->
                   let from = `File loc in
-                  match parse_line conf ~from line with
+                  match
+                    parse_line conf ?version_check ?disable_conf_attrs ~from
+                      line
+                  with
                   | Ok conf -> (conf, errors)
                   | Error _ when ignore_invalid_options () ->
                       warn ~loc "ignoring invalid options %S" line ;
@@ -410,8 +413,23 @@ let build_config ~enable_outside_detected_project ~root ~file ~is_stdin =
       ~disable_conf_files:(disable_conf_files ())
       ~ocp_indent_config:(ocp_indent_config ()) ~root ~file:file_abs
   in
-  let conf =
+  let forward_conf =
+    let read_config_file =
+      read_config_file ~version_check:false ~disable_conf_attrs:false
+    in
     List.fold fs.configuration_files ~init:default ~f:read_config_file
+    |> update_using_env |> C.update_using_cmdline
+  in
+  let conf =
+    let opr_opts =
+      { default.opr_opts with
+        version_check= forward_conf.opr_opts.version_check
+      ; disable_conf_attrs= forward_conf.opr_opts.disable_conf_attrs }
+    in
+    {default with opr_opts}
+  in
+  let conf =
+    List.fold fs.configuration_files ~init:conf ~f:read_config_file
     |> update_using_env |> C.update_using_cmdline
   in
   if

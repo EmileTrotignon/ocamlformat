@@ -110,6 +110,8 @@ val update_state : t -> [`Enable | `Disable] -> t
 
 val parse_line :
      t
+  -> ?version_check:bool
+  -> ?disable_conf_attrs:bool
   -> from:[< `Attribute of Warnings.loc | `File of Warnings.loc]
   -> string
   -> (t, Config_option.Error.t) Result.t
