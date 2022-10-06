@@ -346,7 +346,7 @@ let read_config_file ?version_check ?disable_conf_attrs conf = function
                 ~f:(fun (conf, errors) {txt= line; loc} ->
                   let from = `File loc in
                   match
-                    parse_line ?version_check ?disable_conf_attrs conf ~from
+                    parse_line conf ?version_check ?disable_conf_attrs ~from
                       line
                   with
                   | Ok conf -> (conf, errors)
