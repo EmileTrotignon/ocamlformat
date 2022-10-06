@@ -123,6 +123,7 @@ val update_value :
   t -> name:string -> value:string -> (t, Config_option.Error.t) Result.t
 
 val update_state : t -> [`Enable | `Disable] -> t
+
 val parse_line :
      t
   -> from:[< `Attribute of Warnings.loc | `File of Warnings.loc]
