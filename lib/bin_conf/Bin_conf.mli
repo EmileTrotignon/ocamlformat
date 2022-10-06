@@ -11,7 +11,7 @@
 
 val build_config :
      enable_outside_detected_project:bool
-  -> root:Ocamlformat_stdlib.Fpath.t option
+  -> root:Fpath.t option
   -> file:string
   -> is_stdin:bool
   -> (Ocamlformat.Conf.t, string) Result.t
