@@ -1,6 +1,5 @@
 open Ocamlformat
 open Conf
-
 open Cmdliner
 
 let info =
