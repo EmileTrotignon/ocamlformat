@@ -93,7 +93,7 @@ type opr_opts =
   ; quiet: bool
   ; range: string -> Range.t
   ; disable_conf_attrs: bool
-  ; no_version_check: bool }
+  ; version_check: bool }
 
 type t = {fmt_opts: fmt_opts; opr_opts: opr_opts}
 

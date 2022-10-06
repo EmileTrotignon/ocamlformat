@@ -86,7 +86,7 @@ type opr_opts =
   ; quiet: bool
   ; range: string -> Range.t
   ; disable_conf_attrs: bool
-  ; no_version_check: bool }
+  ; version_check: bool }
 
 type t = {fmt_opts: fmt_opts; opr_opts: opr_opts}
 
@@ -1160,15 +1160,14 @@ module Operational = struct
         update conf ~f:(fun f -> {f with disable_conf_attrs= x}) )
       (fun conf -> conf.opr_opts.disable_conf_attrs)
 
-  let no_version_check =
+  let version_check =
     let doc =
-      "Do not check that the version matches the one specified in \
-       .ocamlformat."
+      "Check that the version matches the one specified in .ocamlformat."
     in
-    let default = false in
-    C.flag ~default ~names:["no-version-check"] ~doc ~kind
-      (fun conf x _ -> update conf ~f:(fun f -> {f with no_version_check= x}))
-      (fun conf -> conf.opr_opts.no_version_check)
+    let default = true in
+    C.flag ~default ~names:["version-check"] ~doc ~kind
+      (fun conf x _ -> update conf ~f:(fun f -> {f with version_check= x}))
+      (fun conf -> conf.opr_opts.version_check)
 end
 
 let ( (* disable_outside_detected_project *) ) =
@@ -1428,7 +1427,7 @@ let parse_line config ~from s =
     | "version", `File _ ->
         if
           String.equal Version.current value
-          || config.opr_opts.no_version_check
+          || not config.opr_opts.version_check
         then Ok config
         else
           Error
@@ -1477,7 +1476,7 @@ let default =
       ; quiet= C.default Operational.quiet
       ; range= C.default Operational.range
       ; disable_conf_attrs= C.default Operational.disable_conf_attrs
-      ; no_version_check= C.default Operational.no_version_check } }
+      ; version_check= C.default Operational.version_check } }
 
 open Parsetree
 
