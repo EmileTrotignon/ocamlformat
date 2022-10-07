@@ -95,7 +95,11 @@ let protect =
         raise exc )
 
 let update_config ?quiet c l =
-  {c with conf= List.fold ~init:c.conf l ~f:(Conf.update ?quiet)}
+  let conf =
+    List.fold ~init:c.conf l ~f:(fun conf attr ->
+        Conf.update ?quiet conf attr )
+  in
+  {c with conf}
 
 (* Preserve the position of comments located after the last element of a
    list/array (after `;`), otherwise comments are picked up by

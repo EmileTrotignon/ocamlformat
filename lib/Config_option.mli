@@ -33,7 +33,13 @@ type parsed_from = [`File of Location.t | `Attribute of Location.t]
 
 type updated_from = [`Env | `Commandline | `Parsed of parsed_from]
 
-type typ = Int | Bool | Range | Ocaml_version | Choice of string list
+type typ =
+  | Int
+  | Bool
+  | Range
+  | Ocaml_version
+  | Choice of string list
+  | String
 
 module UI : sig
   type 'config t =
@@ -47,6 +53,8 @@ module type S = sig
   type config
 
   type 'a t
+
+  type option_store
 
   type kind = Formatting | Operational
 
@@ -65,6 +73,12 @@ module type S = sig
     -> (config -> 'a -> updated_from -> config)
     -> (config -> 'a)
     -> 'a t
+
+  val empty_store : option_store
+
+  val add_option : option_store -> 'a t -> option_store
+
+  val merge_options : option_store -> option_store -> option_store
 
   val section_name : kind -> status -> string
 
@@ -108,6 +122,8 @@ module type S = sig
     -> docv:string
     -> (string -> Range.t) option_decl
 
+  (* val string : default:string -> docv:string -> string option_decl *)
+
   val ocaml_version : default:Ocaml_version.t -> Ocaml_version.t option_decl
 
   val any :
@@ -118,25 +134,30 @@ module type S = sig
     -> 'a option_decl
 
   val removed_option :
-    names:string list -> since:Version.t -> msg:string -> unit
+    names:string list -> since:Version.t -> msg:string -> unit t
   (** Declare an option as removed. Using such an option will result in an
       helpful error including [msg] and [since]. *)
 
   val default : 'a t -> 'a
 
-  val update_using_cmdline : config -> config
+  val get_value : 'a t -> config -> 'a
+
+  val update_using_cmdline : option_store -> config -> config * option_store
 
   val update :
-       config:config
+       option_store
+    -> config:config
     -> from:updated_from
     -> name:string
     -> value:string
     -> inline:bool
-    -> (config, Error.t) Result.t
+    -> (config * option_store, Error.t) Result.t
 
   val to_ui : 'a t -> config UI.t
 
-  val print_config : config -> unit
+  val print_config : option_store -> config -> unit
+
+  val term_of_options : option_store -> (config -> config) Cmdliner.Term.t
 end
 
 module Make (C : CONFIG) : S with type config = C.config

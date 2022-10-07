@@ -99,6 +99,10 @@ type opr_opts =
 
 type t = {fmt_opts: fmt_opts; opr_opts: opr_opts}
 
+module C : Config_option.S with type config = t
+
+val options_ref : C.option_store ref
+
 val default : t
 
 type input = {kind: Syntax.t; name: string; file: file; conf: t}
@@ -123,6 +127,7 @@ val update_value :
   t -> name:string -> value:string -> (t, Config_option.Error.t) Result.t
 
 val update_state : t -> [`Enable | `Disable] -> t
+
 val parse_line :
      t
   -> from:[< `Attribute of Warnings.loc | `File of Warnings.loc]
@@ -147,8 +152,6 @@ module UI : sig
 
   val opr_opts : t Config_option.UI.t list
 end
-
-module C : Config_option.S with type config = t
 
 module Operational : sig
   val update : f:(opr_opts -> opr_opts) -> t -> t

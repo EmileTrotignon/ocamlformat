@@ -24,5 +24,5 @@ let mk ~default arg =
   args := Arg (arg, set) :: !args ;
   (fun () -> !var)
 
-let parse info validate =
+let parse_argv info validate =
   Cmd.eval_value (Cmd.v info (Term.(ret (const validate $ tuple !args))))

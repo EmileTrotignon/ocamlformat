@@ -380,8 +380,10 @@ let is_in_listing_file ~listings ~filename =
 
 let update_using_env conf =
   let f (config, errors) (name, value) =
-    match C.update ~config ~from:`Env ~name ~value ~inline:false with
-    | Ok c -> (c, errors)
+    match C.update !Conf.options_ref ~config ~from:`Env ~name ~value ~inline:false with
+    | Ok ((c,options)) ->
+      Conf.options_ref := options ;
+      (c, errors)
     | Error e -> (config, e :: errors)
   in
   let conf, errors = List.fold_left (config ()) ~init:(conf, []) ~f in
@@ -397,10 +399,11 @@ let build_config ~enable_outside_detected_project ~root ~file ~is_stdin =
       ~disable_conf_files:(disable_conf_files ())
       ~ocp_indent_config:(ocp_indent_config ()) ~root ~file:file_abs
   in
-  let conf =
+  let conf,options =
     List.fold fs.configuration_files ~init:default ~f:read_config_file
-    |> update_using_env |> C.update_using_cmdline
+    |> update_using_env |> C.update_using_cmdline !Conf.options_ref
   in
+  Conf.options_ref := options ;
   if
     (not is_stdin)
     && (not (File_system.has_ocamlformat_file fs))
@@ -579,4 +582,4 @@ let validate () =
   | Error e -> `Error (false, e)
   | Ok action -> `Ok action
 
-let action () = parse info validate
+let action () = parse_argv info validate
