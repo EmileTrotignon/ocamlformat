@@ -2,6 +2,34 @@ open Ocamlformat
 open Conf
 open Cmdliner
 
+type t =
+  { ocamlformat_conf: Conf.t
+  ; enable_outside_detected_project: bool
+  ; inplace: bool
+  ; check: bool
+  ; inputs: file list
+  ; kind: Syntax.t option
+  ; numeric: bool
+  ; output: string option
+  ; name: string option
+  ; print_config: bool
+  ; root: string option }
+
+let ref_flag ~default ~names ~doc =
+  let var = ref default in
+  let option =
+    C.flag ~default ~names ~doc ~kind:Operational
+      (fun conf x _ ->
+        var := x ;
+        conf )
+      (fun _conf -> !var)
+  in
+  option
+
+let pack_and_push options option = (C.add_option options option, option)
+
+let options = !Conf.options_ref
+
 let info =
   let doc = "A tool to format OCaml code." in
   let man =
@@ -56,7 +84,9 @@ let info =
   in
   Cmd.info "ocamlformat" ~version:Version.current ~doc ~man
 
-let enable_outside_detected_project =
+let options, enable_outside_detected_project =
+  pack_and_push options
+  @@
   let witness =
     String.concat ~sep:" or "
       (List.map File_system.project_root_witness ~f:(fun name ->
@@ -76,22 +106,25 @@ let enable_outside_detected_project =
       witness
   in
   let default = false in
-  mk ~default
-    Arg.(value & flag & info ["enable-outside-detected-project"] ~doc ~docs)
+  ref_flag ~default ~names:["enable-outside-detected-project"] ~doc
 
-let inplace =
+let options, inplace =
+  pack_and_push options
+  @@
   let doc = "Format in-place, overwriting input file(s)." in
   let default = false in
-  mk ~default Arg.(value & flag & info ["i"; "inplace"] ~doc ~docs)
+  ref_flag ~default ~names:["i"; "inplace"] ~doc
 
 (* Other Flags *)
 
-let check =
+let options, check =
+  pack_and_push options
+  @@
   let doc =
     "Check whether the input files already are formatted. Mutually \
      exclusive with --inplace and --output."
   in
-  mk ~default:false Arg.(value & flag & info ["check"] ~doc ~docs)
+  ref_flag ~default:false ~names:["check"] ~doc
 
 let inputs =
   let docv = "SRC" in
@@ -168,7 +201,9 @@ let output =
       & opt (some string) default
       & info ["o"; "output"] ~doc ~docs ~docv )
 
-let print_config =
+let options, print_config =
+  pack_and_push options
+  @@
   let doc =
     "Print the configuration determined by the environment variable, the \
      configuration files, preset profiles and command line. Attributes are \
@@ -178,7 +213,7 @@ let print_config =
      current working directory otherwise."
   in
   let default = false in
-  mk ~default Arg.(value & flag & info ["print-config"] ~doc ~docs)
+  ref_flag ~default ~names:["print-config"] ~doc
 
 let root =
   let docv = "DIR" in
@@ -207,19 +242,24 @@ let config =
   let default = [] in
   let assoc = Arg.(pair ~sep:'=' string string) in
   let list_assoc = Arg.(list ~sep:',' assoc) in
-  mk ~default
+  let arg =
     Arg.(
       value & opt list_assoc default & info ["c"; "config"] ~doc ~docs ~env )
+  in
+  mk ~default arg
 
-let disable_conf_files =
+let options, disable_conf_files =
+  pack_and_push options
+  @@
   let doc = "Disable .ocamlformat configuration files." in
-  mk ~default:false
-    Arg.(value & flag & info ["disable-conf-files"] ~doc ~docs)
+  ref_flag ~default:false ~names:["disable-conf-files"] ~doc
 
-let ignore_invalid_options =
+let options, ignore_invalid_options =
+  pack_and_push options
+  @@
   let doc = "Ignore invalid options (e.g. in .ocamlformat)." in
   let default = false in
-  mk ~default Arg.(value & flag & info ["ignore-invalid-option"] ~doc ~docs)
+  ref_flag ~default ~names:["ignore-invalid-option"] ~doc
 
 let ocp_indent_options_doc =
   let alias ocp_indent ocamlformat =
@@ -242,7 +282,9 @@ let ocp_indent_options_doc =
   ; multi_alias "strict_with"
       ["function-indent-nested"; "match-indent-nested"] ]
 
-let ocp_indent_config =
+let options, ocp_indent_config =
+  pack_and_push options
+  @@
   let doc =
     let open Format in
     let supported =
@@ -258,7 +300,7 @@ let ocp_indent_config =
     asprintf "Read .ocp-indent configuration files.%s" supported
   in
   let default = false in
-  mk ~default Arg.(value & flag & info ["ocp-indent-config"] ~doc ~docs)
+  ref_flag ~default ~names:["ocp-indent-config"] ~doc
 
 (** Do not escape from [build_config] *)
 exception Conf_error of string
@@ -302,15 +344,16 @@ let read_config_file conf = function
             in
             let ocp_indent_conf, errors =
               List.fold_left lines ~init:(ocp_indent_conf, [])
-                ~f:(fun (conf, errors) {txt= line; loc} ->
+                ~f:(fun (conf', errors) {txt= line; loc} ->
                   try
                     ( IndentConfig.update_from_string ocp_indent_conf line
                     , errors )
                   with
-                  | Invalid_argument e when ignore_invalid_options () ->
-                      warn ~loc "%s" e ; (conf, errors)
+                  | Invalid_argument e
+                    when C.get_value ignore_invalid_options conf ->
+                      warn ~loc "%s" e ; (conf', errors)
                   | Invalid_argument e ->
-                      (conf, Config_option.Error.Unknown (e, None) :: errors) )
+                      (conf', Config_option.Error.Unknown (e, None) :: errors) )
             in
             match List.rev errors with
             | [] -> update_from_ocp_indent conf ocp_indent_conf
@@ -330,7 +373,7 @@ let read_config_file conf = function
                   let from = `File loc in
                   match parse_line conf ~from line with
                   | Ok conf -> (conf, errors)
-                  | Error _ when ignore_invalid_options () ->
+                  | Error _ when C.get_value ignore_invalid_options conf ->
                       warn ~loc "ignoring invalid options %S" line ;
                       (conf, errors)
                   | Error e -> (conf, e :: errors) )
@@ -378,12 +421,16 @@ let is_in_listing_file ~listings ~filename =
         warn ~loc "%s. Ignoring file." err ;
         None )
 
+let options_ref = ref options
+
 let update_using_env conf =
   let f (config, errors) (name, value) =
-    match C.update !Conf.options_ref ~config ~from:`Env ~name ~value ~inline:false with
-    | Ok ((c,options)) ->
-      Conf.options_ref := options ;
-      (c, errors)
+    match
+      C.update !options_ref ~config ~from:`Env ~name ~value ~inline:false
+    with
+    | Ok (c, options) ->
+        options_ref := options ;
+        (c, errors)
     | Error e -> (config, e :: errors)
   in
   let conf, errors = List.fold_left (config ()) ~init:(conf, []) ~f in
@@ -396,12 +443,18 @@ let build_config ~enable_outside_detected_project ~root ~file ~is_stdin =
   let file_abs = Fpath.(vfile |> to_absolute |> normalize) in
   let fs =
     File_system.make ~enable_outside_detected_project
-      ~disable_conf_files:(disable_conf_files ())
-      ~ocp_indent_config:(ocp_indent_config ()) ~root ~file:file_abs
+      ~disable_conf_files:
+        (C.get_value disable_conf_files
+           Conf.default
+           (* todo : this is okay because disable_conf_file is a fake option
+              that uses a ref. We need a real one. *) )
+      ~ocp_indent_config:(C.get_value ocp_indent_config Conf.default)
+      ~root ~file:file_abs
   in
-  let conf,options =
+  let conf, _options =
     List.fold fs.configuration_files ~init:default ~f:read_config_file
-    |> update_using_env |> C.update_using_cmdline !Conf.options_ref
+    |> update_using_env
+    |> C.update_using_cmdline options
   in
   Conf.options_ref := options ;
   if
@@ -552,14 +605,16 @@ let validate_inputs () =
       |> Result.all
       |> Result.map ~f:(fun files -> `Several_files files)
 
-let validate_action () =
+let validate_action conf =
   match
     List.filter_map
       ~f:(fun s -> s)
       [ Option.map ~f:(fun o -> (`Output o, "--output")) (output ())
-      ; Option.some_if (inplace ()) (`Inplace, "--inplace")
-      ; Option.some_if (check ()) (`Check, "--check")
-      ; Option.some_if (print_config ()) (`Print_config, "--print-config")
+      ; Option.some_if (C.get_value inplace conf) (`Inplace, "--inplace")
+      ; Option.some_if (C.get_value check conf) (`Check, "--check")
+      ; Option.some_if
+          (C.get_value print_config conf)
+          (`Print_config, "--print-config")
       ; Option.some_if (numeric ()) (`Numeric, "--numeric") ]
   with
   | [] -> Ok `No_action
@@ -567,19 +622,21 @@ let validate_action () =
   | (_, a1) :: (_, a2) :: _ ->
       Error (Printf.sprintf "Cannot specify %s with %s" a1 a2)
 
-let validate () =
+let validate conf =
   let root =
     Option.map (root ()) ~f:Fpath.(fun x -> v x |> to_absolute |> normalize)
   in
   let enable_outside_detected_project =
-    enable_outside_detected_project () && Option.is_none root
+    C.get_value enable_outside_detected_project conf && Option.is_none root
   in
   match
-    let+ action = validate_action () in
+    let+ action = validate_action conf in
     let+ inputs = validate_inputs () in
     make_action ~enable_outside_detected_project ~root action inputs
   with
   | Error e -> `Error (false, e)
   | Ok action -> `Ok action
 
-let action () = parse_argv info validate
+let action () =
+  parse_argv info (fun () ->
+      validate Conf.default (*todo : only works because of fake option *) )
