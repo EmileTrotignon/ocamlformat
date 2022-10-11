@@ -531,22 +531,6 @@ module Make (C : CONFIG) = struct
     in
     store := Pack opt :: !store
 
-  (* let update_from config name from redundant = let is_profile_option_name
-     x = List.exists C.profile_option_names ~f:(String.equal x) in let
-     on_pack (Pack {names; get_value; to_string; _}) = if
-     is_profile_option_name (List.hd_exn names) then Some (to_string
-     (get_value config)) else None in let on_pack (Pack ({names; status; _}
-     as p)) = if is_profile_option_name name then if is_profile_option_name
-     (List.hd_exn names) then (* updating --profile option *) Pack {p with
-     from= `Updated (from, redundant)} else let profile_name =
-     List.find_map_exn !store ~f:on_pack in (* updating other options when
-     --profile is set *) Pack {p with from= `Profile (profile_name, from)}
-     else if List.exists names ~f:(String.equal name) then ( (* updating a
-     single option (without setting a profile) *) ( match status with |
-     `Deprecated d -> C.warn_deprecated config (loc_from from) "%s: %a" name
-     pp_deprecated d | _ -> () ) ; Pack {p with from= `Updated (from,
-     redundant)} ) else Pack p in store := List.map !store ~f:on_pack*)
-
   let update ~config ~from:new_from ~name ~value ~inline =
     let _is_profile_option_name x =
       List.exists C.profile_option_names ~f:(String.equal x)

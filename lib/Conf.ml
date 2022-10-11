@@ -1204,8 +1204,7 @@ module Operational = struct
     in
     let default = true in
     C.flag ~default ~names:["version-check"] ~doc ~kind
-      (fun conf elt ->
-        update conf ~f:(fun f -> {f with version_check= elt}) )
+      (fun conf elt -> update conf ~f:(fun f -> {f with version_check= elt}))
       (fun conf -> conf.opr_opts.version_check)
 end
 
