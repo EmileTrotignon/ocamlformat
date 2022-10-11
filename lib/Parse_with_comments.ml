@@ -74,7 +74,8 @@ let parse ?(disable_w50 = false) parse fragment (conf : Conf.t) ~input_name
     Warning.with_warning_filter
       ~filter:(fun loc warn ->
         if
-          Warning.is_unexpected_docstring warn && conf.opr_opts.comment_check.v
+          Warning.is_unexpected_docstring warn
+          && conf.opr_opts.comment_check.v
         then (
           w50 := (loc, warn) :: !w50 ;
           false )

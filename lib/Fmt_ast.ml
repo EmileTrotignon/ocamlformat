@@ -1338,7 +1338,8 @@ and fmt_label_arg ?(box = true) ?epi ?parens ?eol c
     when String.equal l i
          && List.is_empty arg.pexp_attributes
          && Ocaml_version.(
-              compare c.conf.opr_opts.ocaml_version.v Releases.v4_14 >= 0 ) ->
+              compare c.conf.opr_opts.ocaml_version.v Releases.v4_14 >= 0 )
+    ->
       let lbl =
         match lbl with
         | Labelled _ -> str "~"
@@ -1415,8 +1416,8 @@ and fmt_sequence c ?ext ~has_attr parens width xexp fmt_atrs =
       if sequence_blank_line c l1 l2 then fmt "\n@;<1000 0>"
       else if c.conf.fmt_opts.break_sequences.v || force_break then
         fmt "@;<1000 0>"
-      else if parens && Poly.(c.conf.fmt_opts.sequence_style.v = `Before) then
-        fmt "@;<1 -2>"
+      else if parens && Poly.(c.conf.fmt_opts.sequence_style.v = `Before)
+      then fmt "@;<1 -2>"
       else fmt "@;<1 0>"
     in
     match c.conf.fmt_opts.sequence_style.v with
@@ -1536,7 +1537,9 @@ and fmt_pat_cons c ~parens args =
 
 and fmt_match c ~parens ?ext ctx xexp cs e0 keyword =
   let indent = Params.match_indent c.conf ~ctx:xexp.ctx in
-  let align = Poly.(c.conf.fmt_opts.align_pattern_matching_bar.v = `Keyword) in
+  let align =
+    Poly.(c.conf.fmt_opts.align_pattern_matching_bar.v = `Keyword)
+  in
   hvbox indent
     ( Params.Exp.wrap c.conf ~parens ~disambiguate:true
     @@ hvbox_if align 0
@@ -1635,7 +1638,9 @@ and fmt_expression c ?(box = true) ?pro ?epi ?eol ?parens ?(indent_wrap = 0)
     when is_simple c.conf (expression_width c) (sub_exp ~ctx r) ->
       let cmts_before =
         let adj =
-          fmt_if Poly.(c.conf.fmt_opts.assignment_operator.v = `End_line) "@,"
+          fmt_if
+            Poly.(c.conf.fmt_opts.assignment_operator.v = `End_line)
+            "@,"
         in
         Cmts.fmt_before c loc ~pro:(break 1 2) ~epi:adj ~adj
       in
@@ -1785,7 +1790,9 @@ and fmt_expression c ?(box = true) ?pro ?epi ?eol ?parens ?(indent_wrap = 0)
            $ fmt_expression c ~box (sub_exp ~ctx e)
            $ fmt_atrs ) )
   | Pexp_apply (e0, e1N1) -> (
-      let wrap = if c.conf.fmt_opts.wrap_fun_args.v then Fn.id else hvbox 2 in
+      let wrap =
+        if c.conf.fmt_opts.wrap_fun_args.v then Fn.id else hvbox 2
+      in
       match List.rev e1N1 with
       | (lbl, ({pexp_desc= Pexp_fun _; pexp_loc; _} as eN1)) :: rev_e1N
         when List.for_all rev_e1N ~f:(fun (_, eI) ->
@@ -2435,7 +2442,8 @@ and fmt_expression c ?(box = true) ?pro ?epi ?eol ?parens ?(indent_wrap = 0)
   | Pexp_extension ext ->
       hvbox 0
         (Params.Exp.wrap c.conf ~parens
-           ( hvbox c.conf.fmt_opts.extension_indent.v (fmt_extension c ctx ext)
+           ( hvbox c.conf.fmt_opts.extension_indent.v
+               (fmt_extension c ctx ext)
            $ fmt_atrs ) )
   | Pexp_for (p1, e1, e2, dir, e3) ->
       hvbox 0

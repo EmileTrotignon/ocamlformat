@@ -292,8 +292,8 @@ let get_record_pat (c : Conf.t) ~ctx =
   let params, _ = get_record_expr c in
   let box =
     if c.fmt_opts.dock_collection_brackets.v then
-      box_pattern_docked c ~ctx ~space_around:c.fmt_opts.space_around_records.v
-        "{" "}"
+      box_pattern_docked c ~ctx
+        ~space_around:c.fmt_opts.space_around_records.v "{" "}"
     else params.box
   in
   ( {params with box}

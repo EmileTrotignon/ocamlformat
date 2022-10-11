@@ -33,7 +33,8 @@ let ( init
   let ocaml_version = ref Ocaml_version.sys_version in
   let register f = l := f :: !l in
   let init (conf : Conf.t) =
-    leading_nested_match_parens := conf.fmt_opts.leading_nested_match_parens.v ;
+    leading_nested_match_parens :=
+      conf.fmt_opts.leading_nested_match_parens.v ;
     parens_ite := conf.fmt_opts.parens_ite.v ;
     ocaml_version := conf.opr_opts.ocaml_version.v ;
     List.iter !l ~f:(fun f -> f ())
@@ -458,7 +459,8 @@ module Structure_item = struct
 
   let allow_adjacent (itmI, cI) (itmJ, cJ) =
     match
-      Conf.(cI.fmt_opts.module_item_spacing.v, cJ.fmt_opts.module_item_spacing.v)
+      Conf.
+        (cI.fmt_opts.module_item_spacing.v, cJ.fmt_opts.module_item_spacing.v)
     with
     | `Compact, `Compact -> (
       match (itmI.pstr_desc, itmJ.pstr_desc) with
@@ -483,7 +485,8 @@ module Structure_item = struct
     || has_doc i1 || has_doc i2
     ||
     match
-      Conf.(c1.fmt_opts.module_item_spacing.v, c2.fmt_opts.module_item_spacing.v)
+      Conf.
+        (c1.fmt_opts.module_item_spacing.v, c2.fmt_opts.module_item_spacing.v)
     with
     | `Preserve, `Preserve ->
         Source.empty_line_between s i1.pstr_loc.loc_end i2.pstr_loc.loc_start
@@ -542,7 +545,8 @@ module Signature_item = struct
 
   let allow_adjacent (itmI, cI) (itmJ, cJ) =
     match
-      Conf.(cI.fmt_opts.module_item_spacing.v, cJ.fmt_opts.module_item_spacing.v)
+      Conf.
+        (cI.fmt_opts.module_item_spacing.v, cJ.fmt_opts.module_item_spacing.v)
     with
     | `Compact, `Compact -> (
       match (itmI.psig_desc, itmJ.psig_desc) with
@@ -568,7 +572,8 @@ module Signature_item = struct
     || has_doc i1 || has_doc i2
     ||
     match
-      Conf.(c1.fmt_opts.module_item_spacing.v, c2.fmt_opts.module_item_spacing.v)
+      Conf.
+        (c1.fmt_opts.module_item_spacing.v, c2.fmt_opts.module_item_spacing.v)
     with
     | `Preserve, `Preserve ->
         Source.empty_line_between s i1.psig_loc.loc_end i2.psig_loc.loc_start
@@ -606,7 +611,8 @@ module Td = struct
     || has_doc i1 || has_doc i2
     ||
     match
-      Conf.(c1.fmt_opts.module_item_spacing.v, c2.fmt_opts.module_item_spacing.v)
+      Conf.
+        (c1.fmt_opts.module_item_spacing.v, c2.fmt_opts.module_item_spacing.v)
     with
     | `Preserve, `Preserve ->
         Source.empty_line_between s i1.ptype_loc.loc_end
@@ -633,7 +639,8 @@ module Class_field = struct
     || has_doc i1 || has_doc i2
     ||
     match
-      Conf.(c1.fmt_opts.module_item_spacing.v, c2.fmt_opts.module_item_spacing.v)
+      Conf.
+        (c1.fmt_opts.module_item_spacing.v, c2.fmt_opts.module_item_spacing.v)
     with
     | `Preserve, `Preserve ->
         Source.empty_line_between s i1.pcf_loc.loc_end i2.pcf_loc.loc_start
@@ -659,7 +666,8 @@ module Class_type_field = struct
     || has_doc i1 || has_doc i2
     ||
     match
-      Conf.(c1.fmt_opts.module_item_spacing.v, c2.fmt_opts.module_item_spacing.v)
+      Conf.
+        (c1.fmt_opts.module_item_spacing.v, c2.fmt_opts.module_item_spacing.v)
     with
     | `Preserve, `Preserve ->
         Source.empty_line_between s i1.pctf_loc.loc_end i2.pctf_loc.loc_start
