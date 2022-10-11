@@ -1,5 +1,5 @@
 profile=ocamlformat (file tests/.ocamlformat:1)
-no-version-check=false
+version-check=true
 disable-conf-attrs=false
 range=<whole input>
 quiet=false

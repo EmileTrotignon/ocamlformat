@@ -1202,7 +1202,7 @@ module Operational = struct
     let doc =
       "Check that the version matches the one specified in .ocamlformat."
     in
-    let default = false in
+    let default = true in
     C.flag ~default ~names:["version-check"] ~doc ~kind
       (fun conf elt ->
         update conf ~f:(fun f -> {f with version_check= elt}) )
@@ -1216,8 +1216,6 @@ let ( (* disable_outside_detected_project *) ) =
   in
   let names = ["disable-outside-detected-project"] in
   C.removed_option ~names ~since:V.v0_22 ~msg
-
-type file = Stdin | File of string
 
 let ocamlformat_profile from =
   let elt content = make_elt content from in

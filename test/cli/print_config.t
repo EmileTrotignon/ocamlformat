@@ -6,7 +6,7 @@ No redundant values:
 
   $ ocamlformat empty.ml --print-config
   profile=conventional (file .ocamlformat:1)
-  no-version-check=false
+  version-check=true
   disable-conf-attrs=false
   range=<whole input>
   quiet=false
@@ -85,7 +85,7 @@ Redundant values from the conventional profile:
 
   $ ocamlformat empty.ml --print-config
   profile=conventional (file .ocamlformat:1)
-  no-version-check=false
+  version-check=true
   disable-conf-attrs=false
   range=<whole input>
   quiet=false
@@ -164,7 +164,7 @@ Redundant values from the ocamlformat profile:
 
   $ ocamlformat empty.ml --print-config
   profile=ocamlformat (file .ocamlformat:1)
-  no-version-check=false
+  version-check=true
   disable-conf-attrs=false
   range=<whole input>
   quiet=false
