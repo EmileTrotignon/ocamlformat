@@ -12,7 +12,7 @@
 open Ocamlformat
 open Conf
 open Cmdliner
-module C = Ocamlformat.Config_option
+module C = Ocamlformat.Conf_decl
 
 let info =
   let doc = "A tool to format OCaml code." in
@@ -283,7 +283,7 @@ exception Conf_error of string
 
 let failwith_user_errors ~from errors =
   let open Format in
-  let pp_error pp e = pp_print_string pp (Config_option.Error.to_string e) in
+  let pp_error pp e = pp_print_string pp (Conf_decl.Error.to_string e) in
   let pp_errors = pp_print_list ~pp_sep:pp_print_newline pp_error in
   let msg = asprintf "Error while parsing %s:@ %a" from pp_errors errors in
   raise (Conf_error msg)
@@ -330,7 +330,7 @@ let read_config_file ?version_check ?disable_conf_attrs conf = function
                   | Invalid_argument e when ignore_invalid_options () ->
                       warn ~loc "%s" e ; (conf, errors)
                   | Invalid_argument e ->
-                      (conf, Config_option.Error.Unknown (e, None) :: errors) )
+                      (conf, Conf_decl.Error.Unknown (e, None) :: errors) )
             in
             match List.rev errors with
             | [] -> update_from_ocp_indent conf ocp_indent_conf

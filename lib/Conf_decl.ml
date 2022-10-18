@@ -98,7 +98,9 @@ let to_ui option =
     | Ok x ->
         let elt = option.get_value conf in
         let redundant =
-          String.equal (option.to_string (Conf_t.Elt.v elt)) (option.to_string x)
+          String.equal
+            (option.to_string (Conf_t.Elt.v elt))
+            (option.to_string x)
         in
         option.update conf (update_elt ~redundant elt x from)
     | Error _ -> conf
@@ -418,7 +420,9 @@ let update ~config ~from:new_from ~name ~value ~inline =
           | Ok packed_value ->
               let elt = get_value config in
               let redundant =
-                let old_value = to_string @@ Conf_t.Elt.v @@ get_value config in
+                let old_value =
+                  to_string @@ Conf_t.Elt.v @@ get_value config
+                in
                 let new_value = to_string @@ packed_value in
                 String.equal old_value new_value
               in
