@@ -403,7 +403,9 @@ let is_in_listing_file ~listings ~filename =
 
 let update_using_env conf =
   let f (config, errors) (name, value) =
-    match Decl.update ~config ~from:`Env ~name ~value ~inline:false with
+    match
+      Decl.update Conf.options ~config ~from:`Env ~name ~value ~inline:false
+    with
     | Ok c -> (c, errors)
     | Error e -> (config, e :: errors)
   in
@@ -428,7 +430,7 @@ let build_config ~enable_outside_detected_project ~root ~file ~is_stdin =
       read_config_file ~version_check:false ~disable_conf_attrs:false
     in
     List.fold fs.configuration_files ~init:default ~f:read_config_file
-    |> update_using_env |> Decl.update_using_cmdline
+    |> update_using_env |> Decl.update_using_cmdline Conf.options
   in
   let conf =
     let opr_opts =
@@ -440,7 +442,7 @@ let build_config ~enable_outside_detected_project ~root ~file ~is_stdin =
   in
   let conf =
     List.fold fs.configuration_files ~init:conf ~f:read_config_file
-    |> update_using_env |> Decl.update_using_cmdline
+    |> update_using_env |> Decl.update_using_cmdline Conf.options
   in
   if
     (not is_stdin)

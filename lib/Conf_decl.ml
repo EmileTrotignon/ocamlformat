@@ -99,7 +99,17 @@ type 'a declarator =
 
 type pack = Pack : 'a t -> pack
 
-let store = ref []
+module Store = struct
+  type t = pack list
+
+  type store = t
+
+  let empty = []
+
+  let add store ele = Pack ele :: store
+
+  let merge s1 s2 = s1 @ s2
+end
 
 let deprecated ~since:dversion dmsg = {dmsg; dversion}
 
@@ -223,7 +233,6 @@ let flag ~default ~names ~doc ~kind
     ; get_value (* ; from *)
     ; status= map_status status }
   in
-  store := Pack opt :: !store ;
   opt
 
 let any converter ~values ~default ~docv ~names ~doc ~kind
@@ -254,7 +263,6 @@ let any converter ~values ~default ~docv ~names ~doc ~kind
     ; get_value (* ; from *)
     ; status= map_status status }
   in
-  store := Pack opt :: !store ;
   opt
 
 let int = any ~values:Int Arg.int
@@ -378,10 +386,10 @@ let removed_option ~names ~since ~msg =
     ; get_value
     ; status }
   in
-  store := Pack opt :: !store
+  opt
 
-let update ~config ~from:new_from ~name ~value ~inline =
-  List.find_map !store
+let update store ~config ~from:new_from ~name ~value ~inline =
+  List.find_map store
     ~f:(fun
          (Pack
            { names
@@ -431,7 +439,7 @@ let update ~config ~from:new_from ~name ~value ~inline =
 
 let default {default; _} = default
 
-let update_using_cmdline config =
+let update_using_cmdline store config =
   let on_pack config (Pack {cmdline_get; update; get_value; to_string; _}) =
     match cmdline_get () with
     | None -> config
@@ -445,9 +453,9 @@ let update_using_cmdline config =
         let config = update config new_elt in
         config
   in
-  List.fold !store ~init:config ~f:on_pack
+  List.fold store ~init:config ~f:on_pack
 
-let print_config c =
+let print_config store c =
   let on_pack (Pack {names; to_string; get_value; status; _}) =
     let name = Option.value_exn (longest names) in
     let value = c |> get_value |> Conf_t.Elt.v |> to_string in
@@ -457,4 +465,4 @@ let print_config c =
         Format.eprintf "%s=%s%a\n%!" name value pp_from from
     | `Removed _ -> ()
   in
-  List.iter !store ~f:on_pack
+  List.iter store ~f:on_pack
