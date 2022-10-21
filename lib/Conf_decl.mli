@@ -119,7 +119,8 @@ val removed_option :
 
 val default : 'a t -> 'a
 
-val update_using_cmdline : Store.t -> Conf_t.t -> Conf_t.t
+val update_using_cmdline :
+  Cmdliner.Cmd.info -> Store.t -> Conf_t.t -> Conf_t.t
 
 val update :
      Store.t
@@ -133,3 +134,5 @@ val update :
 val to_ui : 'a t -> Conf_t.t UI.t
 
 val print_config : Store.t -> Conf_t.t -> unit
+
+val term_of_store : Store.t -> (Conf_t.t -> Conf_t.t) Cmdliner.Term.t

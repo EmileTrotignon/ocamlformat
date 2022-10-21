@@ -14,6 +14,10 @@ open Conf
 open Cmdliner
 module Decl = Ocamlformat.Conf_decl
 
+let _config =
+  mk ~default:Conf.default
+    Term.(Decl.term_of_store Conf.options $ const Conf.default)
+
 let info =
   let doc = "A tool to format OCaml code." in
   let man =
@@ -430,7 +434,8 @@ let build_config ~enable_outside_detected_project ~root ~file ~is_stdin =
       read_config_file ~version_check:false ~disable_conf_attrs:false
     in
     List.fold fs.configuration_files ~init:default ~f:read_config_file
-    |> update_using_env |> Decl.update_using_cmdline Conf.options
+    |> update_using_env
+    |> Decl.update_using_cmdline info Conf.options
   in
   let conf =
     let opr_opts =
@@ -442,7 +447,8 @@ let build_config ~enable_outside_detected_project ~root ~file ~is_stdin =
   in
   let conf =
     List.fold fs.configuration_files ~init:conf ~f:read_config_file
-    |> update_using_env |> Decl.update_using_cmdline Conf.options
+    |> update_using_env
+    |> Decl.update_using_cmdline info Conf.options
   in
   if
     (not is_stdin)
