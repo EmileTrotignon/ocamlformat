@@ -3178,7 +3178,7 @@ alias_type:
     function_type
       { $1 }
   | mktyp(
-      ty = alias_type AS QUOTE tyvar = ident
+      ty = alias_type AS QUOTE tyvar = mkrhs(ident)
         { Ptyp_alias(ty, tyvar) }
     )
     { $1 }
@@ -3253,8 +3253,8 @@ atomic_type:
   | LPAREN MODULE ext_attributes package_core_type RPAREN
       { wrap_typ_attrs ~loc:$sloc (reloc_typ ~loc:$sloc $4) $3 }
   | mktyp( /* begin mktyp group */
-      QUOTE ident
-        { Ptyp_var $2 }
+      QUOTE tyvar=ident
+        { Ptyp_var tyvar }
     | UNDERSCORE
         { Ptyp_any }
     | tys = actual_type_parameters
