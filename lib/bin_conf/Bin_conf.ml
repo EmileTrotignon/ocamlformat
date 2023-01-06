@@ -110,6 +110,8 @@ let kind = Decl.Operational
 
 let docs = Decl.section_name kind `Valid
 
+let declare_option ~set term = Term.(const set $ term)
+
 let enable_outside_detected_project =
   let witness =
     String.concat ~sep:" or "
@@ -136,9 +138,9 @@ let enable_outside_detected_project =
 
 let inplace =
   let doc = "Format in-place, overwriting input file(s)." in
-  Term.(
-    const (fun inplace conf -> {conf with inplace})
-    $ Arg.(value & flag & info ["i"; "inplace"] ~doc ~docs) )
+  declare_option
+    ~set:(fun inplace conf -> {conf with inplace})
+    Arg.(value & flag & info ["i"; "inplace"] ~doc ~docs)
 
 (* Other Flags *)
 
@@ -147,9 +149,9 @@ let check =
     "Check whether the input files already are formatted. Mutually \
      exclusive with --inplace and --output."
   in
-  Term.(
-    const (fun check conf -> {conf with check})
-    $ Arg.(value & flag & info ["check"] ~doc ~docs) )
+  declare_option
+    ~set:(fun check conf -> {conf with check})
+    Arg.(value & flag & info ["check"] ~doc ~docs)
 
 let inputs =
   let docv = "SRC" in
@@ -171,9 +173,9 @@ let inputs =
      $(b,--inplace). If $(b,-) is passed, will read from stdin."
   in
   let default = [] in
-  Term.(
-    const (fun inputs conf -> {conf with inputs})
-    $ Arg.(value & pos_all file_or_dash default & info [] ~doc ~docv ~docs) )
+  declare_option
+    ~set:(fun inputs conf -> {conf with inputs})
+    Arg.(value & pos_all file_or_dash default & info [] ~doc ~docv ~docs)
 
 let kind =
   let doc = "Parse input as an implementation." in
@@ -189,9 +191,9 @@ let kind =
   let doc = "Parse input as an odoc documentation." in
   let doc_file = (Some Syntax.Documentation, Arg.info ["doc"] ~doc ~docs) in
   let default = None in
-  Term.(
-    const (fun kind conf -> {conf with kind})
-    $ Arg.(value & vflag default [impl; intf; use_file; repl_file; doc_file]) )
+  declare_option
+    ~set:(fun kind conf -> {conf with kind})
+    Arg.(value & vflag default [impl; intf; use_file; repl_file; doc_file])
 
 let name =
   let docv = "NAME" in
@@ -203,9 +205,9 @@ let name =
      documentation of other options for details."
   in
   let default = None in
-  Term.(
-    const (fun name conf -> {conf with name})
-    $ Arg.(value & opt (some string) default & info ["name"] ~doc ~docs ~docv) )
+  declare_option
+    ~set:(fun name conf -> {conf with name})
+    Arg.(value & opt (some string) default & info ["name"] ~doc ~docs ~docv)
 
 let numeric =
   let doc =
@@ -213,9 +215,9 @@ let numeric =
      corresponding to the indentation value, printing as many values as \
      lines in the document."
   in
-  Term.(
-    const (fun numeric conf -> {conf with numeric})
-    $ Arg.(value & flag & info ["numeric"] ~doc ~docs) )
+  declare_option
+    ~set:(fun numeric conf -> {conf with numeric})
+    Arg.(value & flag & info ["numeric"] ~doc ~docs)
 
 let output =
   let docv = "DST" in
@@ -224,12 +226,12 @@ let output =
      omitted."
   in
   let default = None in
-  Term.(
-    const (fun output conf -> {conf with output})
-    $ Arg.(
-        value
-        & opt (some string) default
-        & info ["o"; "output"] ~doc ~docs ~docv ) )
+  declare_option
+    ~set:(fun output conf -> {conf with output})
+    Arg.(
+      value
+      & opt (some string) default
+      & info ["o"; "output"] ~doc ~docs ~docv )
 
 let print_config =
   let doc =
@@ -240,9 +242,9 @@ let print_config =
      the configuration for the root directory if specified, or for the \
      current working directory otherwise."
   in
-  Term.(
-    const (fun print_config conf -> {conf with print_config})
-    $ Arg.(value & flag & info ["print-config"] ~doc ~docs) )
+  declare_option
+    ~set:(fun print_config conf -> {conf with print_config})
+    Arg.(value & flag & info ["print-config"] ~doc ~docs)
 
 let root =
   let docv = "DIR" in
@@ -251,9 +253,9 @@ let root =
      configuration files inside $(docv) and its subdirectories."
   in
   let default = None in
-  Term.(
-    const (fun root conf -> {conf with root})
-    $ Arg.(value & opt (some dir) default & info ["root"] ~doc ~docs ~docv) )
+  declare_option
+    ~set:(fun root conf -> {conf with root})
+    Arg.(value & opt (some dir) default & info ["root"] ~doc ~docs ~docv)
 
 let kind_of_ext fname =
   match Filename.extension fname with
@@ -272,16 +274,16 @@ let config =
   let default = [] in
   let assoc = Arg.(pair ~sep:'=' string string) in
   let list_assoc = Arg.(list ~sep:',' assoc) in
-  Term.(
-    const (fun config conf -> {conf with config})
-    $ Arg.(
-        value & opt list_assoc default & info ["c"; "config"] ~doc ~docs ~env ) )
+  declare_option
+    ~set:(fun config conf -> {conf with config})
+    Arg.(
+      value & opt list_assoc default & info ["c"; "config"] ~doc ~docs ~env )
 
 let disable_conf_files =
   let doc = "Disable .ocamlformat configuration files." in
-  Term.(
-    const (fun disable_conf_files conf -> {conf with disable_conf_files})
-    $ Arg.(value & flag & info ["disable-conf-files"] ~doc ~docs) )
+  declare_option
+    ~set:(fun disable_conf_files conf -> {conf with disable_conf_files})
+    Arg.(value & flag & info ["disable-conf-files"] ~doc ~docs)
 
 let ignore_invalid_options =
   let doc = "Ignore invalid options (e.g. in .ocamlformat)." in
@@ -326,9 +328,9 @@ let ocp_indent_config =
     in
     asprintf "Read .ocp-indent configuration files.%s" supported
   in
-  Term.(
-    const (fun ocp_indent_config conf -> {conf with ocp_indent_config})
-    $ Arg.(value & flag & info ["ocp-indent-config"] ~doc ~docs) )
+  declare_option
+    ~set:(fun ocp_indent_config conf -> {conf with ocp_indent_config})
+    Arg.(value & flag & info ["ocp-indent-config"] ~doc ~docs)
 
 let terms =
   [ Term.(
@@ -362,8 +364,9 @@ let global_term =
   term
 
 let set_global_term =
-  Term.(
-    const (fun conf_modif -> global_conf := conf_modif default) $ global_term )
+  declare_option
+    ~set:(fun conf_modif -> global_conf := conf_modif default)
+    global_term
 
 (** Do not escape from [build_config] *)
 exception Conf_error of string
