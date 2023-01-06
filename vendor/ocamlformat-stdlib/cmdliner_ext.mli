@@ -2,10 +2,6 @@
 
 include module type of struct include Cmdliner end
 
-val mk : default:'a -> 'a Term.t -> (unit -> 'a)
-(** [mk ~default term] is a ref which, after [parse] is called, contains
-    the value of the command line option specified by [term]. *)
-
 val parse : Cmd.info -> (unit -> 'a Term.ret) -> (unit Term.t) -> ('a Cmd.eval_ok, Cmd.eval_error) result
 (** [parse info validate] parses the command line according to the options
     declared by calls to [mk], using manual and version [info], and calling

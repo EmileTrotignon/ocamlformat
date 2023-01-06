@@ -52,10 +52,6 @@ let default =
 
 let global_conf = ref default
 
-let _config =
-  mk ~default:Conf.default
-    Term.(Decl.term_of_store Conf.options $ const Conf.default)
-
 let info =
   let doc = "A tool to format OCaml code." in
   let man =
