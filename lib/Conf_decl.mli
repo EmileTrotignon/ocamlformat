@@ -119,9 +119,6 @@ val removed_option :
 
 val default : 'a t -> 'a
 
-val update_using_cmdline :
-  Cmdliner.Cmd.info -> Store.t -> Conf_t.t -> Conf_t.t
-
 val update :
      Store.t
   -> config:Conf_t.t

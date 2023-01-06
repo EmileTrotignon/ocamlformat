@@ -433,7 +433,7 @@ let update store ~config ~from:new_from ~name ~value ~inline =
 
 let default {default; _} = default
 
-let term_of_store ?(extra_term=Term.const Fun.id) store =
+let term_of_store store =
   let compose_terms (t1 : ('a -> 'b) Term.t) (t2 : ('b -> 'c) Term.t) :
       ('a -> 'c) Term.t =
     let open Term in
@@ -463,27 +463,7 @@ let term_of_store ?(extra_term=Term.const Fun.id) store =
     compose_terms update_term acc
   in
   let term = List.fold_left ~init:(Term.const (fun x -> x)) ~f:compose store in
-  Term.(extra_term $ term)
-
-let discard_formatter =
-  Format.(
-    formatter_of_out_functions
-      { out_string= (fun _ _ _ -> ())
-      ; out_flush= (fun () -> ())
-      ; out_newline= (fun () -> ())
-      ; out_spaces= (fun _ -> ())
-      ; out_indent= (fun _ -> ()) } )
-
-let update_using_cmdline info store config =
-  let term = Term.(term_of_store store $ const config) in
-  match
-    Cmd.eval_value ~err:discard_formatter ~help:discard_formatter
-      (Cmd.v info term)
-  with
-  | Ok (`Ok config) ->
-      config
-  | Error _ | Ok (`Version | `Help) ->
-      config
+  term
 
 let print_config store c =
   let on_pack (Pack {names; to_string; get_value; status; _}) =
