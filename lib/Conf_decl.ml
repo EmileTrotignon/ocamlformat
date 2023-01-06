@@ -434,6 +434,7 @@ let update store ~config ~from:new_from ~name ~value ~inline =
 let default {default; _} = default
 
 let term_of_store store =
+  let store = List.rev store in
   let compose_terms (t1 : ('a -> 'b) Term.t) (t2 : ('b -> 'c) Term.t) :
       ('a -> 'c) Term.t =
     let open Term in

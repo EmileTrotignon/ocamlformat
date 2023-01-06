@@ -46,6 +46,201 @@ let warn ~loc fmt =
 module Decl = Conf_decl
 module Store = Decl.Store
 
+let conventional_profile from =
+  let elt content = Elt.make content from in
+  { align_pattern_matching_bar= elt `Paren
+  ; assignment_operator= elt `End_line
+  ; break_before_in= elt `Fit_or_vertical
+  ; break_cases= elt `Fit
+  ; break_collection_expressions= elt `Fit_or_vertical
+  ; break_colon= elt `After
+  ; break_infix= elt `Wrap
+  ; break_infix_before_func= elt false
+  ; break_fun_decl= elt `Wrap
+  ; break_fun_sig= elt `Wrap
+  ; break_separators= elt `After
+  ; break_sequences= elt true
+  ; break_string_literals= elt `Auto
+  ; break_struct= elt true
+  ; cases_exp_indent= elt 4
+  ; cases_matching_exp_indent= elt `Normal
+  ; disambiguate_non_breaking_match= elt false
+  ; doc_comments= elt `After_when_possible
+  ; doc_comments_padding= elt 2
+  ; doc_comments_tag_only= elt `Default
+  ; dock_collection_brackets= elt true
+  ; exp_grouping= elt `Parens
+  ; extension_indent= elt 2
+  ; field_space= elt `Loose
+  ; function_indent= elt 2
+  ; function_indent_nested= elt `Never
+  ; if_then_else= elt `Compact
+  ; indent_after_in= elt 0
+  ; indicate_multiline_delimiters= elt `No
+  ; indicate_nested_or_patterns= elt `Unsafe_no
+  ; infix_precedence= elt `Indent
+  ; leading_nested_match_parens= elt false
+  ; let_and= elt `Compact
+  ; let_binding_indent= elt 2
+  ; let_binding_spacing= elt `Compact
+  ; let_module= elt `Compact
+  ; line_endings= elt `Lf
+  ; margin= elt 80
+  ; match_indent= elt 0
+  ; match_indent_nested= elt `Never
+  ; max_indent= elt None
+  ; module_item_spacing= elt `Compact
+  ; nested_match= elt `Wrap
+  ; ocp_indent_compat= elt false
+  ; parens_ite= elt false
+  ; parens_tuple= elt `Always
+  ; parens_tuple_patterns= elt `Multi_line_only
+  ; parse_docstrings= elt false
+  ; parse_toplevel_phrases= elt false
+  ; sequence_blank_line= elt `Preserve_one
+  ; sequence_style= elt `Terminator
+  ; single_case= elt `Compact
+  ; space_around_arrays= elt true
+  ; space_around_lists= elt true
+  ; space_around_records= elt true
+  ; space_around_variants= elt true
+  ; stritem_extension_indent= elt 0
+  ; type_decl= elt `Compact
+  ; type_decl_indent= elt 2
+  ; wrap_comments= elt false
+  ; wrap_fun_args= elt true }
+
+let default_profile = conventional_profile
+
+let ocamlformat_profile from =
+  let elt content = Elt.make content from in
+  { align_pattern_matching_bar= elt `Paren
+  ; assignment_operator= elt `End_line
+  ; break_before_in= elt `Fit_or_vertical
+  ; break_cases= elt `Nested
+  ; break_collection_expressions= elt `Fit_or_vertical
+  ; break_colon= elt `After
+  ; break_infix= elt `Wrap
+  ; break_infix_before_func= elt true
+  ; break_fun_decl= elt `Wrap
+  ; break_fun_sig= elt `Wrap
+  ; break_separators= elt `Before
+  ; break_sequences= elt false
+  ; break_string_literals= elt `Auto
+  ; break_struct= elt true
+  ; cases_exp_indent= elt 4
+  ; cases_matching_exp_indent= elt `Compact
+  ; disambiguate_non_breaking_match= elt false
+  ; doc_comments= elt `Before_except_val
+  ; doc_comments_padding= elt 2
+  ; doc_comments_tag_only= elt `Default
+  ; dock_collection_brackets= elt false
+  ; exp_grouping= elt `Parens
+  ; extension_indent= elt 2
+  ; field_space= elt `Tight
+  ; function_indent= elt 2
+  ; function_indent_nested= elt `Never
+  ; if_then_else= elt `Compact
+  ; indent_after_in= elt 0
+  ; indicate_multiline_delimiters= elt `Space
+  ; indicate_nested_or_patterns= elt `Space
+  ; infix_precedence= elt `Indent
+  ; leading_nested_match_parens= elt false
+  ; let_and= elt `Compact
+  ; let_binding_indent= elt 2
+  ; let_binding_spacing= elt `Compact
+  ; let_module= elt `Compact
+  ; line_endings= elt `Lf
+  ; margin= elt 80
+  ; match_indent= elt 0
+  ; match_indent_nested= elt `Never
+  ; max_indent= elt None
+  ; module_item_spacing= elt `Sparse
+  ; nested_match= elt `Wrap
+  ; ocp_indent_compat= elt false
+  ; parens_ite= elt false
+  ; parens_tuple= elt `Always
+  ; parens_tuple_patterns= elt `Multi_line_only
+  ; parse_docstrings= elt false
+  ; parse_toplevel_phrases= elt false
+  ; sequence_blank_line= elt `Compact
+  ; sequence_style= elt `Separator
+  ; single_case= elt `Compact
+  ; space_around_arrays= elt false
+  ; space_around_lists= elt false
+  ; space_around_records= elt false
+  ; space_around_variants= elt false
+  ; stritem_extension_indent= elt 0
+  ; type_decl= elt `Compact
+  ; type_decl_indent= elt 2
+  ; wrap_comments= elt false
+  ; wrap_fun_args= elt true }
+
+let janestreet_profile from =
+  let elt content = Elt.make content from in
+  { align_pattern_matching_bar= elt `Keyword
+  ; assignment_operator= elt `Begin_line
+  ; break_before_in= elt `Fit_or_vertical
+  ; break_cases= elt `Fit_or_vertical
+  ; break_collection_expressions=
+      elt (ocamlformat_profile from).break_collection_expressions.v
+  ; break_colon= elt `Before
+  ; break_infix= elt `Fit_or_vertical
+  ; break_infix_before_func= elt true
+  ; break_fun_decl= elt `Fit_or_vertical
+  ; break_fun_sig= elt `Fit_or_vertical
+  ; break_separators= elt `Before
+  ; break_sequences= elt true
+  ; break_string_literals= elt `Auto
+  ; break_struct= elt (ocamlformat_profile from).break_struct.v
+  ; cases_exp_indent= elt 2
+  ; cases_matching_exp_indent= elt `Normal
+  ; disambiguate_non_breaking_match= elt false
+  ; doc_comments= elt `Before
+  ; doc_comments_padding= elt 1
+  ; doc_comments_tag_only= elt `Fit
+  ; dock_collection_brackets= elt false
+  ; exp_grouping= elt `Parens
+  ; extension_indent= elt 2
+  ; field_space= elt `Loose
+  ; function_indent= elt 2
+  ; function_indent_nested= elt `Never
+  ; if_then_else= elt `Keyword_first
+  ; indent_after_in= elt 0
+  ; indicate_multiline_delimiters= elt `No
+  ; indicate_nested_or_patterns= elt `Unsafe_no
+  ; infix_precedence= elt `Parens
+  ; leading_nested_match_parens= elt true
+  ; let_and= elt `Sparse
+  ; let_binding_indent= elt 2
+  ; let_binding_spacing= elt `Double_semicolon
+  ; let_module= elt `Sparse
+  ; line_endings= elt `Lf
+  ; margin= elt 90
+  ; match_indent= elt 0
+  ; match_indent_nested= elt `Never
+  ; max_indent= elt @@ Some 2
+  ; module_item_spacing= elt `Compact
+  ; nested_match= elt `Wrap
+  ; ocp_indent_compat= elt true
+  ; parens_ite= elt true
+  ; parens_tuple= elt `Multi_line_only
+  ; parens_tuple_patterns= elt `Multi_line_only
+  ; parse_docstrings= elt false
+  ; parse_toplevel_phrases= elt false
+  ; sequence_blank_line= elt `Compact
+  ; sequence_style= elt `Terminator
+  ; single_case= elt `Sparse
+  ; space_around_arrays= elt true
+  ; space_around_lists= elt true
+  ; space_around_records= elt true
+  ; space_around_variants= elt true
+  ; stritem_extension_indent= elt 0
+  ; type_decl= elt `Sparse
+  ; type_decl_indent= elt 2
+  ; wrap_comments= elt false
+  ; wrap_fun_args= elt false }
+
 let add_option options opt = (Store.add options opt, opt)
 
 let add_removed options opt = Store.add options opt
@@ -820,7 +1015,10 @@ module Formatting = struct
     let doc = "Format code to fit within $(docv) columns." in
     Decl.int ~names:["m"; "margin"] ~default:80 ~doc ~docv ~kind
       ~allow_inline:false
-      (fun conf elt -> update conf ~f:(fun f -> {f with margin= elt}))
+      (fun conf elt ->
+        (* printf "updating margin : %i\n" elt.v ;
+        Out_channel.flush stdout ; *)
+        update conf ~f:(fun f -> {f with margin= elt}) )
       (fun conf -> conf.fmt_opts.margin)
 
   let options, match_indent =
@@ -1284,211 +1482,6 @@ let options (*, disable_outside_detected_project *) =
   let names = ["disable-outside-detected-project"] in
   Decl.removed_option ~names ~since:V.v0_22 ~msg
 
-let ocamlformat_profile from =
-  let elt content = Elt.make content from in
-  { align_pattern_matching_bar= elt `Paren
-  ; assignment_operator= elt `End_line
-  ; break_before_in= elt `Fit_or_vertical
-  ; break_cases= elt `Nested
-  ; break_collection_expressions= elt `Fit_or_vertical
-  ; break_colon= elt `After
-  ; break_infix= elt `Wrap
-  ; break_infix_before_func= elt true
-  ; break_fun_decl= elt `Wrap
-  ; break_fun_sig= elt `Wrap
-  ; break_separators= elt `Before
-  ; break_sequences= elt false
-  ; break_string_literals= elt `Auto
-  ; break_struct= elt true
-  ; cases_exp_indent= elt 4
-  ; cases_matching_exp_indent= elt `Compact
-  ; disambiguate_non_breaking_match= elt false
-  ; doc_comments= elt `Before_except_val
-  ; doc_comments_padding= elt 2
-  ; doc_comments_tag_only= elt `Default
-  ; dock_collection_brackets= elt false
-  ; exp_grouping= elt `Parens
-  ; extension_indent= elt 2
-  ; field_space= elt `Tight
-  ; function_indent= elt 2
-  ; function_indent_nested= elt `Never
-  ; if_then_else= elt `Compact
-  ; indent_after_in= elt 0
-  ; indicate_multiline_delimiters= elt `Space
-  ; indicate_nested_or_patterns= elt `Space
-  ; infix_precedence= elt `Indent
-  ; leading_nested_match_parens= elt false
-  ; let_and= elt `Compact
-  ; let_binding_indent= elt 2
-  ; let_binding_spacing= elt `Compact
-  ; let_module= elt `Compact
-  ; line_endings= elt `Lf
-  ; margin= elt 80
-  ; match_indent= elt 0
-  ; match_indent_nested= elt `Never
-  ; max_indent= elt None
-  ; module_item_spacing= elt `Sparse
-  ; nested_match= elt `Wrap
-  ; ocp_indent_compat= elt false
-  ; parens_ite= elt false
-  ; parens_tuple= elt `Always
-  ; parens_tuple_patterns= elt `Multi_line_only
-  ; parse_docstrings= elt false
-  ; parse_toplevel_phrases= elt false
-  ; sequence_blank_line= elt `Compact
-  ; sequence_style= elt `Separator
-  ; single_case= elt `Compact
-  ; space_around_arrays= elt false
-  ; space_around_lists= elt false
-  ; space_around_records= elt false
-  ; space_around_variants= elt false
-  ; stritem_extension_indent= elt 0
-  ; type_decl= elt `Compact
-  ; type_decl_indent= elt 2
-  ; wrap_comments= elt false
-  ; wrap_fun_args= elt true }
-
-let conventional_profile from =
-  let elt content = Elt.make content from in
-  let default_elt opt = elt @@ Decl.default opt in
-  { align_pattern_matching_bar= elt `Paren
-  ; assignment_operator= default_elt Formatting.assignment_operator
-  ; break_before_in= default_elt Formatting.break_before_in
-  ; break_cases= default_elt Formatting.break_cases
-  ; break_collection_expressions=
-      default_elt Formatting.break_collection_expressions
-  ; break_colon= default_elt Formatting.break_colon
-  ; break_infix= default_elt Formatting.break_infix
-  ; break_infix_before_func= default_elt Formatting.break_infix_before_func
-  ; break_fun_decl= default_elt Formatting.break_fun_decl
-  ; break_fun_sig= default_elt Formatting.break_fun_sig
-  ; break_separators= default_elt Formatting.break_separators
-  ; break_sequences= default_elt Formatting.break_sequences
-  ; break_string_literals= default_elt Formatting.break_string_literals
-  ; break_struct=
-      (elt @@ Poly.(Decl.default Formatting.break_struct = `Force))
-  ; cases_exp_indent= default_elt Formatting.cases_exp_indent
-  ; cases_matching_exp_indent=
-      default_elt Formatting.cases_matching_exp_indent
-  ; disambiguate_non_breaking_match=
-      default_elt Formatting.disambiguate_non_breaking_match
-  ; doc_comments= default_elt Formatting.doc_comments
-  ; doc_comments_padding= default_elt Formatting.doc_comments_padding
-  ; doc_comments_tag_only= default_elt Formatting.doc_comments_tag_only
-  ; dock_collection_brackets= default_elt Formatting.dock_collection_brackets
-  ; exp_grouping= default_elt Formatting.exp_grouping
-  ; extension_indent= default_elt Formatting.extension_indent
-  ; field_space= default_elt Formatting.field_space
-  ; function_indent= default_elt Formatting.function_indent
-  ; function_indent_nested= default_elt Formatting.function_indent_nested
-  ; if_then_else= default_elt Formatting.if_then_else
-  ; indent_after_in= default_elt Formatting.indent_after_in
-  ; indicate_multiline_delimiters=
-      default_elt Formatting.indicate_multiline_delimiters
-  ; indicate_nested_or_patterns=
-      default_elt Formatting.indicate_nested_or_patterns
-  ; infix_precedence= default_elt Formatting.infix_precedence
-  ; leading_nested_match_parens=
-      default_elt Formatting.leading_nested_match_parens
-  ; let_and= default_elt Formatting.let_and
-  ; let_binding_indent= default_elt Formatting.let_binding_indent
-  ; let_binding_spacing= default_elt Formatting.let_binding_spacing
-  ; let_module= default_elt Formatting.let_module
-  ; line_endings= default_elt Formatting.line_endings
-  ; margin= default_elt Formatting.margin
-  ; match_indent= default_elt Formatting.match_indent
-  ; match_indent_nested= default_elt Formatting.match_indent_nested
-  ; max_indent= default_elt Formatting.max_indent
-  ; module_item_spacing= default_elt Formatting.module_item_spacing
-  ; nested_match= default_elt Formatting.nested_match
-  ; ocp_indent_compat= default_elt Formatting.ocp_indent_compat
-  ; parens_ite= default_elt Formatting.parens_ite
-  ; parens_tuple= default_elt Formatting.parens_tuple
-  ; parens_tuple_patterns= default_elt Formatting.parens_tuple_patterns
-  ; parse_docstrings= default_elt Formatting.parse_docstrings
-  ; parse_toplevel_phrases= default_elt Formatting.parse_toplevel_phrases
-  ; sequence_blank_line= default_elt Formatting.sequence_blank_line
-  ; sequence_style= default_elt Formatting.sequence_style
-  ; single_case= default_elt Formatting.single_case
-  ; space_around_arrays= default_elt Formatting.space_around_arrays
-  ; space_around_lists= default_elt Formatting.space_around_lists
-  ; space_around_records= default_elt Formatting.space_around_records
-  ; space_around_variants= default_elt Formatting.space_around_variants
-  ; stritem_extension_indent= default_elt Formatting.stritem_extension_indent
-  ; type_decl= default_elt Formatting.type_decl
-  ; type_decl_indent= default_elt Formatting.type_decl_indent
-  ; wrap_comments= default_elt Formatting.wrap_comments
-  ; wrap_fun_args= default_elt Formatting.wrap_fun_args }
-
-let default_profile = conventional_profile
-
-let janestreet_profile from =
-  let elt content = Elt.make content from in
-  { align_pattern_matching_bar= elt `Keyword
-  ; assignment_operator= elt `Begin_line
-  ; break_before_in= elt `Fit_or_vertical
-  ; break_cases= elt `Fit_or_vertical
-  ; break_collection_expressions=
-      elt (ocamlformat_profile from).break_collection_expressions.v
-  ; break_colon= elt `Before
-  ; break_infix= elt `Fit_or_vertical
-  ; break_infix_before_func= elt true
-  ; break_fun_decl= elt `Fit_or_vertical
-  ; break_fun_sig= elt `Fit_or_vertical
-  ; break_separators= elt `Before
-  ; break_sequences= elt true
-  ; break_string_literals= elt `Auto
-  ; break_struct= elt (ocamlformat_profile from).break_struct.v
-  ; cases_exp_indent= elt 2
-  ; cases_matching_exp_indent= elt `Normal
-  ; disambiguate_non_breaking_match= elt false
-  ; doc_comments= elt `Before
-  ; doc_comments_padding= elt 1
-  ; doc_comments_tag_only= elt `Fit
-  ; dock_collection_brackets= elt false
-  ; exp_grouping= elt `Parens
-  ; extension_indent= elt 2
-  ; field_space= elt `Loose
-  ; function_indent= elt 2
-  ; function_indent_nested= elt `Never
-  ; if_then_else= elt `Keyword_first
-  ; indent_after_in= elt 0
-  ; indicate_multiline_delimiters= elt `No
-  ; indicate_nested_or_patterns= elt `Unsafe_no
-  ; infix_precedence= elt `Parens
-  ; leading_nested_match_parens= elt true
-  ; let_and= elt `Sparse
-  ; let_binding_indent= elt 2
-  ; let_binding_spacing= elt `Double_semicolon
-  ; let_module= elt `Sparse
-  ; line_endings= elt `Lf
-  ; margin= elt 90
-  ; match_indent= elt 0
-  ; match_indent_nested= elt `Never
-  ; max_indent= elt @@ Some 2
-  ; module_item_spacing= elt `Compact
-  ; nested_match= elt `Wrap
-  ; ocp_indent_compat= elt true
-  ; parens_ite= elt true
-  ; parens_tuple= elt `Multi_line_only
-  ; parens_tuple_patterns= elt `Multi_line_only
-  ; parse_docstrings= elt false
-  ; parse_toplevel_phrases= elt false
-  ; sequence_blank_line= elt `Compact
-  ; sequence_style= elt `Terminator
-  ; single_case= elt `Sparse
-  ; space_around_arrays= elt true
-  ; space_around_lists= elt true
-  ; space_around_records= elt true
-  ; space_around_variants= elt true
-  ; stritem_extension_indent= elt 0
-  ; type_decl= elt `Sparse
-  ; type_decl_indent= elt 2
-  ; wrap_comments= elt false
-  ; wrap_fun_args= elt false }
-
-let selected_profile_ref = ref @@ Elt.make `default `Default
-
 let options, profile =
   add_option options
   @@
@@ -1529,17 +1522,19 @@ let options, profile =
       ; Decl.Value_removed.make ~name:"sparse" ~since:V.v0_22 ~msg:"" ]
     (fun conf elt ->
       let p = elt.v and from = elt.from in
+      let name =
+        match p with
+        | `default -> "default"
+        | `ocamlformat -> "ocamlformat"
+        | `janestreet -> "janestreet"
+      in
+      (* printf "setting profile : %s\n" name ;
+      Out_channel.flush stdout ; *)
       let from_p =
         let ufrom =
           match from with
           | `Default | `Updated (_, Some _) -> assert false
           | `Profile (_, uf) | `Updated (uf, _) -> uf
-        in
-        let name =
-          match p with
-          | `default -> "default"
-          | `ocamlformat -> "ocamlformat"
-          | `janestreet -> "janestreet"
         in
         `Profile (name, ufrom)
       in
@@ -1550,9 +1545,8 @@ let options, profile =
         | `janestreet -> janestreet_profile )
           from_p
       in
-      selected_profile_ref := elt ;
-      {conf with fmt_opts= p} )
-    (fun _ -> !selected_profile_ref)
+      {conf with profile= elt; fmt_opts= p} )
+    (fun conf -> conf.profile)
 
 let parse_line config ?(version_check = config.opr_opts.version_check.v)
     ?(disable_conf_attrs = config.opr_opts.disable_conf_attrs.v) ~from s =
@@ -1603,6 +1597,7 @@ let default =
   let elt content = Elt.make content `Default in
   let default_elt opt = elt @@ Decl.default opt in
   { fmt_opts= default_profile `Default
+  ; profile= elt `default
   ; opr_opts=
       { comment_check= default_elt Operational.comment_check
       ; debug= default_elt Operational.debug

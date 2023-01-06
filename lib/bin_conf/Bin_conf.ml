@@ -335,7 +335,7 @@ let ocp_indent_config =
 let terms =
   [ Term.(
       const (fun lib_conf_modif conf ->
-          {conf with lib_conf= lib_conf_modif Conf.default} )
+          {conf with lib_conf= lib_conf_modif conf.lib_conf} )
       $ Decl.term_of_store Conf.options )
   ; enable_outside_detected_project
   ; inplace
