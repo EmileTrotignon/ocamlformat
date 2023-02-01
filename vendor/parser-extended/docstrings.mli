@@ -78,6 +78,7 @@ val docs_attr : docstring -> Parsetree.attribute
 (** Convert item documentation to attributes and add them to an
     attribute list *)
 val add_docs_attrs : docs -> Parsetree.attributes -> Parsetree.attributes
+val add_docs_attrs' : docs -> Parsetree.ext_attrs -> Parsetree.ext_attrs
 
 (** Fetch the item documentation for the current symbol. This also
     marks this documentation (for ambiguity warnings). *)
@@ -133,6 +134,7 @@ val text_attr : docstring -> Parsetree.attribute
 
 (** Convert text to attributes and add them to an attribute list *)
 val add_text_attrs : text -> Parsetree.attributes -> Parsetree.attributes
+val add_text_attrs' : text -> Parsetree.ext_attrs -> Parsetree.ext_attrs
 
 (** Fetch the text preceding the current symbol. *)
 val symbol_text : unit -> text
