@@ -1084,13 +1084,13 @@ and value_constraint i ppf x =
 and open_description i ppf x =
   line i ppf "open_description %a %a\n" fmt_override_flag x.popen_override
     fmt_location x.popen_loc;
-  attributes i ppf x.popen_attributes;
+  ext_attrs i ppf x.popen_attributes;
   fmt_longident_loc ppf x.popen_expr
 
 and open_declaration i ppf x =
   line i ppf "open_declaration %a %a\n" fmt_override_flag x.popen_override
     fmt_location x.popen_loc;
-  attributes i ppf x.popen_attributes;
+  ext_attrs i ppf x.popen_attributes;
   let i = i+1 in
   module_expr i ppf x.popen_expr
 

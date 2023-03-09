@@ -380,7 +380,7 @@ module Mb:
 (** Opens *)
 module Opn:
   sig
-    val mk: ?loc: loc -> ?attrs:attrs -> ?docs:docs ->
+    val mk: ?loc: loc -> ?attrs:ext_attrs -> ?docs:docs ->
       ?override:override_flag -> 'a -> 'a open_infos
   end
 
