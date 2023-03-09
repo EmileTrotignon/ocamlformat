@@ -336,13 +336,14 @@ module Structure_item = struct
         ; ptyexn_constructor= {pext_attributes= atrs2; _}
         ; _ }
      |Pstr_modtype
-        {pmtd_ext_attrs= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
-     |Pstr_include
-        {pincl_mod= {pmod_attributes= atrs1; _}; pincl_attributes= atrs2; _}
-      ->
+        {pmtd_ext_attrs= {attrs_before= atrs1; attrs_after= atrs2; _}; _} ->
         List.exists ~f:Attr.is_doc atrs1 || List.exists ~f:Attr.is_doc atrs2
     (* three attribute lists *)
-    | Pstr_module
+    | Pstr_include
+        { pincl_mod= {pmod_attributes= atrs1; _}
+        ; pincl_attributes= {attrs_before= atrs2; attrs_after= atrs3; _}
+        ; _ }
+     |Pstr_module
         { pmb_ext_attrs= {attrs_before= atrs1; attrs_after= atrs2; _}
         ; pmb_expr= {pmod_attributes= atrs3; _}
         ; _ } ->
@@ -434,8 +435,6 @@ module Signature_item = struct
         {pmtd_ext_attrs= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
      |Psig_modsubst
         {pms_ext_attrs= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
-     |Psig_include
-        {pincl_mod= {pmty_attributes= atrs1; _}; pincl_attributes= atrs2; _}
      |Psig_exception
         { ptyexn_attributes= atrs1
         ; ptyexn_constructor= {pext_attributes= atrs2; _}
@@ -449,6 +448,10 @@ module Signature_item = struct
      |Psig_module
         { pmd_ext_attrs= {attrs_before= atrs1; attrs_after= atrs2; _}
         ; pmd_type= {pmty_attributes= atrs3; _}
+        ; _ }
+     |Psig_include
+        { pincl_mod= {pmty_attributes= atrs1; _}
+        ; pincl_attributes= {attrs_before= atrs2; attrs_after= atrs3; _}
         ; _ } ->
         List.exists ~f:(List.exists ~f:Attr.is_doc) [atrs1; atrs2; atrs3]
     | Psig_type (_, [])

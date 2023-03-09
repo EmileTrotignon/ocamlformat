@@ -1096,13 +1096,13 @@ and open_declaration i ppf x =
 
 and include_description i ppf x =
   line i ppf "include_description %a\n" fmt_location x.pincl_loc;
-  attributes i ppf x.pincl_attributes;
+  ext_attrs i ppf x.pincl_attributes;
   let i = i+1 in
   module_type i ppf x.pincl_mod
 
 and include_declaration i ppf x =
   line i ppf "include_declaration %a\n" fmt_location x.pincl_loc;
-  attributes i ppf x.pincl_attributes;
+  ext_attrs i ppf x.pincl_attributes;
   let i = i+1 in
   module_expr i ppf x.pincl_mod
 
