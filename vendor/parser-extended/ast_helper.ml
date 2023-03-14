@@ -460,7 +460,7 @@ module Vb = struct
 end
 
 module Ci = struct
-  let mk ?(loc = !default_loc) ?(attrs = [])
+  let mk ?(loc = !default_loc) ?(attrs = Attr.ext_attrs ())
         ?(docs = empty_docs) ?(text = [])
         ?(virt = Concrete) ?(params = []) name expr =
     {
@@ -469,9 +469,12 @@ module Ci = struct
      pci_name = name;
      pci_expr = expr;
      pci_attributes =
-       add_text_attrs text (add_docs_attrs docs attrs);
+       add_text_attrs' text (add_docs_attrs' docs attrs);
      pci_loc = loc;
     }
+
+  let mk_exh ~text ~loc ~attrs ~docs = mk ~loc ~attrs ~docs ?text
+
 end
 
 module Type = struct

@@ -486,8 +486,13 @@ module Cf:
 (** Classes *)
 module Ci:
   sig
-    val mk: ?loc:loc -> ?attrs:attrs -> ?docs:docs -> ?text:text ->
+    val mk: ?loc:loc -> ?attrs:ext_attrs -> ?docs:docs -> ?text:text ->
       ?virt:virtual_flag ->
+      ?params:(core_type * variance_and_injectivity) list ->
+      str -> 'a -> 'a class_infos
+    
+    val mk_exh : text:text option -> loc:loc -> attrs:ext_attrs -> docs:docs -> 
+      ?virt:virtual_flag -> 
       ?params:(core_type * variance_and_injectivity) list ->
       str -> 'a -> 'a class_infos
   end

@@ -325,12 +325,16 @@ module Structure_item = struct
      |Pstr_type (_, {ptype_attributes= atrs; _} :: _)
      |Pstr_typext {ptyext_attributes= atrs; _}
      |Pstr_recmodule ({pmb_expr= {pmod_attributes= atrs; _}; _} :: _)
-     |Pstr_extension (_, atrs)
-     |Pstr_class_type ({pci_attributes= atrs; _} :: _)
-     |Pstr_class ({pci_attributes= atrs; _} :: _) ->
+     |Pstr_extension (_, atrs) ->
         List.exists ~f:Attr.is_doc atrs
     (* two attribute lists *)
-    | Pstr_open
+    | Pstr_class_type
+        ( {pci_attributes= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
+        :: _ )
+     |Pstr_class
+        ( {pci_attributes= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
+        :: _ )
+     |Pstr_open
         {popen_attributes= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
      |Pstr_exception
         { ptyexn_attributes= atrs1
@@ -424,12 +428,16 @@ module Signature_item = struct
      |Psig_type (_, {ptype_attributes= atrs; _} :: _)
      |Psig_typesubst ({ptype_attributes= atrs; _} :: _)
      |Psig_typext {ptyext_attributes= atrs; _}
-     |Psig_extension (_, atrs)
-     |Psig_class_type ({pci_attributes= atrs; _} :: _)
-     |Psig_class ({pci_attributes= atrs; _} :: _) ->
+     |Psig_extension (_, atrs) ->
         List.exists ~f:Attr.is_doc atrs
     (* two attribute list *)
-    | Psig_modtype
+    | Psig_class_type
+        ( {pci_attributes= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
+        :: _ )
+     |Psig_class
+        ( {pci_attributes= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
+        :: _ )
+     |Psig_modtype
         {pmtd_ext_attrs= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
      |Psig_modtypesubst
         {pmtd_ext_attrs= {attrs_before= atrs1; attrs_after= atrs2; _}; _}

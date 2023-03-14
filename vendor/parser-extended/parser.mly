@@ -1349,6 +1349,10 @@ structure_item:
         { Pstr_include $1 }
     | open_declaration
         { Pstr_open $1 }
+    | class_declarations
+        { Pstr_class $1 }
+    | class_type_declarations
+        { Pstr_class_type $1 }
     )
   | wrap_mkstr_ext(
       primitive_declaration
@@ -1361,10 +1365,6 @@ structure_item:
         { pstr_typext $1 }
     | str_exception_declaration
         { pstr_exception $1 }
-    | class_declarations
-        { let (ext, l) = $1 in (Pstr_class l, ext) }
-    | class_type_declarations
-        { let (ext, l) = $1 in (Pstr_class_type l, ext) }
     )
     { $1 }
 ;
@@ -1612,6 +1612,10 @@ signature_item:
         { Psig_modtypesubst $1 }
     | include_statement(module_type)
         { Psig_include $1 }
+    | class_descriptions
+        { Psig_class $1 }
+    | class_type_declarations
+        { Psig_class_type $1 }
     )
     { $1 }
   | wrap_mksig_ext(
@@ -1629,11 +1633,6 @@ signature_item:
         { psig_exception $1 }
     | open_description
         { let (body, ext) = $1 in (Psig_open body, ext) }
-
-    | class_descriptions
-        { let (ext, l) = $1 in (Psig_class l, ext) }
-    | class_type_declarations
-        { let (ext, l) = $1 in (Psig_class_type l, ext) }
     )
     { $1 }
 
@@ -1739,41 +1738,30 @@ module_type_subst:
 (* Class declarations. *)
 
 %inline class_declarations:
-  xlist(class_declaration, and_class_declaration)
-    { $1 }
+  class_declaration list(and_class_declaration)
+    { $1 :: $2 }
 ;
 %inline class_declaration:
-  CLASS
-  ext = ext
-  attrs1 = attributes
-  virt = virtual_flag
-  params = formal_class_parameters
-  id = mkrhs(LIDENT)
-  body = class_fun_binding
-  attrs2 = post_item_attributes
-  {
-    let attrs = attrs1 @ attrs2 in
-    let loc = make_loc $sloc in
-    let docs = symbol_docs $sloc in
-    ext,
-    Ci.mk id body ~virt ~params ~attrs ~loc ~docs
-  }
+  ext_attrs (
+    CLASS,
+    virt = virtual_flag
+    params = formal_class_parameters
+    id = mkrhs(LIDENT)
+    body = class_fun_binding
+    { Ci.mk_exh id body ~virt ~params }
+  )
+  { $1 }
 ;
 %inline and_class_declaration:
-  AND
-  attrs1 = attributes
-  virt = virtual_flag
-  params = formal_class_parameters
-  id = mkrhs(LIDENT)
-  body = class_fun_binding
-  attrs2 = post_item_attributes
-  {
-    let attrs = attrs1 @ attrs2 in
-    let loc = make_loc $sloc in
-    let docs = symbol_docs $sloc in
-    let text = symbol_text $symbolstartpos in
-    Ci.mk id body ~virt ~params ~attrs ~loc ~text ~docs
-  }
+  ext_attrs_no_ext (
+    AND,
+    virt = virtual_flag
+    params = formal_class_parameters
+    id = mkrhs(LIDENT)
+    body = class_fun_binding
+    { Ci.mk_exh id body ~virt ~params }
+  )
+  { $1 }
 ;
 
 class_fun_binding:
@@ -2035,82 +2023,60 @@ constrain_field:
 ;
 (* A group of class descriptions. *)
 %inline class_descriptions:
-  xlist(class_description, and_class_description)
-    { $1 }
+  class_description list(and_class_description)
+    { $1 :: $2 }
 ;
 %inline class_description:
-  CLASS
-  ext = ext
-  attrs1 = attributes
-  virt = virtual_flag
-  params = formal_class_parameters
-  id = mkrhs(LIDENT)
-  COLON
-  cty = class_type
-  attrs2 = post_item_attributes
-    {
-      let attrs = attrs1 @ attrs2 in
-      let loc = make_loc $sloc in
-      let docs = symbol_docs $sloc in
-      ext,
-      Ci.mk id cty ~virt ~params ~attrs ~loc ~docs
-    }
+  ext_attrs (
+    CLASS,
+    virt = virtual_flag
+    params = formal_class_parameters
+    id = mkrhs(LIDENT)
+    COLON
+    cty = class_type
+    { Ci.mk_exh id cty ~virt ~params }
+  )
+  { $1 }
 ;
 %inline and_class_description:
-  AND
-  attrs1 = attributes
-  virt = virtual_flag
-  params = formal_class_parameters
-  id = mkrhs(LIDENT)
-  COLON
-  cty = class_type
-  attrs2 = post_item_attributes
-    {
-      let attrs = attrs1 @ attrs2 in
-      let loc = make_loc $sloc in
-      let docs = symbol_docs $sloc in
-      let text = symbol_text $symbolstartpos in
-      Ci.mk id cty ~virt ~params ~attrs ~loc ~text ~docs
-    }
+  ext_attrs_no_ext (
+    AND,
+    virt = virtual_flag
+    params = formal_class_parameters
+    id = mkrhs(LIDENT)
+    COLON
+    cty = class_type
+    { Ci.mk_exh id cty ~virt ~params }
+  )
+  { $1 }
 ;
 class_type_declarations:
-  xlist(class_type_declaration, and_class_type_declaration)
-    { $1 }
+  class_type_declaration list(and_class_type_declaration)
+    { $1 :: $2 }
 ;
 %inline class_type_declaration:
-  CLASS TYPE
-  ext = ext
-  attrs1 = attributes
-  virt = virtual_flag
-  params = formal_class_parameters
-  id = mkrhs(LIDENT)
-  EQUAL
-  csig = class_signature
-  attrs2 = post_item_attributes
-    {
-      let attrs = attrs1 @ attrs2 in
-      let loc = make_loc $sloc in
-      let docs = symbol_docs $sloc in
-      ext,
-      Ci.mk id csig ~virt ~params ~attrs ~loc ~docs
-    }
+  ext_attrs (
+    CLASS TYPE {},
+    virt = virtual_flag
+    params = formal_class_parameters
+    id = mkrhs(LIDENT)
+    EQUAL
+    csig = class_signature
+    { Ci.mk_exh id csig ~virt ~params }
+  )
+  { $1 }
 ;
 %inline and_class_type_declaration:
-  AND
-  attrs1 = attributes
-  virt = virtual_flag
-  params = formal_class_parameters
-  id = mkrhs(LIDENT)
-  EQUAL
-  csig = class_signature
-  attrs2 = post_item_attributes
-    {
-      let attrs = attrs1 @ attrs2 in
-      let loc = make_loc $sloc in
-      let docs = symbol_docs $sloc in
-      let text = symbol_text $symbolstartpos in
-      Ci.mk id csig ~virt ~params ~attrs ~loc ~text ~docs
-    }
+  ext_attrs_no_ext (
+      AND,
+      virt = virtual_flag
+      params = formal_class_parameters
+      id = mkrhs(LIDENT)
+      EQUAL
+      csig = class_signature
+      { Ci.mk_exh id csig ~virt ~params }
+    )
+    { $1 }
 ;
 
 /* Core expressions */
