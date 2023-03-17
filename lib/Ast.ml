@@ -322,13 +322,16 @@ module Structure_item = struct
     | Pstr_eval (_, atrs)
      |Pstr_value {pvbs_bindings= {pvb_attributes= atrs; _} :: _; _}
      |Pstr_primitive {pval_attributes= atrs; _}
-     |Pstr_type (_, {ptype_attributes= atrs; _} :: _)
      |Pstr_typext {ptyext_attributes= atrs; _}
      |Pstr_recmodule ({pmb_expr= {pmod_attributes= atrs; _}; _} :: _)
      |Pstr_extension (_, atrs) ->
         List.exists ~f:Attr.is_doc atrs
     (* two attribute lists *)
-    | Pstr_class_type
+    | Pstr_type
+        ( _
+        , {ptype_attributes= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
+          :: _ )
+     |Pstr_class_type
         ( {pci_attributes= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
         :: _ )
      |Pstr_class
@@ -425,13 +428,18 @@ module Signature_item = struct
     | Psig_attribute atr -> Attr.is_doc atr
     (* one attribute list *)
     | Psig_value {pval_attributes= atrs; _}
-     |Psig_type (_, {ptype_attributes= atrs; _} :: _)
-     |Psig_typesubst ({ptype_attributes= atrs; _} :: _)
      |Psig_typext {ptyext_attributes= atrs; _}
      |Psig_extension (_, atrs) ->
         List.exists ~f:Attr.is_doc atrs
     (* two attribute list *)
-    | Psig_class_type
+    | Psig_typesubst
+        ( {ptype_attributes= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
+        :: _ )
+     |Psig_type
+        ( _
+        , {ptype_attributes= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
+          :: _ )
+     |Psig_class_type
         ( {pci_attributes= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
         :: _ )
      |Psig_class
@@ -572,7 +580,9 @@ module Md = struct
 end
 
 module Td = struct
-  let has_doc itm = List.exists ~f:Attr.is_doc itm.ptype_attributes
+  let has_doc itm =
+    List.exists ~f:Attr.is_doc itm.ptype_attributes.attrs_before
+    || List.exists ~f:Attr.is_doc itm.ptype_attributes.attrs_after
 
   let is_simple (i, (c : Conf.t)) =
     match c.fmt_opts.module_item_spacing.v with
@@ -706,7 +716,7 @@ let is_top = function Top -> true | _ -> false
 let attributes = function
   | Pld _ -> []
   | Typ x -> x.ptyp_attributes
-  | Td x -> x.ptype_attributes
+  | Td x -> x.ptype_attributes.attrs_before @ x.ptype_attributes.attrs_after
   | Cty x -> x.pcty_attributes
   | Pat x -> x.ppat_attributes
   | Exp x -> x.pexp_attributes

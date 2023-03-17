@@ -211,9 +211,9 @@ let%foo[@foo] x = 4
 
 and[@foo] y = x
 
-type%foo t = int [@@foo]
+type%foo[@foo] t = int
 
-and t = int [@@foo]
+and[@foo] t = int
 
 type%foo t += T [@@foo]
 
@@ -242,9 +242,9 @@ module type S = sig
 
   external%foo x : t = "" [@@foo]
 
-  type%foo t = int [@@foo]
+  type%foo[@foo] t = int
 
-  and t' = int [@@foo]
+  and[@foo] t' = int
 
   type%foo t += T [@@foo]
 

@@ -505,7 +505,7 @@ let package_type_of_module_type pmty =
 
         (* restrictions below are checked by the 'with_constraint' rule *)
         assert (ptyp.ptype_kind = Ptype_abstract);
-        assert (ptyp.ptype_attributes = []);
+        assert (ptyp.ptype_attributes.attrs_before @ ptyp.ptype_attributes.attrs_after = []);
         let ty =
           match ptyp.ptype_manifest with
           | Some ty -> ty
@@ -2858,34 +2858,34 @@ primitive_declaration:
 generic_type_declaration(flag, kind):
   TYPE
   ext = ext
-  attrs1 = attributes
+  before = attributes
   flag = flag
   params = type_parameters
   id = mkrhs(LIDENT)
   kind_priv_manifest = kind
   cstrs = constraints
-  attrs2 = post_item_attributes
+  after = post_item_attributes
     {
       let (kind, priv, manifest) = kind_priv_manifest in
       let docs = symbol_docs $sloc in
-      let attrs = attrs1 @ attrs2 in
-      let loc = make_loc $sloc in
+      let attrs = Attr.ext_attrs ?ext ~before ~after () in
+      let loc = make_loc $sloc in 
       (flag, ext),
       Type.mk id ~params ~cstrs ~kind ~priv ?manifest ~attrs ~loc ~docs
     }
 ;
 %inline generic_and_type_declaration(kind):
   AND
-  attrs1 = attributes
+  before = attributes
   params = type_parameters
   id = mkrhs(LIDENT)
   kind_priv_manifest = kind
   cstrs = constraints
-  attrs2 = post_item_attributes
+  after = post_item_attributes
     {
       let (kind, priv, manifest) = kind_priv_manifest in
       let docs = symbol_docs $sloc in
-      let attrs = attrs1 @ attrs2 in
+      let attrs = Attr.ext_attrs ~before ~after () in
       let loc = make_loc $sloc in
       let text = symbol_text $symbolstartpos in
       Type.mk id ~params ~cstrs ~kind ~priv ?manifest ~attrs ~loc ~docs ~text
