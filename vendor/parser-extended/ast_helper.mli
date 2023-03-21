@@ -234,7 +234,7 @@ module Type:
 (** Type extensions *)
 module Te:
   sig
-    val mk: ?loc:loc -> ?attrs:attrs -> ?docs:docs ->
+    val mk: ?loc:loc -> ?attrs:ext_attrs -> ?docs:docs ->
       ?params:(core_type * variance_and_injectivity) list ->
       ?priv:private_flag -> lid -> extension_constructor list -> type_extension
 
