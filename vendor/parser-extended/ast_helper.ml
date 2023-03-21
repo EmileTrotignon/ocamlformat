@@ -446,15 +446,13 @@ module Incl = struct
 end
 
 module Vb = struct
-  let mk ?(loc = !default_loc) ?(attrs = []) ?(docs = empty_docs)
-        ?(text = []) ?value_constraint ~is_pun pat expr =
+  let mk ?(loc = !default_loc) ?(attrs = Attr.ext_attrs ())  ?value_constraint ~is_pun pat expr =
     {
      pvb_pat = pat;
      pvb_expr = expr;
      pvb_constraint=value_constraint;
      pvb_is_pun = is_pun;
-     pvb_attributes =
-       add_text_attrs text (add_docs_attrs docs attrs);
+     pvb_attributes = attrs;
      pvb_loc = loc;
     }
 end

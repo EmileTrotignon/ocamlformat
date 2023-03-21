@@ -396,7 +396,7 @@ module Incl:
 (** Value bindings *)
 module Vb:
   sig
-    val mk: ?loc: loc -> ?attrs:attrs -> ?docs:docs -> ?text:text ->
+    val mk: ?loc: loc -> ?attrs:ext_attrs ->
       ?value_constraint:value_constraint -> is_pun:bool -> pattern ->
       expression -> value_binding
   end

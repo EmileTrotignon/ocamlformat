@@ -320,14 +320,18 @@ module Structure_item = struct
     | Pstr_attribute atr -> Attr.is_doc atr
     (* one attribute list *)
     | Pstr_eval (_, atrs)
-     |Pstr_value {pvbs_bindings= {pvb_attributes= atrs; _} :: _; _}
      |Pstr_primitive {pval_attributes= atrs; _}
      |Pstr_typext {ptyext_attributes= atrs; _}
      |Pstr_recmodule ({pmb_expr= {pmod_attributes= atrs; _}; _} :: _)
      |Pstr_extension (_, atrs) ->
         List.exists ~f:Attr.is_doc atrs
     (* two attribute lists *)
-    | Pstr_type
+    | Pstr_value
+        { pvbs_bindings=
+            {pvb_attributes= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
+            :: _
+        ; _ }
+     |Pstr_type
         ( _
         , {ptype_attributes= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
           :: _ )
@@ -534,7 +538,9 @@ module Signature_item = struct
 end
 
 module Lb = struct
-  let has_doc itm = List.exists ~f:Attr.is_doc itm.pvb_attributes
+  let has_doc itm =
+    List.exists ~f:Attr.is_doc itm.pvb_attributes.attrs_before
+    || List.exists ~f:Attr.is_doc itm.pvb_attributes.attrs_after
 
   let is_simple (i, (c : Conf.t)) =
     Poly.(c.fmt_opts.module_item_spacing.v = `Compact)
@@ -720,7 +726,7 @@ let attributes = function
   | Cty x -> x.pcty_attributes
   | Pat x -> x.ppat_attributes
   | Exp x -> x.pexp_attributes
-  | Lb x -> x.pvb_attributes
+  | Lb x -> x.pvb_attributes.attrs_before @ x.pvb_attributes.attrs_after
   | Mb x -> x.pmb_ext_attrs.attrs_before @ x.pmb_ext_attrs.attrs_after
   | Md x -> x.pmd_ext_attrs.attrs_before @ x.pmd_ext_attrs.attrs_after
   | Cl x -> x.pcl_attributes

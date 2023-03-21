@@ -70,7 +70,7 @@ module Let_binding : sig
         | `None ]
     ; lb_exp: expression Ast.xt
     ; lb_pun: bool
-    ; lb_attrs: attribute list
+    ; lb_attrs: ext_attrs
     ; lb_loc: Location.t }
 
   val of_let_binding :

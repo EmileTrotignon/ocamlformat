@@ -223,7 +223,7 @@ module Let_binding = struct
         | `None ]
     ; lb_exp: expression xt
     ; lb_pun: bool
-    ; lb_attrs: attribute list
+    ; lb_attrs: ext_attrs
     ; lb_loc: Location.t }
 
   let split_annot cmts xargs ({ast= body; _} as xbody) =
@@ -361,6 +361,6 @@ module Let_binding = struct
             | Ppat_var {txt= v; _}, Pexp_ident {txt= Lident e; _} ->
                 String.equal v e
             | _ -> false )
-        ; lb_attrs= []
+        ; lb_attrs= (Ast_helper.Attr.ext_attrs ())
         ; lb_loc= bo.pbop_loc } )
 end
