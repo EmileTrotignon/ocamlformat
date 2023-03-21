@@ -181,7 +181,8 @@ class%foo [@foo] x = x
 
 class type%foo [@foo] x = x
 
-external%foo x : _ = "" [@@foo]
+external%foo [@foo] x : _ = ""
+
 exception%foo X [@foo]
 
 module%foo [@foo] M = M
@@ -196,8 +197,8 @@ open%foo [@foo] M
 
 (* Signature items *)
 module type S = sig
-  val%foo x : t [@@foo]
-  external%foo x : t = "" [@@foo]
+  val%foo [@foo] x : t
+  external%foo [@foo] x : t = ""
 
   type%foo[@foo] t = int
   and[@foo] t' = int

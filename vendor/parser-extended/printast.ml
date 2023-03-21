@@ -517,7 +517,7 @@ and if_branch i ppf { if_cond; if_body } =
 and value_description i ppf x =
   line i ppf "value_description %a %a\n" fmt_string_loc
        x.pval_name fmt_location x.pval_loc;
-  attributes i ppf x.pval_attributes;
+  ext_attrs i ppf x.pval_attributes;
   core_type (i+1) ppf x.pval_type;
   list (i+1) string_loc ppf x.pval_prim
 

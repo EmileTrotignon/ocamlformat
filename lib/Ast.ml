@@ -320,13 +320,14 @@ module Structure_item = struct
     | Pstr_attribute atr -> Attr.is_doc atr
     (* one attribute list *)
     | Pstr_eval (_, atrs)
-     |Pstr_primitive {pval_attributes= atrs; _}
      |Pstr_typext {ptyext_attributes= atrs; _}
      |Pstr_recmodule ({pmb_expr= {pmod_attributes= atrs; _}; _} :: _)
      |Pstr_extension (_, atrs) ->
         List.exists ~f:Attr.is_doc atrs
     (* two attribute lists *)
-    | Pstr_value
+    | Pstr_primitive
+        {pval_attributes= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
+     |Pstr_value
         { pvbs_bindings=
             {pvb_attributes= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
             :: _
@@ -429,14 +430,13 @@ end
 module Signature_item = struct
   let has_doc itm =
     match itm.psig_desc with
-    | Psig_attribute atr -> Attr.is_doc atr
-    (* one attribute list *)
-    | Psig_value {pval_attributes= atrs; _}
-     |Psig_typext {ptyext_attributes= atrs; _}
-     |Psig_extension (_, atrs) ->
+    | Psig_attribute atr -> Attr.is_doc atr (* one attribute list *)
+    | Psig_typext {ptyext_attributes= atrs; _} | Psig_extension (_, atrs) ->
         List.exists ~f:Attr.is_doc atrs
     (* two attribute list *)
-    | Psig_typesubst
+    | Psig_value
+        {pval_attributes= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
+     |Psig_typesubst
         ( {ptype_attributes= {attrs_before= atrs1; attrs_after= atrs2; _}; _}
         :: _ )
      |Psig_type

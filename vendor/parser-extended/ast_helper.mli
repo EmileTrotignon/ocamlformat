@@ -207,7 +207,10 @@ module Exp:
 (** Value declarations *)
 module Val:
   sig
-    val mk: ?loc:loc -> ?attrs:attrs -> ?docs:docs ->
+    val mk: ?loc:loc -> ?attrs:ext_attrs -> ?docs:docs ->
+      ?prim:str list -> str -> core_type -> value_description
+    
+    val mk_exh: loc:loc -> attrs:ext_attrs -> docs:docs ->
       ?prim:str list -> str -> core_type -> value_description
   end
 
