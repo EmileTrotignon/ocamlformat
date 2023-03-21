@@ -217,7 +217,6 @@ module type S = sig
   module type%foo [@foo] S = S
 
   include%foo [@foo] M
-
   open%foo [@foo] M
 
   class%foo [@foo] x : t
