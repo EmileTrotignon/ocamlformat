@@ -577,12 +577,6 @@ let rec fmt_extension_aux c ctx ~key (ext, pld) =
       assert (not (Cmts.has_before c.cmts pstr_loc)) ;
       assert (not (Cmts.has_after c.cmts pstr_loc)) ;
       hvbox 0 (fmt_quoted_string (Ext.Key.to_string key) ext str delim)
-  | _, PStr [({pstr_loc; _} as si)], (Pld _ | Str _ | Top)
-    when Source.extension_using_sugar ~name:ext ~payload:pstr_loc ->
-      fmt_structure_item c ~last:true ~ext ~semisemi:false (sub_str ~ctx si)
-  | _, PSig [({psig_loc; _} as si)], (Pld _ | Sig _ | Top)
-    when Source.extension_using_sugar ~name:ext ~payload:psig_loc ->
-      fmt_signature_item c ~ext (sub_sig ~ctx si)
   | _, PPat (({ppat_loc; _} as pat), _), (Pld _ | Top)
     when Source.extension_using_sugar ~name:ext ~payload:ppat_loc ->
       fmt_pattern c ~ext (sub_pat ~ctx pat)
@@ -3403,7 +3397,9 @@ and fmt_type_extension c ctx
     ; ptyext_loc } =
   let c = update_config_attrs c ptyext_attributes in
   let ext = ptyext_attributes.attrs_extension in
-  let doc, _doc_after, attrs_before, attrs_after = fmt_docstring_around_item_attrs ~force_before:true c ptyext_attributes in
+  let doc, _doc_after, attrs_before, attrs_after =
+    fmt_docstring_around_item_attrs ~force_before:true c ptyext_attributes
+  in
   let fmt_ctor ctor = hvbox 0 (fmt_extension_constructor c ctx ctor) in
   Cmts.fmt c ptyext_loc
   @@ hvbox 2
@@ -3429,17 +3425,24 @@ and fmt_type_extension c ctx
 and fmt_type_exception ~pre c ctx
     {ptyexn_attributes= item_attrs; ptyexn_constructor; ptyexn_loc} =
   let {pext_attributes= cons_attrs; _} = ptyexn_constructor in
-  let docs, item_attrs = extract_doc_attrs [] item_attrs in
+  let docs, attrs_before = extract_doc_attrs [] item_attrs.attrs_before in
+  let docs, attrs_after = extract_doc_attrs docs item_attrs.attrs_after in
   let docs, cons_attrs = extract_doc_attrs docs cons_attrs in
   let doc_before, doc_after = fmt_docstring_around_item' c docs in
   let ptyexn_constructor =
     {ptyexn_constructor with pext_attributes= cons_attrs}
   in
+  let ext = item_attrs.attrs_extension in
   Cmts.fmt c ptyexn_loc
     (hvbox 0
        ( doc_before
-       $ hvbox 2 (pre $ fmt_extension_constructor c ctx ptyexn_constructor)
-       $ fmt_item_attributes c ~pre:(Break (1, 0)) item_attrs
+       $ hvbox 2
+           ( pre
+           $ fmt_extension_suffix c ext
+           $ fmt_attributes c ~pre:(Break (1, 0)) attrs_before
+           $ fmt "@ "
+           $ fmt_extension_constructor c ctx ptyexn_constructor )
+       $ fmt_item_attributes c ~pre:(Break (1, 0)) attrs_after
        $ doc_after ) )
 
 and fmt_extension_constructor c ctx ec =
@@ -3607,7 +3610,7 @@ and fmt_signature c ctx itms =
   let ast x = Sig x in
   fmt_item_list c ctx update_config ast fmt_item itms
 
-and fmt_signature_item c ?ext {ast= si; _} =
+and fmt_signature_item c {ast= si; _} =
   protect c (Sig si)
   @@
   let fmt_cmts_before = Cmts.Toplevel.fmt_before c si.psig_loc in
@@ -3618,7 +3621,7 @@ and fmt_signature_item c ?ext {ast= si; _} =
   match si.psig_desc with
   | Psig_attribute attr -> fmt_floating_attributes_and_docstrings c [attr]
   | Psig_exception exc ->
-      let pre = str "exception" $ fmt_extension_suffix c ext $ fmt "@ " in
+      let pre = str "exception" in
       hvbox 2 (fmt_type_exception ~pre c ctx exc)
   | Psig_extension (ext, atrs) ->
       let doc_before, doc_after, atrs = fmt_docstring_around_item c atrs in
@@ -4206,8 +4209,8 @@ and fmt_type c ?eq rec_flag decls ctx =
   let ast x = Td x in
   fmt_item_list c ctx update_config ast fmt_decl decls
 
-and fmt_structure_item c ~last:last_item ?ext ~semisemi
-    {ctx= parent_ctx; ast= si} =
+and fmt_structure_item c ~last:last_item ~semisemi {ctx= parent_ctx; ast= si}
+    =
   protect c (Str si)
   @@
   let ctx = Str si in
@@ -4226,7 +4229,7 @@ and fmt_structure_item c ~last:last_item ?ext ~semisemi
       $ cbox 0 ~name:"eval" (fmt_expression c (sub_exp ~ctx exp))
       $ fmt_item_attributes c ~pre:Space atrs
   | Pstr_exception extn_constr ->
-      let pre = str "exception" $ fmt_extension_suffix c ext $ fmt "@ " in
+      let pre = str "exception" in
       hvbox 2 ~name:"exn" (fmt_type_exception ~pre c ctx extn_constr)
   | Pstr_include {pincl_mod; pincl_attributes= attributes; pincl_loc} ->
       update_config_maybe_disabled_attrs c pincl_loc attributes
@@ -4244,9 +4247,8 @@ and fmt_structure_item c ~last:last_item ?ext ~semisemi
         fmt_or_k
           (is_override popen_override)
           ( str "open!"
-          $ fmt_if (Option.is_some attributes.attrs_extension) "@ "
-          $ opt ext (fun _ -> str " " $ fmt_extension_suffix c ext) )
-          (str "open" $ fmt_extension_suffix c ext)
+          $ fmt_if (Option.is_some attributes.attrs_extension) "@ " )
+          (str "open")
       in
       fmt_module_statement c ~attributes ~keyword (sub_mod ~ctx popen_expr)
   | Pstr_primitive vd -> fmt_value_description c ctx vd

@@ -238,7 +238,7 @@ module Te:
       ?params:(core_type * variance_and_injectivity) list ->
       ?priv:private_flag -> lid -> extension_constructor list -> type_extension
 
-    val mk_exception: ?loc:loc -> ?attrs:attrs -> ?docs:docs ->
+    val mk_exception: ?loc:loc -> ?attrs:ext_attrs -> ?docs:docs ->
       extension_constructor -> type_exception
 
     val constructor: ?loc:loc -> ?attrs:attrs -> ?docs:docs -> ?info:info ->
