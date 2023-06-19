@@ -23,13 +23,20 @@ let ensure_escape ?(escape_char = '\\') ~escapeworthy s =
   let dst = Buffer.create (String.length s + 8) in
   let prev_off = ref 0 in
   let stash until =
-    Buffer.add_substring dst s ~pos:!prev_off ~len:(until - !prev_off)
+    Buffer.add_substring dst s !prev_off (until - !prev_off)
   in
   let len = String.length s in
+  let is_char_escaped i =
+      if i = 0 then
+        false
+      else
+        Char.(s.[i - 1] = escape_char)
+
+  in
   for i = 0 to len - 1 do
     if
       escapeworthy s.[i]
-      && not (String.Escaping.is_char_escaped s ~escape_char i)
+      && not (is_char_escaped i)
     then (
       stash i ;
       prev_off := i ;
@@ -56,7 +63,7 @@ let split_on_whitespaces =
 let str_normalized ?(escape = escape_all) c s =
   if c.conf.fmt_opts.wrap_docstrings.v then
     split_on_whitespaces s
-    |> List.filter ~f:(Fn.non String.is_empty)
+    |> List.filter ~f:(Fun.negate String.is_empty)
     |> fun s -> list s "@ " (fun s -> escape s |> str)
   else str (escape s)
 
@@ -224,7 +231,7 @@ let rec fmt_inline_elements c elements =
         @@ wrap_elements "{" "}" ~always_wrap:false url txt
         $ aux t
   in
-  aux (List.map elements ~f:(ign_loc ~f:Fn.id))
+  aux (List.map elements ~f:(ign_loc ~f:Fun.id))
 
 and fmt_nestable_block_element c elm =
   match elm.Loc.value with

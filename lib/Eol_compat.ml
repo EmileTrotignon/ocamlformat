@@ -35,7 +35,7 @@ let normalize_eol ?(exclude_locs = []) ~line_endings s =
         Buffer.contents buf
     | (start, stop) :: xs ->
         normalize_segment ~seen_cr:0 i start ;
-        Buffer.add_substring buf s ~pos:start ~len:(stop - start) ;
+        Buffer.add_substring buf s start (stop - start) ;
         loop xs stop
   in
   loop exclude_locs 0

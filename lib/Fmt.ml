@@ -40,30 +40,30 @@ module T : sig
   val eval : Format_.formatter -> t -> unit
   (** Main function to evaluate a term using an actual formatter. *)
 end = struct
-  type t = (Format_.formatter -> unit) Staged.t
+  type t = (Format_.formatter -> unit)
 
   let ( $ ) f g =
-    let f = Staged.unstage f in
-    let g = Staged.unstage g in
-    Staged.stage (fun x -> f x ; g x)
+    let f =  f in
+    let g =  g in
+    (fun x -> f x ; g x)
 
-  let with_pp f = Staged.stage f
+  let with_pp f = f
 
   let eval fs f =
-    let f = Staged.unstage f in
+    let f = f in
     f fs
 
   let protect t ~on_error =
-    let t = Staged.unstage t in
-    Staged.stage (fun fs ->
+    let t =  t in
+     (fun fs ->
         try t fs
         with exn ->
           Format_.pp_print_flush fs () ;
           on_error exn )
 
   let lazy_ f =
-    Staged.stage (fun fs ->
-        let k = Staged.unstage (f ()) in
+    (fun fs ->
+        let k =  (f ()) in
         k fs )
 end
 
@@ -189,7 +189,7 @@ let fits_or_breaks ~level fits nspaces offset breaks =
   with_pp (fun fs ->
       Format_.pp_print_fits_or_breaks fs ~level fits nspaces offset breaks )
 
-let fits_breaks ?force ?(hint = (0, Int.min_value)) ?(level = 0) fits breaks
+let fits_breaks ?force ?(hint = (0, Int.min_int)) ?(level = 0) fits breaks
     =
   let nspaces, offset = hint in
   match force with
@@ -258,7 +258,7 @@ let debug_box_open ?name box_kind n fs =
     pp_color_k (box_depth_color ())
       (fun fs -> Format_.fprintf fs "@<0>[@<0>%s@<0>>" openning)
       fs ;
-    Int.incr box_depth )
+    incr box_depth )
 
 let debug_box_close fs =
   if !box_debug_enabled then
@@ -266,7 +266,7 @@ let debug_box_close fs =
       (* mismatched close, red background *)
       pp_color_k 41 (fun fs -> Format_.fprintf fs "@<0>]") fs
     else (
-      Int.decr box_depth ;
+      decr box_depth ;
       pp_color_k (box_depth_color ())
         (fun fs -> Format_.fprintf fs "@<0>]")
         fs )
@@ -326,7 +326,7 @@ let fill_text ?(epi = "") text =
   assert (not (String.is_empty text)) ;
   let fmt_line line =
     let words =
-      List.filter ~f:(Fn.non String.is_empty)
+      List.filter ~f:(Fun.negate String.is_empty)
         (String.split_on_chars line
            ~on:['\t'; '\n'; '\011'; '\012'; '\r'; ' '] )
     in
@@ -335,7 +335,7 @@ let fill_text ?(epi = "") text =
   let lines =
     List.remove_consecutive_duplicates
       ~equal:(fun x y -> String.is_empty x && String.is_empty y)
-      (String.split (String.rstrip text) ~on:'\n')
+      (String.split_on_char (String.rstrip text) ~sep:'\n')
   in
   let pro = if String.starts_with_whitespace text then " " else "" in
   let epi =

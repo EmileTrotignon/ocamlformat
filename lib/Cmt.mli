@@ -23,7 +23,7 @@ val loc : t -> Location.t
 
 val txt : t -> string
 
-include Comparator.S with type t := t
+val compare : t -> t -> int
 
 type error =
   { kind: [`Added of t | `Modified of t * t | `Dropped of t]
@@ -37,10 +37,17 @@ type loc = t
 
 module Comparator_no_loc : sig
   type t = loc
+  val compare : t -> t -> int
 
-  include Comparator.S with type t := t
 end
 
 val unindent_lines : offset:int -> string list -> string list
 (** Detect and remove the baseline indentation of a comment or a code block.
     [offset] is the column number at which the first line starts. *)
+
+    module Set_no_loc : Set.S with type elt = t
+
+module Set : Set.S with type elt = t
+module Map_no_loc : Map.S with type key = t
+
+module Map : Map.S with type key = t

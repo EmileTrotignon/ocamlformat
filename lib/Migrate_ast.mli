@@ -22,21 +22,23 @@ end
 module Position : sig
   type t = Lexing.position
 
-  include Comparator.S with type t := t
-
   val column : t -> int
 
   val distance : t -> t -> int
 
   val compare : t -> t -> int
+
+  module Map : Map.S with type key = t 
 end
+
 
 module Location : sig
   include module type of Location
 
   type comparator_witness
+  
+  module Map : Map.S with type key = t 
 
-  val comparator : (t, comparator_witness) Comparator.t
 
   val contains : t -> t -> bool
 

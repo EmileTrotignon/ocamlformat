@@ -8,7 +8,7 @@ let to_absolute file = if is_rel file then append (cwd ()) file else file
 
 let to_string ?(relativize = false) p =
   if relativize then
-    Base.Option.value_map
+    Option_ext.value_map
       (Fpath.relativize ~root:(cwd ()) p)
       ~default:(to_string p) ~f:to_string
   else to_string p

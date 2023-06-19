@@ -199,7 +199,7 @@ let get_cases (c : Conf.t) ~ctx ~first ~last ~xbch:({ast; _} as xast) =
   | `Nested ->
       { leading_space= fmt_if (not first) "@ "
       ; bar= fmt_or_k first (if_newline "| ") (str "| ")
-      ; box_all= Fn.id
+      ; box_all= Fun.id
       ; box_pattern_arrow= hovbox 0
       ; break_before_arrow= fmt "@;<1 2>"
       ; break_after_arrow= fmt_if (not parens_branch) "@;<0 3>"
@@ -250,7 +250,7 @@ let wrap_record (c : Conf.t) =
 
 let wrap_tuple (c : Conf.t) ~parens ~no_parens_if_break =
   if parens then wrap_fits_breaks c "(" ")"
-  else if no_parens_if_break then Fn.id
+  else if no_parens_if_break then Fun.id
   else wrap_k (fits_breaks "" "( ") (fits_breaks "" ~hint:(1, 0) ")")
 
 type record_type =
@@ -455,7 +455,7 @@ let get_if_then_else (c : Conf.t) ~first ~last ~parens_bch ~parens_prev_bch
   | `Compact ->
       { box_branch= hovbox 2
       ; cond= cond ()
-      ; box_keyword_and_expr= Fn.id
+      ; box_keyword_and_expr= Fun.id
       ; branch_pro= fmt_or (beginend || parens_bch) " " "@ "
       ; wrap_parens=
           wrap_parens
@@ -468,9 +468,9 @@ let get_if_then_else (c : Conf.t) ~first ~last ~parens_bch ~parens_prev_bch
       ; break_end_branch= noop
       ; space_between_branches= fmt "@ " }
   | `K_R ->
-      { box_branch= Fn.id
+      { box_branch= Fun.id
       ; cond= cond ()
-      ; box_keyword_and_expr= Fn.id
+      ; box_keyword_and_expr= Fun.id
       ; branch_pro
       ; wrap_parens= wrap_parens ~wrap_breaks:(wrap_k (break 1000 2) noop)
       ; box_expr= Some false
@@ -486,7 +486,7 @@ let get_if_then_else (c : Conf.t) ~first ~last ~parens_bch ~parens_prev_bch
             | `Closing_on_separate_line when parens_prev_bch -> -2
             | _ -> 0 )
       ; cond= cond ()
-      ; box_keyword_and_expr= Fn.id
+      ; box_keyword_and_expr= Fun.id
       ; branch_pro
       ; wrap_parens=
           wrap_parens
@@ -507,9 +507,9 @@ let get_if_then_else (c : Conf.t) ~first ~last ~parens_bch ~parens_prev_bch
             | `Closing_on_separate_line when beginend || parens_bch -> " "
             | _ -> "@ " ) }
   | `Vertical ->
-      { box_branch= Fn.id
+      { box_branch= Fun.id
       ; cond= cond ()
-      ; box_keyword_and_expr= Fn.id
+      ; box_keyword_and_expr= Fun.id
       ; branch_pro
       ; wrap_parens=
           wrap_parens
@@ -526,7 +526,7 @@ let get_if_then_else (c : Conf.t) ~first ~last ~parens_bch ~parens_prev_bch
             | `Closing_on_separate_line when parens_bch -> " "
             | _ -> "@ " ) }
   | `Keyword_first ->
-      { box_branch= Fn.id
+      { box_branch= Fun.id
       ; cond=
           opt xcond (fun xcnd ->
               hvbox 2
@@ -575,7 +575,7 @@ module Align = struct
     List.exists
       ~f:(function
         | Nolabel, _ -> false
-        | Labelled _, x | Optional _, x -> phys_equal x exp )
+        | Labelled _, x | Optional _, x ->  x == exp )
       args
 
   let general (c : Conf.t) t =
@@ -587,7 +587,7 @@ module Align = struct
     (* Matches on the RHS of an infix are docked in ocp-indent-compat. *)
     let docked =
       match ctx with
-      | Exp {pexp_desc= Pexp_infix (_, _, rhs); _} when phys_equal rhs ast ->
+      | Exp {pexp_desc= Pexp_infix (_, _, rhs); _} when  rhs == ast ->
           c.fmt_opts.ocp_indent_compat.v
       | _ -> false
     in

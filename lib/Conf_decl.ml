@@ -356,7 +356,7 @@ module Value_removed = struct
 
   let add_parse_errors values conv =
     let parse s =
-      match List.find values ~f:(fun {name; _} -> String.equal name s) with
+      match List.find_opt values ~f:(fun {name; _} -> String.equal name s) with
       | Some {name; version; msg} ->
           Format.kasprintf
             (fun s -> Error (`Msg s))
@@ -370,9 +370,9 @@ end
 let choice ~all ?(removed_values = []) ~names ~default ~doc ~kind
     ?(allow_inline = Poly.(kind = Formatting)) ?status update get_value =
   let default_v = default |> get_value |> Conf_t.Elt.v in
-  let _, default', _, _ = List.hd_exn all in
+  let _, default', _, _ = List.hd all in
   assert (Stdlib.(default_v = default')) ;
-  let name = Option.value_exn (longest names) in
+  let name = Option.get (longest names) in
   let opt_names = List.map all ~f:(fun (x, y, _, _) -> (x, y)) in
   let conv =
     Value_removed.add_parse_errors removed_values (Arg.enum opt_names)
@@ -397,7 +397,7 @@ let choice ~all ?(removed_values = []) ~names ~default ~doc ~kind
   let update conf elt =
     let x = Conf_t.Elt.v elt in
     let from = Conf_t.Elt.from elt in
-    ( match List.find all ~f:(fun (_, v, _, _) -> Poly.(x = v)) with
+    ( match List.find_opt all ~f:(fun (_, v, _, _) -> Poly.(x = v)) with
     | Some value -> Value.warn_if_deprecated conf from name value
     | None -> () ) ;
     update conf elt
@@ -460,7 +460,7 @@ let update store ~config ~from:new_from ~name ~value ~inline =
           | Error (`Msg error) -> Some (Error (Error.Bad_value (name, error)))
       else
         match
-          List.find names ~f:(fun x -> String.equal ("no-" ^ x) name)
+          List.find_opt names ~f:(fun x -> String.equal ("no-" ^ x) name)
         with
         | Some valid_name ->
             let error =
@@ -478,7 +478,7 @@ let default {default; _} = default
 
 let print_config store c =
   let on_pack (Pack {names; to_string; get_value; status; _}) =
-    let name = Option.value_exn (longest names) in
+    let name = Option.get (longest names) in
     let value = c |> get_value |> Conf_t.Elt.v |> to_string in
     let from = c |> get_value |> Conf_t.Elt.from in
     match status with

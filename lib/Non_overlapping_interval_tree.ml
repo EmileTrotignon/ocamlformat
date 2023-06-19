@@ -10,11 +10,15 @@
 (**************************************************************************)
 
 module type IN = sig
-  include Comparator.S
+  type t
+
+  val compare : t -> t -> int
 
   val contains : t -> t -> bool
 
   val compare_width_decreasing : t -> t -> int
+
+  val to_sexp : t -> Sexp.t
 end
 
 module type S = sig
@@ -37,16 +41,18 @@ end
 module Make (Itv : IN) = struct
   (* simple but (asymptotically) suboptimal implementation *)
 
+  module Map = Map.Make(Itv)
+
   type itv = Itv.t
 
-  type t = {roots: Itv.t list; map: Itv.t list Map.M(Itv).t}
+  type t = {roots: Itv.t list; map: Itv.t list Map.t}
 
-  let empty = {roots= []; map= Map.empty (module Itv)}
+  let empty = {roots= []; map= Map.empty}
 
   let roots t = t.roots
 
   let map_add_multi map ~key ~data =
-    Map.update map key ~f:(function None -> [data] | Some l -> data :: l)
+    Map.update  key (function None -> Some [data] | Some l -> Some (data :: l)) map
 
   (** Descend tree from roots, find deepest node that contains elt. *)
   let rec parents map roots ~ancestors elt =
@@ -54,7 +60,7 @@ module Make (Itv : IN) = struct
       (List.find_map roots ~f:(fun root ->
            if Itv.contains root elt then
              let ancestors = root :: ancestors in
-             ( match Map.find map root with
+             ( match Map.find_opt  root map with
              | Some children -> parents map children ~ancestors elt
              | None -> ancestors )
              |> Option.some
@@ -65,7 +71,7 @@ module Make (Itv : IN) = struct
   let add_child t ~parent ~child =
     {t with map= map_add_multi t.map ~key:parent ~data:child}
 
-  let map_lists ~f {roots; map} = {roots= f roots; map= Map.map map ~f}
+  let map_lists ~f {roots; map} = {roots= f roots; map= Map.map f map}
 
   let rec find_in_previous t elt = function
     | [] -> parents t.map t.roots elt ~ancestors:[]
@@ -88,12 +94,12 @@ module Make (Itv : IN) = struct
       (ancestors, t)
     in
     elts
-    |> List.dedup_and_sort ~compare:Itv.compare_width_decreasing
-    |> List.fold ~init:([], empty) ~f:add
+    |> List.sort_uniq ~cmp:Itv.compare_width_decreasing
+    |> List.fold_left ~init:([], empty) ~f:add
     |> snd
-    |> map_lists ~f:(List.sort ~compare:Itv.compare_width_decreasing)
+    |> map_lists ~f:(List.sort ~cmp:Itv.compare_width_decreasing)
 
-  let children {map; _} elt = Option.value ~default:[] (Map.find map elt)
+  let children {map; _} elt = Option.value ~default:[] (Map.find_opt elt map)
 
   let dump tree =
     let open Fmt in
@@ -102,7 +108,7 @@ module Make (Itv : IN) = struct
         (list roots "@," (fun root ->
              let children = children tree root in
              vbox 1
-               ( str (Sexp.to_string_hum (Itv.comparator.sexp_of_t root))
+               ( str (Sexp.to_string_hum (Itv.to_sexp root))
                $ wrap_if
                    (not (List.is_empty children))
                    "@,{" " }" (dump_ tree children) ) ) )

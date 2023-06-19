@@ -63,7 +63,7 @@ module String_id = struct
 
   let is_monadic_binding s =
     String.length s > 3
-    && (String.is_prefix s ~prefix:"let" || String.is_prefix s ~prefix:"and")
+    && (String.starts_with s ~prefix:"let" || String.starts_with s ~prefix:"and")
     && Option.is_none
          (String.lfindi s ~pos:3 ~f:(fun _ c -> not (Char_id.is_kwdop c)))
 

@@ -41,7 +41,6 @@ module T = struct
 end
 
 include T
-include Comparator.Make (T)
 
 type error =
   { kind: [`Added of t | `Modified of t * t | `Dropped of t]
@@ -85,17 +84,24 @@ let pp_error fs {kind; cmt_kind} =
 module T_no_loc = struct
   include T
 
-  let compare =
-    Comparable.lexicographic [Comparable.lift String.compare ~f:txt]
+  let compare cmt cmt'=
+
+    String.compare (txt cmt) (txt cmt')
 end
 
 type loc = t
 
-module Comparator_no_loc = struct
-  type t = loc
 
-  include Comparator.Make (T_no_loc)
-end
+module Set_no_loc = Set.Make(T_no_loc)
+
+module Set = Set.Make (T)
+
+
+
+
+module Map_no_loc = Map.Make(T_no_loc)
+
+module Map = Map.Make (T)
 
 type pos = Before | Within | After
 

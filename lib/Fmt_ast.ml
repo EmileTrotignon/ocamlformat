@@ -101,7 +101,7 @@ let protect =
         raise exc )
 
 let update_config ?quiet c l =
-  {c with conf= List.fold ~init:c.conf l ~f:(Conf.update ?quiet)}
+  {c with conf= List.fold_left ~init:c.conf l ~f:(Conf.update ?quiet)}
 
 (* Preserve the position of comments located after the last element of a
    list/array (after `;`), otherwise comments are picked up by
@@ -172,7 +172,7 @@ let maybe_disabled_k c (loc : Location.t) (l : attributes) f k =
     let s = Source.string_at c.source loc in
     k (Cmts.fmt c loc (str s))
 
-let maybe_disabled c loc l f = maybe_disabled_k c loc l f Fn.id
+let maybe_disabled c loc l f = maybe_disabled_k c loc l f Fun.id
 
 let update_config_maybe_disabled c loc l f =
   let c = update_config c l in
@@ -188,7 +188,7 @@ let update_items_config c items update_config =
     let c = update_config c i in
     (c, (i, c))
   in
-  let _, items = List.fold_map items ~init:c ~f:with_config in
+  let _, items = List.fold_left_map items ~init:c ~f:with_config in
   items
 
 let box_semisemi c ~parent_ctx b k =
@@ -262,7 +262,7 @@ let fmt_constant c ?epi {pconst_desc; pconst_loc= loc} =
   | Pconst_string (_, loc', None) -> (
       let delim = ["@,"; "@;"] in
       let contains_pp_commands s =
-        let is_substring substring = String.is_substring s ~substring in
+        let is_substring substring = String.contains s ~substring in
         List.exists delim ~f:is_substring
       in
       let fmt_string_auto ~break_on_newlines s =
@@ -673,7 +673,7 @@ and fmt_record_field c ?typ1 ?typ2 ?rhs lid1 =
   let fmt_type_rhs =
     match List.filter_opt [t1; t2; r] with
     | [] -> noop
-    | l -> field_space $ list l "@ " Fn.id
+    | l -> field_space $ list l "@ " Fun.id
   in
   Cmts.fmt_before c lid1.loc
   $ cbox 0
@@ -737,7 +737,7 @@ and fmt_core_type c ?(box = true) ?pro ?(pro_space = true) ?constraint_ctx
   let doc, atrs = doc_atrs ptyp_attributes in
   Cmts.fmt c ptyp_loc
   @@ (fun k -> k $ fmt_docstring c ~pro:(fmt "@ ") doc)
-  @@ ( if List.is_empty atrs then Fn.id
+  @@ ( if List.is_empty atrs then Fun.id
        else fun k ->
          hvbox 0 (Params.parens c.conf (k $ fmt_attributes c ~pre:Cut atrs))
      )
@@ -757,7 +757,7 @@ and fmt_core_type c ?(box = true) ?pro ?(pro_space = true) ?constraint_ctx
   let parenze_constraint_ctx =
     match constraint_ctx with
     | Some `Fun when not parens -> wrap "(" ")"
-    | _ -> Fn.id
+    | _ -> Fun.id
   in
   match ptyp_desc with
   | Ptyp_alias (typ, str) ->
@@ -955,7 +955,7 @@ and fmt_pattern ?ext c ?pro ?parens ?(box = false)
   update_config_maybe_disabled c ppat_loc ppat_attributes
   @@ fun c ->
   let parens = match parens with Some b -> b | None -> parenze_pat xpat in
-  (match ctx0 with Pat {ppat_desc= Ppat_tuple _; _} -> hvbox 0 | _ -> Fn.id)
+  (match ctx0 with Pat {ppat_desc= Ppat_tuple _; _} -> hvbox 0 | _ -> Fun.id)
   @@ ( match ppat_desc with
      | Ppat_or _ -> fun k -> Cmts.fmt c ppat_loc @@ k
      | _ -> fun k -> Cmts.fmt c ppat_loc @@ (fmt_opt pro $ k) )
@@ -1881,7 +1881,7 @@ and fmt_expression c ?(box = true) ?pro ?epi ?eol ?parens ?(indent_wrap = 0)
            $ fmt_atrs ) )
   | Pexp_apply (e0, e1N1) -> (
       let wrap =
-        if c.conf.fmt_opts.wrap_fun_args.v then Fn.id else hvbox 2
+        if c.conf.fmt_opts.wrap_fun_args.v then Fun.id else hvbox 2
       in
       let (lbl, last_arg), args_before =
         match List.rev e1N1 with
@@ -2631,11 +2631,11 @@ and fmt_expression c ?(box = true) ?pro ?epi ?eol ?parens ?(indent_wrap = 0)
            branch *)
         | Exp {pexp_desc= Pexp_ifthenelse (_, Some z); _}
           when Base.phys_equal xexp.ast z ->
-            Fn.id
+            Fun.id
         | Exp {pexp_desc= Pexp_ifthenelse (eN, _); _}
           when List.exists eN ~f:(fun x ->
                    Base.phys_equal xexp.ast x.if_body ) ->
-            Fn.id
+            Fun.id
         (* begin-end keywords are handled when printing pattern-matching
            cases *)
         | Exp
@@ -2643,7 +2643,7 @@ and fmt_expression c ?(box = true) ?pro ?epi ?eol ?parens ?(indent_wrap = 0)
                 Pexp_function xs | Pexp_match (_, xs) | Pexp_try (_, xs)
             ; _ }
           when List.exists xs ~f:(fun x -> Poly.(x.pc_rhs = exp)) ->
-            Fn.id
+            Fun.id
         | _ ->
             fun k ->
               let opn = str "begin" $ fmt_extension_suffix c ext
@@ -3409,7 +3409,7 @@ and fmt_functor_param c ctx {loc; txt= arg} =
         (wrap "(" ")"
            (hovbox 0
               ( hovbox 0 (fmt_str_loc_opt c name $ fmt "@ : ")
-              $ compose_module (fmt_module_type c xmt) ~f:Fn.id ) ) )
+              $ compose_module (fmt_module_type c xmt) ~f:Fun.id ) ) )
 
 and fmt_module_type c ?(rec_ = false) ({ast= mty; _} as xmty) =
   let ctx = Mty mty in
@@ -3890,7 +3890,7 @@ and fmt_mod_apply c ctx loc attrs ~parens ~dock_struct me_f arg =
               ( hvbox 2
                   ( compose_module
                       (fmt_module_expr c (sub_mod ~ctx me_f))
-                      ~f:Fn.id
+                      ~f:Fun.id
                   $ break 1 0 $ x )
               $ fmt_attributes_and_docstrings c attrs ) }
     | `Block (blk_a, arg_is_simple) ->
@@ -3911,7 +3911,7 @@ and fmt_mod_apply c ctx loc attrs ~parens ~dock_struct me_f arg =
             c.conf.fmt_opts.break_struct.v && (not dock_struct)
             && not arg_is_simple
           in
-          compose_module (fmt_module_expr c (sub_mod ~ctx me_f)) ~f:Fn.id
+          compose_module (fmt_module_expr c (sub_mod ~ctx me_f)) ~f:Fun.id
           $ break (if break_struct then 1000 else 1) 0
           $ str "("
         in
@@ -3948,7 +3948,7 @@ and fmt_mod_apply c ctx loc attrs ~parens ~dock_struct me_f arg =
             $
             match arg with
             | `Unit x -> x
-            | `Block (x, _) -> wrap "(" ")" (compose_module x ~f:Fn.id) )
+            | `Block (x, _) -> wrap "(" ")" (compose_module x ~f:Fun.id) )
       ; cls= close_box $ blk_f.cls
       ; epi=
           Option.some_if has_epi
@@ -4473,7 +4473,7 @@ let fmt_file (type a) ~ctx ~fmt_code ~debug (fragment : a Extended_ast.t)
   | Use_file, l -> Chunk.split_and_fmt Use_file c ctx l
   | Core_type, ty -> fmt_core_type c (sub_typ ~ctx:(Pld (PTyp ty)) ty)
   | Module_type, mty ->
-      compose_module ~f:Fn.id
+      compose_module ~f:Fun.id
         (fmt_module_type c (sub_mty ~ctx:(Mty mty) mty))
   | Expression, e ->
       fmt_expression c (sub_exp ~ctx:(Str (Ast_helper.Str.eval e)) e)

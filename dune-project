@@ -38,8 +38,6 @@
    (and
     :with-test
     (>= 1.3.0)))
-  (base
-   (>= v0.12.0))
   dune
   dune-build-info
   either

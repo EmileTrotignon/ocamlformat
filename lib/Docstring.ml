@@ -37,7 +37,7 @@ type norm_conf = {normalize_code: string -> string}
 let normalize_text s =
   (* normalize consecutive whitespace chars to a single space *)
   String.concat ~sep:" "
-    (List.filter ~f:(Fn.non String.is_empty)
+    (List.filter ~f:(Fun.negate String.is_empty)
        (String.split_on_chars s ~on:['\t'; '\n'; '\011'; '\012'; '\r'; ' ']) )
 
 let list f fmt l =
@@ -154,5 +154,5 @@ let normalize ~parse_docstrings ~normalize_code text =
     Format.asprintf "Docstring(%a)%!" (odoc_docs c) (Odoc_parser.ast parsed)
 
 let dump fmt x =
-  let c = {normalize_code= Fn.id} in
+  let c = {normalize_code= Fun.id} in
   Format.fprintf fmt "Docstring(%a)%!" (odoc_docs c) x

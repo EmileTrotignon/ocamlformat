@@ -751,7 +751,7 @@ end
 
 let clear_remaining_inside t loc =
   if t.debug then
-    update_remaining t ~f:(Set.filter ~f:(Fn.non (Location.contains loc)))
+    update_remaining t ~f:(Set.filter ~f:(Fun.negate (Location.contains loc)))
 
 let drop_inside t loc =
   let clear pos =

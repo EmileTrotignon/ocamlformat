@@ -138,7 +138,7 @@ module Exp = struct
     | Pexp_fun _ | Pexp_function _ | Pexp_ifthenelse _ | Pexp_match _
      |Pexp_newtype _ | Pexp_try _ ->
         false
-    | _ -> List.exists pexp_attributes ~f:(Fn.non Attr.is_doc)
+    | _ -> List.exists pexp_attributes ~f:(Fun.negate Attr.is_doc)
 
   let rec is_trivial exp =
     match exp.pexp_desc with
@@ -209,12 +209,12 @@ module Pat = struct
      |Ppat_record _ | Ppat_array _ | Ppat_list _ | Ppat_type _
      |Ppat_unpack _ | Ppat_extension _ | Ppat_open _ | Ppat_interval _ ->
         false
-    | _ -> List.exists ppat_attributes ~f:(Fn.non Attr.is_doc)
+    | _ -> List.exists ppat_attributes ~f:(Fun.negate Attr.is_doc)
 end
 
 let doc_atrs ?(acc = []) atrs =
   let docs, rev_atrs =
-    List.fold atrs ~init:(acc, []) ~f:(fun (docs, rev_atrs) atr ->
+    List.fold_left atrs ~init:(acc, []) ~f:(fun (docs, rev_atrs) atr ->
         let open Asttypes in
         match atr with
         | { attr_name=
@@ -269,14 +269,14 @@ module Mty = struct
   let is_simple = mty_is_simple
 
   let has_trailing_attributes {pmty_attributes; _} =
-    List.exists pmty_attributes ~f:(Fn.non Attr.is_doc)
+    List.exists pmty_attributes ~f:(Fun.negate Attr.is_doc)
 end
 
 module Mod = struct
   let is_simple = mod_is_simple
 
   let has_trailing_attributes {pmod_attributes; _} =
-    List.exists pmod_attributes ~f:(Fn.non Attr.is_doc)
+    List.exists pmod_attributes ~f:(Fun.negate Attr.is_doc)
 end
 
 module Cty = struct
@@ -838,7 +838,7 @@ end = struct
 
   (* This module uses physical equality extensively to detect sub-terms. *)
 
-  let ( == ) = Base.phys_equal
+  let ( == ) = (==)
 
   let dump ctx ast fs =
     Format.fprintf fs "ast: %a@\nctx: %a@\n" T.dump ast T.dump ctx
@@ -1494,12 +1494,12 @@ end = struct
     let open Prec in
     let open Assoc in
     let is_tuple_lvl1_in_constructor ty = function
-      | {pcd_args= Pcstr_tuple t1N; _} -> List.exists t1N ~f:(phys_equal ty)
+      | {pcd_args= Pcstr_tuple t1N; _} -> List.exists t1N ~f:((==) ty)
       | _ -> false
     in
     let is_tuple_lvl1_in_ext_constructor ty = function
       | {pext_kind= Pext_decl (_, Pcstr_tuple t1N, _); _} ->
-          List.exists t1N ~f:(phys_equal ty)
+          List.exists t1N ~f:((==) ty)
       | _ -> false
     in
     let constructor_cxt_prec_of_inner = function
@@ -1758,7 +1758,7 @@ end = struct
       ; ctx= Td {ptype_kind= Ptype_variant l; _} }
       when List.exists l ~f:(fun c ->
                match c.pcd_args with
-               | Pcstr_tuple l -> List.exists l ~f:(phys_equal typ)
+               | Pcstr_tuple l -> List.exists l ~f:((==) typ)
                | _ -> false ) ->
         true
     | { ast= {ptyp_desc= Ptyp_alias _ | Ptyp_arrow _ | Ptyp_tuple _; _}
@@ -1884,7 +1884,7 @@ end = struct
     | _ -> false
 
   let marked_parenzed_inner_nested_match =
-    let memo = Hashtbl.Poly.create () in
+    let memo = Hashtbl.create 16 in
     register_reset (fun () -> Hashtbl.clear memo) ;
     memo
 
@@ -1892,7 +1892,7 @@ end = struct
       which satisfies [Exp.mem_cls cls] and is not parenthesized. *)
   let rec exposed_right_exp =
     (* exponential without memoization *)
-    let memo = Hashtbl.Poly.create () in
+    let memo = Hashtbl.create 16 in
     register_reset (fun () -> Hashtbl.clear memo) ;
     fun cls exp ->
       let exposed_ () =
@@ -1952,7 +1952,7 @@ end = struct
       || Hashtbl.find_or_add memo (cls, exp) ~default:exposed_
 
   and exposed_right_cl =
-    let memo = Hashtbl.Poly.create () in
+    let memo = Hashtbl.create 16 in
     register_reset (fun () -> Hashtbl.clear memo) ;
     fun cls cl ->
       let exposed_ () =
@@ -2079,7 +2079,7 @@ end = struct
       | _ -> failwith "exp must be lhs or rhs from the parent expression"
     in
     assert_check_exp xexp ;
-    Hashtbl.find marked_parenzed_inner_nested_match exp
+    Hashtbl.find_opt marked_parenzed_inner_nested_match exp
     |> Option.value ~default:false
     ||
     match (ctx, exp) with

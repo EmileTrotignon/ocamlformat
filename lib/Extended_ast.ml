@@ -51,7 +51,7 @@ let map (type a) (x : a t) (m : Ast_mapper.mapper) : a -> a =
   | Module_type -> m.module_type m
   | Expression -> m.expr m
   | Repl_file -> List.map ~f:(m.repl_phrase m)
-  | Documentation -> Fn.id
+  | Documentation -> Fun.id
 
 module Parse = struct
   let normalize_mapper ~preserve_beginend =
@@ -172,7 +172,7 @@ module Parse = struct
                ; _ } ->
                  true
              | _ -> false ->
-          let exprs = List.(rev (tl_exn (rev l))) in
+          let exprs = List.(rev (tl (rev l))) in
           {e with pexp_desc= Pexp_list exprs}
       (* Removing beginend *)
       | {pexp_desc= Pexp_beginend e'; pexp_attributes= []; _}

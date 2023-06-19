@@ -116,6 +116,6 @@ let parse_toplevel ?disable_w50 (conf : Conf.t) ~input_name ~source =
     Parse.ast fg ~preserve_beginend ~input_name s
   in
   if is_repl_block source && conf.fmt_opts.parse_toplevel_phrases.v then
-    Either.Second
+    Either.Right
       (parse ?disable_w50 parse_ast Repl_file conf ~input_name ~source)
-  else First (parse ?disable_w50 parse_ast Use_file conf ~input_name ~source)
+  else Either.Left (parse ?disable_w50 parse_ast Use_file conf ~input_name ~source)

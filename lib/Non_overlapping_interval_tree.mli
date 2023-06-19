@@ -14,7 +14,9 @@
     other. *)
 
 module type IN = sig
-  include Comparator.S
+  type t
+
+  val compare : t -> t -> int
 
   val contains : t -> t -> bool
 

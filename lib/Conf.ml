@@ -1494,12 +1494,12 @@ let parse_line config ?(version_check = config.opr_opts.version_check.v)
             ~name ~value ~inline:true
   in
   let s =
-    match String.index s '#' with
+    match String.index_opt s '#' with
     | Some i -> String.sub s ~pos:0 ~len:i
     | None -> s
   in
   let s = String.strip s in
-  match String.split ~on:'=' s with
+  match String.split_on_char ~sep:'=' s with
   | [] | [""] -> Ok config
   | [name; value] ->
       let name = String.strip name in
@@ -1531,7 +1531,7 @@ let parse_attr {attr_name= {txt; loc= _}; attr_payload; _} =
           ; _ } ] ->
         Ok (str, strloc)
     | _ -> Error (`Msg "Invalid format: String expected") )
-  | _ when String.is_prefix ~prefix:"ocamlformat." txt ->
+  | _ when String.starts_with ~prefix:"ocamlformat." txt ->
       Error
         (`Msg
           (Format.sprintf "Invalid format: Unknown suffix %S"
@@ -1543,7 +1543,7 @@ let update ?(quiet = false) c ({attr_name= {txt; loc}; _} as attr) =
     match parse_attr attr with
     | Ok (str, strloc) ->
         parse_line ~from:(`Attribute strloc) c str
-        |> Result.map_error ~f:Error.to_string
+        |> Result.map_error Error.to_string
     | Error (`Msg msg) -> Error msg
     | Error `Ignore -> Ok c
   in

@@ -17,7 +17,7 @@ let start_column loc =
 
 let dedup_cmts fragment ast comments =
   let of_ast ast =
-    let docs = ref (Set.empty (module Cmt)) in
+    let docs = ref (Cmt.Set.empty) in
     let attribute m atr =
       match atr with
       | { attr_payload=
@@ -33,18 +33,18 @@ let dedup_cmts fragment ast comments =
                 ; _ } ]
         ; _ }
         when Ast.Attr.is_doc atr ->
-          docs := Set.add !docs (Cmt.create_docstring doc pexp_loc) ;
+          docs := Cmt.Set.add  (Cmt.create_docstring doc pexp_loc) !docs ;
           atr
       | _ -> Ast_mapper.default_mapper.attribute m atr
     in
     map fragment {Ast_mapper.default_mapper with attribute} ast |> ignore ;
     !docs
   in
-  Set.(to_list (diff (of_list (module Cmt) comments) (of_ast ast)))
+  Cmt.Set.(elements (diff (of_list comments) (of_ast ast)))
 
 let normalize_comments dedup fmt comments =
   let comments = dedup comments in
-  List.sort comments ~compare:(fun a b ->
+  List.sort comments ~cmp:(fun a b ->
       Migrate_ast.Location.compare (Cmt.loc a) (Cmt.loc b) )
   |> List.iter ~f:(fun cmt -> Format.fprintf fmt "%s," (Cmt.txt cmt))
 
@@ -61,11 +61,11 @@ let normalize_code conf (m : Ast_mapper.mapper) ~offset txt =
   in
   let input_name = "<output>" in
   match Parse_with_comments.parse_toplevel conf ~input_name ~source:txt with
-  | First {ast; comments; _} ->
+  | Left {ast; comments; _} ->
       normalize_parse_result Use_file
         (List.map ~f:(m.toplevel_phrase m) ast)
         comments
-  | Second {ast; comments; _} ->
+  | Right {ast; comments; _} ->
       normalize_parse_result Repl_file
         (List.map ~f:(m.repl_phrase m) ast)
         comments
@@ -75,7 +75,7 @@ let docstring (c : Conf.t) =
   Docstring.normalize ~parse_docstrings:c.fmt_opts.parse_docstrings.v
 
 let sort_attributes : attributes -> attributes =
-  List.sort ~compare:Poly.compare
+  List.sort ~cmp:Poly.compare
 
 let make_mapper conf ~ignore_doc_comments =
   let open Ast_helper in
@@ -176,7 +176,7 @@ let diff ~f ~cmt_kind x y =
   |> Sequence.to_list
   (*= - [First _] is reported as a comment dropped
       - [Second _] is reported as a comment added *)
-  |> List.map ~f:(Either.value_map ~first:dropped ~second:added)
+  |> List.map ~f:(Either.value_map ~left:dropped ~right:added)
   |> function [] -> Ok () | errors -> Error errors
 
 let diff_docstrings c x y =

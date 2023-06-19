@@ -37,8 +37,8 @@ let map (type a) (x : a t) (m : Ast_mapper.mapper) : a -> a =
   | Core_type -> m.typ m
   | Module_type -> m.module_type m
   | Expression -> m.expr m
-  | Repl_file -> Fn.id
-  | Documentation -> Fn.id
+  | Repl_file -> Fun.id
+  | Documentation -> Fun.id
 
 module Parse = struct
   let ast (type a) (fg : a t) ~input_name str : a =

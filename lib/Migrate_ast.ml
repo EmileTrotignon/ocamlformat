@@ -24,6 +24,7 @@ end
 module Position = struct
   open Lexing
 
+  module Self = struct
   type t = position
 
   let column {pos_bol; pos_cnum; _} = pos_cnum - pos_bol
@@ -39,16 +40,20 @@ module Position = struct
   let compare_col p1 p2 = Int.compare (column p1) (column p2)
 
   let compare p1 p2 =
-    if phys_equal p1 p2 then 0 else Int.compare p1.pos_cnum p2.pos_cnum
+    if  p1 == p2 then 0 else Int.compare p1.pos_cnum p2.pos_cnum
 
-  include (val Comparator.make ~compare ~sexp_of_t)
+  end
 
+  module Map = Map.Make (Self)
+
+include Self
   let distance p1 p2 = p2.pos_cnum - p1.pos_cnum
 end
 
 module Location = struct
-  include Location
 
+module Self = struct
+  include Location
   let fmt fs {loc_start; loc_end; loc_ghost} =
     Format.fprintf fs "(%a..%a)%s" Position.fmt loc_start Position.fmt
       loc_end
@@ -65,18 +70,11 @@ module Location = struct
       | 0 -> Bool.compare loc_ghost b.loc_ghost
       | c -> c )
     | c -> c
+  end
 
+  module Map = Map.Make(Self)
+include Self
   type location = t
-
-  module Location_comparator = Comparator.Make (struct
-    type t = location
-
-    let sexp_of_t = sexp_of_t
-
-    let compare = compare
-  end)
-
-  include Location_comparator
 
   let compare_start x y = Position.compare x.loc_start y.loc_start
 
@@ -95,7 +93,8 @@ module Location = struct
   let descending cmp a b = -cmp a b
 
   let compare_width_decreasing =
-    Comparable.lexicographic [compare_start; descending compare_end; compare]
+    
+    compare_lexicographic [compare_start; descending compare_end; compare]
 
   let is_single_line x margin =
     (* The last character of a line can exceed the margin if it is not

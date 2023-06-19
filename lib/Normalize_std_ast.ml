@@ -18,7 +18,7 @@ let is_doc = function
 
 let dedup_cmts fragment ast comments =
   let of_ast ast =
-    let docs = ref (Set.empty (module Cmt)) in
+    let docs = ref (Cmt.Set.empty) in
     let attribute m atr =
       match atr with
       | { attr_payload=
@@ -33,14 +33,14 @@ let dedup_cmts fragment ast comments =
                 ; _ } ]
         ; _ }
         when is_doc atr ->
-          docs := Set.add !docs (Cmt.create_docstring doc pexp_loc) ;
+          docs := Cmt.Set.add  (Cmt.create_docstring doc pexp_loc) !docs ;
           atr
       | _ -> Ast_mapper.default_mapper.attribute m atr
     in
     map fragment {Ast_mapper.default_mapper with attribute} ast |> ignore ;
     !docs
   in
-  Set.(to_list (diff (of_list (module Cmt) comments) (of_ast ast)))
+  Cmt.Set.(elements (diff (of_list comments) (of_ast ast)))
 
 let normalize_code conf (m : Ast_mapper.mapper) txt =
   let input_name = "<output>" in
@@ -51,7 +51,7 @@ let normalize_code conf (m : Ast_mapper.mapper) txt =
   | {ast; comments; _} ->
       let comments = dedup_cmts Structure ast comments in
       let print_comments fmt (l : Cmt.t list) =
-        List.sort l ~compare:(fun a b ->
+        List.sort l ~cmp:(fun a b ->
             Migrate_ast.Location.compare (Cmt.loc a) (Cmt.loc b) )
         |> List.iter ~f:(fun cmt -> Format.fprintf fmt "%s," (Cmt.txt cmt))
       in
@@ -64,7 +64,7 @@ let docstring (c : Conf.t) =
   Docstring.normalize ~parse_docstrings:c.fmt_opts.parse_docstrings.v
 
 let sort_attributes : attributes -> attributes =
-  List.sort ~compare:Poly.compare
+  List.sort ~cmp:Poly.compare
 
 let make_mapper conf ~ignore_doc_comments =
   let open Ast_helper in
@@ -211,13 +211,13 @@ let moved_docstrings fragment c s1 s2 =
   let added x = {Cmt.kind= `Added (cmt x); cmt_kind} in
   let modified (x, y) = {Cmt.kind= `Modified (cmt x, cmt y); cmt_kind} in
   match List.zip d1 d2 with
-  | Unequal_lengths ->
+  | None ->
       (* We only return the ones that are not in both lists. *)
-      let l1 = List.filter d1 ~f:(fun x -> not (List.mem ~equal d2 x)) in
+      let l1 = List.filter d1 ~f:(fun x -> not (List.exists ~f:(equal x) d2)) in
       let l1 = List.map ~f:dropped l1 in
-      let l2 = List.filter d2 ~f:(fun x -> not (List.mem ~equal d1 x)) in
+      let l2 = List.filter d2 ~f:(fun x -> not (List.exists ~f:(equal x) d1)) in
       let l2 = List.map ~f:added l2 in
       List.rev_append l1 l2
-  | Ok l ->
+  | Some l ->
       let l = List.filter l ~f:(fun (x, y) -> not (equal x y)) in
       List.map ~f:modified l
