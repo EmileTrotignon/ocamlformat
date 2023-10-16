@@ -44,6 +44,7 @@ profile. This started with version 0.26.0.
 - Fix position of comments around and within `(type ...)` function arguments (#2503, @gpetiot)
 - Fix missing parentheses around constraint expressions with attributes (#2513, @alanechang)
 - Fix formatting of type vars in GADT constructors (#2518, @Julow)
+- Fix the formatting of the `in` keyword when `[@ocamlformat disable]` is attached to a let-binding (#2242, @EmileTrotignon)
 
 ## 0.26.1 (2023-09-15)
 
@@ -85,7 +86,6 @@ profile. This started with version 0.26.0.
 - Fix indentation of trailing double-semicolons (#2295, @gpetiot)
 - Fix formatting of comments in "disable" chunks (#2279, @gpetiot)
 - Fix non-stabilizing comments attached to private/virtual/mutable keywords (#2272, #2307, @gpetiot, @Julow)
-- Fix the formatting of the `in` keyword when `[@ocamlformat disable]` is attached to a let-binding (#2242, @EmileTrotignon)
 
 ### Changed
 
