@@ -1474,8 +1474,8 @@ and fmt_function ?force_closing_paren ~ctx ?(wrap_intro = fun x -> hvbox 2 x $ s
         fmt_fun_args_typ args typ, fmt_expression c (sub_exp ~ctx body)
     | [], _, Pfunction_body _ -> assert false
     | args, typ, Pfunction_cases (cs, _loc, cs_attrs) ->
-        (* Only [function]. [spilled_attrs] are extra attrs to add to the
-           [function] keyword. *)
+        (* Both [fun] and [function]. [spilled_attrs] are extra attrs to add to
+           the [function] keyword. *)
         let fun_, spilled_attrs =
           match args, typ with
           | [], None -> noop, attrs
@@ -1814,7 +1814,7 @@ and fmt_expression c ?(box = true) ?(pro = noop) ?eol ?parens
           (Params.parens_if parens c.conf
              ( hvbox c.conf.fmt_opts.extension_indent.v
                  (wrap (str "[") (str "]")
-                    (fmt_function ~ctx:(Exp call) ~wrap_intro:(fun x -> 
+                    (fmt_function ~ctx:(Exp call) ~wrap_intro:(fun x ->
                          ( str "%"
                            $ hovbox 2
                                ( fmt_str_loc c name $ space_break $ x)))
@@ -1842,7 +1842,7 @@ and fmt_expression c ?(box = true) ?(pro = noop) ?eol ?parens
              $ Cmts.fmt c loc (str "|>" $ force_newline)
              $ hvbox c.conf.fmt_opts.extension_indent.v
                  (wrap (str "[") (str "]")
-                    (fmt_function ~ctx:(Exp retn) ~wrap_intro:(fun x -> 
+                    (fmt_function ~ctx:(Exp retn) ~wrap_intro:(fun x ->
                          ( str "%"
                            $ hovbox 2
                                ( fmt_str_loc c name $ space_break $ x)))
@@ -1913,12 +1913,12 @@ and fmt_expression c ?(box = true) ?(pro = noop) ?eol ?parens
               (wrap_if has_attr (str "(") (str ")")
                  (fmt_function
                    ~ctx:(Exp r) ~box:false ~parens:(parens_r) ~wrap_intro:(fun intro ->
-                 ( 
+                 (
                      ( hvbox indent_wrap
                          ( fmt_expression ~indent_wrap c (sub_exp ~ctx l)
                          $ space_break
                          $ hovbox 0
-                             ( 
+                             (
                                  ( fmt_str_loc c op $ space_break $ intro)))
                       )
                  ) $ space_break)
@@ -2189,6 +2189,11 @@ and fmt_expression c ?(box = true) ?(pro = noop) ?eol ?parens
              ) )
   | Pexp_function ([], None, Pfunction_cases (cs, _, _)) ->
       let indent = Params.Indent.function_ c.conf ~parens xexp in
+      let force_break_cases =
+        match ctx0, cs with
+        | Str _, _ :: _ :: _ -> true
+        | _ -> false
+      in
       let outer_pro, inner_pro = if parens then pro, noop else noop, pro in
       outer_pro
       $ Params.Exp.wrap c.conf ~parens ~disambiguate:true ~fits_breaks:false
@@ -2198,7 +2203,7 @@ and fmt_expression c ?(box = true) ?(pro = noop) ?eol ?parens
                $ fmt_extension_suffix c ext
                $ fmt_attributes c pexp_attributes )
            $ break 1 indent
-           $ hvbox 0 (fmt_cases c ctx cs) )
+           $ hvbox 0 (fmt_cases c ~force_break_cases ctx cs) )
   | Pexp_function ([], Some _, _) -> assert false
   | Pexp_ident {txt; loc} ->
       let outer_parens = has_attr && parens in
@@ -3082,9 +3087,9 @@ and fmt_class_type_field c {ast= cf; _} =
   | Pctf_attribute attr -> fmt_floating_attributes_and_docstrings c [attr]
   | Pctf_extension ext -> fmt_item_extension c ctx ext
 
-and fmt_cases c ctx cs = list_fl cs (fmt_case c ctx)
+and fmt_cases c ?force_break_cases ctx cs = list_fl cs (fmt_case c ?force_break_cases ctx)
 
-and fmt_case c ctx ~first ~last case =
+and fmt_case c ?(force_break_cases=false) ctx ~first ~last case =
   let {pc_lhs; pc_guard; pc_rhs} = case in
   let xrhs = sub_exp ~ctx pc_rhs in
   (* side effects of Cmts.fmt_before before [fmt_lhs] is important *)
@@ -3099,6 +3104,7 @@ and fmt_case c ctx ~first ~last case =
   let p =
     Params.get_cases c.conf ~ctx ~first ~last ~cmts_before ~xbch:xrhs
   in
+  let p = Params.get_cases c.conf ~ctx ~first ~last ~force_break_cases ~xbch:xrhs in
   p.leading_space $ leading_cmt
   $ p.box_all
       ( p.box_pattern_arrow

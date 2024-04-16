@@ -89,7 +89,7 @@ val get_cases :
   -> ctx:Ast.t
   -> first:bool
   -> last:bool
-  -> cmts_before:bool
+  -> force_break_cases:bool
   -> xbch:expression Ast.xt
   -> cases
 
