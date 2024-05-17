@@ -9813,7 +9813,9 @@ let xxxxxx =
 let _ =
   match x with
   | _
-    when f ~f:(function[@ocaml.warning (* ....................................... *) "-4"]
+    when f
+           ~f:
+             (function [@ocaml.warning (* ....................................... *) "-4"]
            | _ -> .) -> y
 ;;
 
