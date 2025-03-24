@@ -345,7 +345,9 @@ let relocate_ext_cmts (t : t) src (pre, pld) ~whole_loc =
               ( { pexp_desc= Pexp_constant {pconst_desc= Pconst_string _; _}
                 ; pexp_loc= _
                 ; pexp_loc_stack= _
-                ; pexp_attributes= _ }
+                ; pexp_attributes= _
+                ; pexp_outer_attributes= _
+                ; pexp_ext= _}
               , [] )
         ; pstr_loc } ]
     when Source.is_quoted_string src pstr_loc ->
@@ -356,10 +358,12 @@ let relocate_ext_cmts (t : t) src (pre, pld) ~whole_loc =
               ( { pexp_desc= Pexp_sequence (e1, _)
                 ; pexp_loc= _
                 ; pexp_loc_stack= _
-                ; pexp_attributes }
+                ; pexp_attributes
+              ; pexp_outer_attributes
+                ; pexp_ext= _ }
               , [] )
         ; pstr_loc= _ } ]
-    when List.is_empty pexp_attributes
+    when List.is_empty pexp_attributes && List.is_empty pexp_outer_attributes
          && Source.extension_using_sugar ~name:pre ~payload:e1.pexp_loc ->
       ()
   | PStr [{pstr_desc= Pstr_eval _; pstr_loc; _}] ->

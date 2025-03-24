@@ -340,7 +340,7 @@ and pattern i ppf x =
 
 and expression i ppf x =
   line i ppf "expression %a\n" fmt_location x.pexp_loc;
-  attributes i ppf x.pexp_attributes;
+  ext_attrs i ppf x.pexp_ext_attrs;
   let i = i+1 in
   match x.pexp_desc with
   | Pexp_ident (li) -> line i ppf "Pexp_ident %a\n" fmt_longident_loc li;

@@ -466,8 +466,8 @@ let get_cases (c : Conf.t) ~ctx ~first ~last ~cmts_before
   let indent = if align_nested_match then 0 else indent in
   let open_paren_branch, close_paren_branch, branch_expr =
     match ast with
-    | {pexp_desc= Pexp_beginend nested_exp; pexp_attributes= []; _}
-      when not cmts_before ->
+    | {pexp_desc= Pexp_beginend nested_exp; pexp_ext_attrs; _}
+      when not (Ast.Ext_attrs.has_attrs pexp_ext_attrs) && not cmts_before ->
         let close_paren =
           let offset =
             match c.fmt_opts.break_cases.v with `Nested -> 0 | _ -> -2
@@ -756,7 +756,7 @@ let get_if_then_else (c : Conf.t) ~first ~last ~parens_bch ~parens_prev_bch
   let beginend, branch_expr =
     let ast = xbch.Ast.ast in
     match ast with
-    | {pexp_desc= Pexp_beginend nested_exp; pexp_attributes= []; _} ->
+    | {pexp_desc= Pexp_beginend nested_exp; pexp_ext_attrs; _} when not (Ast.Ext_attrs.has_attrs pexp_ext_attrs) ->
         (true, sub_exp ~ctx:(Exp ast) nested_exp)
     | _ -> (false, xbch)
   in

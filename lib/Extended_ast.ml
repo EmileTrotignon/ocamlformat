@@ -67,7 +67,7 @@ module Parse = struct
       match (t, v) with
       (* [{ x = x }] -> [{ x }] *)
       | ( _
-        , Some {pexp_desc= Pexp_ident {txt= v_txt; _}; pexp_attributes= []; _}
+        , Some {pexp_desc= Pexp_ident {txt= v_txt; _}; pexp_attributes= []; pexp_outer_attributes= []; _}
         )
         when Std_longident.field_alias ~field:f.txt v_txt ->
           (f, t, None)
@@ -77,10 +77,10 @@ module Parse = struct
             { pexp_desc=
                 Pexp_constraint
                   ( { pexp_desc= Pexp_ident {txt= v_txt; _}
-                    ; pexp_attributes= []
+                    ; pexp_attributes= []; pexp_outer_attributes= []
                     ; _ }
                   , t1 )
-            ; pexp_attributes= []
+            ; pexp_attributes= []; pexp_outer_attributes= []
             ; _ } )
         when enable_short_field_annot
              && Std_longident.field_alias ~field:f.txt v_txt ->
@@ -91,10 +91,10 @@ module Parse = struct
             { pexp_desc=
                 Pexp_constraint
                   ( { pexp_desc= Pexp_ident {txt= v_txt; _}
-                    ; pexp_attributes= []
+                    ; pexp_attributes= []; pexp_outer_attributes= []
                     ; _ }
                   , t1 )
-            ; pexp_attributes= []
+            ; pexp_attributes= []; pexp_outer_attributes= []
             ; _ } )
         when enable_short_field_annot
              && Std_longident.field_alias ~field:f.txt v_txt ->
@@ -106,11 +106,11 @@ module Parse = struct
             { pexp_desc=
                 Pexp_coerce
                   ( { pexp_desc= Pexp_ident {txt= v_txt; _}
-                    ; pexp_attributes= []
+                    ; pexp_attributes= []; pexp_outer_attributes= []
                     ; _ }
                   , t1
                   , t2 )
-            ; pexp_attributes= []
+            ; pexp_attributes= []; pexp_outer_attributes= []
             ; _ } )
         when enable_short_field_annot
              && Std_longident.field_alias ~field:f.txt v_txt ->
@@ -121,11 +121,11 @@ module Parse = struct
             { pexp_desc=
                 Pexp_coerce
                   ( { pexp_desc= Pexp_ident {txt= v_txt; _}
-                    ; pexp_attributes= []
+                    ; pexp_attributes= []; pexp_outer_attributes= []
                     ; _ }
                   , None
                   , t2 )
-            ; pexp_attributes= []
+            ; pexp_attributes= []; pexp_outer_attributes= []
             ; _ } )
         when enable_short_field_annot
              && Std_longident.field_alias ~field:f.txt v_txt ->
@@ -191,14 +191,14 @@ module Parse = struct
         when match List.last_exn l with
              (* Empty lists are always represented as Lident [] *)
              | { pexp_desc= Pexp_construct ({txt= Lident "[]"; loc= _}, None)
-               ; pexp_attributes= []
+               ; pexp_attributes= []; pexp_outer_attributes= []
                ; _ } ->
                  true
              | _ -> false ->
           let exprs = List.(rev (tl_exn (rev l))) in
           {e with pexp_desc= Pexp_list exprs}
       (* Removing beginend *)
-      | {pexp_desc= Pexp_beginend e'; pexp_attributes= []; _}
+      | {pexp_desc= Pexp_beginend e'; pexp_attributes= []; pexp_outer_attributes= []; _}
         when not preserve_beginend ->
           m.expr m e'
       (* Field alias shorthand *)
@@ -212,7 +212,7 @@ module Parse = struct
             Pexp_apply
               ( { pexp_desc=
                     Pexp_ident {txt= Lident op as longident; loc= loc_op}
-                ; pexp_attributes= []
+                ; pexp_attributes= []; pexp_outer_attributes= []
                 ; _ }
               , [(Nolabel, l); (Nolabel, r)] )
         ; _ } as e
@@ -224,7 +224,7 @@ module Parse = struct
       | { pexp_desc=
             Pexp_constraint
               ( { pexp_desc= Pexp_pack (name, None)
-                ; pexp_attributes= []
+                ; pexp_attributes= []; pexp_outer_attributes= []
                 ; pexp_loc
                 ; _ }
               , {ptyp_desc= Ptyp_package pt; ptyp_attributes= []; ptyp_loc; _}

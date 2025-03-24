@@ -20,7 +20,7 @@ module Exp = struct
     let rec infix_ ?(child_expr = true) xop xexp =
       let ctx = Exp xexp.ast in
       match (assoc, xexp.ast) with
-      | _, {pexp_attributes= _ :: _; _} when child_expr ->
+      | _, {pexp_ext_attrs; _} when Ast.Ext_attrs.has_attrs pexp_ext_attrs && child_expr ->
           (* Avoid dropping attributes on child expressions, e.g. [(a + b)
              [@attr] + c] *)
           [(xop, xexp)]
@@ -69,11 +69,11 @@ let sequence cmts xexp =
             [ { pstr_desc=
                   Pstr_eval
                     ( ( { pexp_desc= Pexp_sequence (e1, e2)
-                        ; pexp_attributes
+                        ; pexp_ext_attrs
                         ; _ } as exp )
                     , _ )
               ; pstr_loc } ] )
-      when List.is_empty pexp_attributes
+      when not Ast.Ext_attrs.has_attrs pexp_ext_attrs
            && Source.extension_using_sugar ~name:ext ~payload:e1.pexp_loc ->
         let ctx = Exp exp in
         if (not allow_attribute) && not (List.is_empty exp.pexp_attributes)

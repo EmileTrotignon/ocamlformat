@@ -537,33 +537,33 @@ module E = struct
     let if_loc_then = sub.location sub if_loc_then in
     { if_cond; if_body; if_attrs; if_loc_then }
 
-  let map sub {pexp_loc = loc; pexp_desc = desc; pexp_attributes = attrs} =
+  let map sub {pexp_loc = loc; pexp_desc = desc; pexp_ext_attrs= ext_attrs } =
     let open Exp in
     let loc = sub.location sub loc in
-    let attrs = sub.attributes sub attrs in
+    let ext_attrs = sub.ext_attrs sub ext_attrs in
     match desc with
-    | Pexp_ident x -> ident ~loc ~attrs (map_loc sub x)
-    | Pexp_constant x -> constant ~loc ~attrs (sub.constant sub x)
+    | Pexp_ident x -> ident ~loc ~ext_attrs (map_loc sub x)
+    | Pexp_constant x -> constant ~loc ~ext_attrs (sub.constant sub x)
     | Pexp_let (lbs, e, loc_in) ->
-        let_ ~loc ~loc_in:(sub.location sub loc_in) ~attrs (sub.value_bindings sub lbs)
+        let_ ~loc  ~loc_in:(sub.location sub loc_in) ~ext_attrs (sub.value_bindings sub lbs)
           (sub.expr sub e)
     | Pexp_function (ps, c, b) ->
-      function_ ~loc ~attrs
+      function_  ~loc ~ext_attrs
         (List.map (map_function_param sub) ps)
         (map_opt (map_constraint sub) c)
         (map_function_body sub b)
     | Pexp_apply (e, l) ->
-        apply ~loc ~attrs
+        apply  ~loc ~ext_attrs
           (sub.expr sub e)
           (List.map (map_tuple (sub.arg_label sub) (sub.expr sub)) l)
     | Pexp_match (e, pel) ->
-        match_ ~loc ~attrs (sub.expr sub e) (sub.cases sub pel)
-    | Pexp_try (e, pel) -> try_ ~loc ~attrs (sub.expr sub e) (sub.cases sub pel)
-    | Pexp_tuple el -> tuple ~loc ~attrs (List.map (sub.expr sub) el)
+        match_  ~loc ~ext_attrs (sub.expr sub e) (sub.cases sub pel)
+    | Pexp_try (e, pel) -> try_  ~loc ~ext_attrs (sub.expr sub e) (sub.cases sub pel)
+    | Pexp_tuple el -> tuple  ~loc ~ext_attrs (List.map (sub.expr sub) el)
     | Pexp_construct (lid, arg) ->
-        construct ~loc ~attrs (map_loc sub lid) (map_opt (sub.expr sub) arg)
+        construct  ~loc ~ext_attrs (map_loc sub lid) (map_opt (sub.expr sub) arg)
     | Pexp_variant (lab, eo) ->
-        variant ~loc ~attrs (variant_var sub lab) (map_opt (sub.expr sub) eo)
+        variant  ~loc ~ext_attrs (variant_var sub lab) (map_opt (sub.expr sub) eo)
     | Pexp_record (l, eo) ->
         let fields =
           List.map
@@ -573,37 +573,37 @@ module E = struct
                (map_opt (sub.expr sub)))
             l
         in
-        record ~loc ~attrs fields (map_opt (sub.expr sub) eo)
+        record ~loc ~ext_attrs fields (map_opt (sub.expr sub) eo)
     | Pexp_field (e, lid) ->
-        field ~loc ~attrs (sub.expr sub e) (map_loc sub lid)
+        field ~loc ~ext_attrs (sub.expr sub e) (map_loc sub lid)
     | Pexp_setfield (e1, lid, e2) ->
-        setfield ~loc ~attrs (sub.expr sub e1) (map_loc sub lid)
+        setfield ~loc ~ext_attrs (sub.expr sub e1) (map_loc sub lid)
           (sub.expr sub e2)
-    | Pexp_array el -> array ~loc ~attrs (List.map (sub.expr sub) el)
-    | Pexp_list el -> list ~loc ~attrs (List.map (sub.expr sub) el)
+    | Pexp_array el -> array ~loc ~ext_attrs (List.map (sub.expr sub) el)
+    | Pexp_list el -> list ~loc ~ext_attrs (List.map (sub.expr sub) el)
     | Pexp_ifthenelse (eN, e2) ->
         let map_else (exp, loc_else) =
           sub.expr sub exp, sub.location sub loc_else
         in
-        ifthenelse ~loc ~attrs (List.map (map_if_branch sub) eN)
+        ifthenelse ~loc ~ext_attrs (List.map (map_if_branch sub) eN)
           (map_opt map_else e2)
     | Pexp_sequence (e1, e2) ->
-        sequence ~loc ~attrs (sub.expr sub e1) (sub.expr sub e2)
+        sequence ~loc ~ext_attrs (sub.expr sub e1) (sub.expr sub e2)
     | Pexp_while (e1, e2) ->
-        while_ ~loc ~attrs (sub.expr sub e1) (sub.expr sub e2)
+        while_ ~loc ~ext_attrs (sub.expr sub e1) (sub.expr sub e2)
     | Pexp_for (p, e1, e2, d, e3) ->
-        for_ ~loc ~attrs (sub.pat sub p) (sub.expr sub e1) (sub.expr sub e2) d
+        for_ ~loc ~ext_attrs (sub.pat sub p) (sub.expr sub e1) (sub.expr sub e2) d
           (sub.expr sub e3)
     | Pexp_coerce (e, t1, t2) ->
-        coerce ~loc ~attrs (sub.expr sub e) (map_opt (sub.typ sub) t1)
+        coerce ~loc ~ext_attrs (sub.expr sub e) (map_opt (sub.typ sub) t1)
           (sub.typ sub t2)
     | Pexp_constraint (e, t) ->
-        constraint_ ~loc ~attrs (sub.expr sub e) (sub.typ sub t)
+        constraint_ ~loc ~ext_attrs (sub.expr sub e) (sub.typ sub t)
     | Pexp_send (e, s) ->
-        send ~loc ~attrs (sub.expr sub e) (map_loc sub s)
-    | Pexp_new lid -> new_ ~loc ~attrs (map_loc sub lid)
+        send ~loc ~ext_attrs (sub.expr sub e) (map_loc sub s)
+    | Pexp_new lid -> new_ ~loc ~ext_attrs (map_loc sub lid)
     | Pexp_setinstvar (s, e) ->
-        setinstvar ~loc ~attrs (map_loc sub s) (sub.expr sub e)
+        setinstvar ~loc ~ext_attrs (map_loc sub s) (sub.expr sub e)
     | Pexp_indexop_access {pia_lhs; pia_kind; pia_paren; pia_rhs} ->
         let pia_kind =
           match pia_kind with
@@ -611,45 +611,45 @@ module E = struct
           | Dotop (path, op, idx) ->
               Dotop(map_opt (map_loc sub) path, op, List.map (sub.expr sub) idx)
         in
-        indexop_access ~loc ~attrs (sub.expr sub pia_lhs) pia_kind pia_paren
+        indexop_access ~loc ~ext_attrs (sub.expr sub pia_lhs) pia_kind pia_paren
           (map_opt (sub.expr sub) pia_rhs)
     | Pexp_override sel ->
-        override ~loc ~attrs
+        override ~loc ~ext_attrs
           (List.map (map_tuple (map_loc sub) (sub.expr sub)) sel)
     | Pexp_letmodule (s, args, me, e) ->
-        letmodule ~loc ~attrs (map_loc sub s)
+        letmodule ~loc ~ext_attrs (map_loc sub s)
           (List.map (map_functor_param sub) args)
           (sub.module_expr sub me)
           (sub.expr sub e)
     | Pexp_letexception (cd, e) ->
-        letexception ~loc ~attrs
+        letexception ~loc ~ext_attrs
           (sub.extension_constructor sub cd)
           (sub.expr sub e)
-    | Pexp_assert e -> assert_ ~loc ~attrs (sub.expr sub e)
-    | Pexp_lazy e -> lazy_ ~loc ~attrs (sub.expr sub e)
-    | Pexp_object cls -> object_ ~loc ~attrs (sub.class_structure sub cls)
+    | Pexp_assert e -> assert_ ~loc ~ext_attrs (sub.expr sub e)
+    | Pexp_lazy e -> lazy_ ~loc ~ext_attrs (sub.expr sub e)
+    | Pexp_object cls -> object_ ~loc ~ext_attrs (sub.class_structure sub cls)
     | Pexp_pack (me, pt) ->
-        pack ~loc ~attrs
+        pack ~loc ~ext_attrs
           (sub.module_expr sub me)
           (map_opt (map_package_type sub) pt)
-    | Pexp_open (o, e) -> open_ ~loc ~attrs (map_loc sub o) (sub.expr sub e)
+    | Pexp_open (o, e) -> open_ ~loc ~ext_attrs (map_loc sub o) (sub.expr sub e)
     | Pexp_letopen (o, e) ->
-        letopen ~loc ~attrs (sub.open_declaration sub o) (sub.expr sub e)
+        letopen ~loc ~ext_attrs (sub.open_declaration sub o) (sub.expr sub e)
     | Pexp_letop {let_; ands; body; loc_in} ->
-        letop ~loc ~attrs ~loc_in:(sub.location sub loc_in) (sub.binding_op sub let_)
+        letop ~loc ~ext_attrs ~loc_in:(sub.location sub loc_in) (sub.binding_op sub let_)
           (List.map (sub.binding_op sub) ands) (sub.expr sub body)
-    | Pexp_extension x -> extension ~loc ~attrs (sub.extension sub x)
-    | Pexp_unreachable -> unreachable ~loc ~attrs ()
+    | Pexp_extension x -> extension ~loc ~ext_attrs (sub.extension sub x)
+    | Pexp_unreachable -> unreachable ~loc ~ext_attrs ()
     (* Added *)
-    | Pexp_hole -> hole ~loc ~attrs ()
+    | Pexp_hole -> hole ~loc ~ext_attrs ()
     (* *)
-    | Pexp_beginend e -> beginend ~loc ~attrs (sub.expr sub e)
-    | Pexp_parens e -> parens ~loc ~attrs (sub.expr sub e)
-    | Pexp_cons l -> cons ~loc ~attrs (List.map (sub.expr sub) l)
+    | Pexp_beginend e -> beginend ~loc ~ext_attrs (sub.expr sub e)
+    | Pexp_parens e -> parens ~loc ~ext_attrs (sub.expr sub e)
+    | Pexp_cons l -> cons ~loc ~ext_attrs (List.map (sub.expr sub) l)
     | Pexp_prefix (op, e) ->
-        prefix ~loc ~attrs (map_loc sub op) (sub.expr sub e)
+        prefix ~loc ~ext_attrs (map_loc sub op) (sub.expr sub e)
     | Pexp_infix (op, e1, e2) ->
-        infix ~loc ~attrs (map_loc sub op) (sub.expr sub e1) (sub.expr sub e2)
+        infix ~loc ~ext_attrs (map_loc sub op) (sub.expr sub e1) (sub.expr sub e2)
 
   let map_binding_op sub {pbop_op; pbop_pat; pbop_args; pbop_typ; pbop_exp; pbop_is_pun; pbop_loc} =
     let open Exp in
@@ -752,7 +752,7 @@ module CE = struct
         let tc = map_opt (E.map_constraint sub) tc in
         Cfk_concrete (o, tc, sub.expr sub e)
     | Cfk_virtual t -> Cfk_virtual (sub.typ sub t)
-  
+
   let map_method_kind sub = function
     | Cfk_concrete (o, (args, t), e) ->
         let args = List.map (FP.map sub FP.map_expr) args in

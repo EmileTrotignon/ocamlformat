@@ -238,7 +238,7 @@ let doc_atrs ?(acc = []) atrs =
                               Pexp_constant
                                 {pconst_desc= Pconst_string (doc, _, None); _}
                           ; pexp_loc= loc
-                          ; pexp_attributes= []
+                          ; pexp_attributes= []; pexp_outer_attributes= []
                           ; _ }
                         , [] )
                   ; _ } ]
@@ -701,7 +701,7 @@ let attributes = function
   | Td x -> attrs_of_ext_attrs x.ptype_attributes
   | Cty x -> x.pcty_attributes
   | Pat x -> x.ppat_attributes
-  | Exp x -> x.pexp_attributes
+  | Exp x -> x.pexp_attributes @ x.pexp_outer_attributes
   | Fpe _ | Fpc _ -> []
   | Vc _ -> []
   | Lb x -> attrs_of_ext_attrs x.pvb_attributes
@@ -2056,7 +2056,7 @@ end = struct
         | Pexp_extension
             ( ext
             , PStr
-                [ { pstr_desc= Pstr_eval (({pexp_attributes= []; _} as e), _)
+                [ { pstr_desc= Pstr_eval (({pexp_attributes= []; pexp_outer_attributes= []; _} as e), _)
                   ; _ } ] )
           when Source.extension_using_sugar ~name:ext ~payload:e.pexp_loc ->
             continue e
@@ -2226,7 +2226,7 @@ end = struct
       | _ -> false
     in
     let exp_in_sequence lhs rhs exp =
-      match (lhs.pexp_desc, exp.pexp_attributes) with
+      match (lhs.pexp_desc, exp.pexp_attributes @ exp.pexp_outer_attributes) with
       | (Pexp_match _ | Pexp_try _), _ :: _ when lhs == exp -> true
       | _, _ :: _ -> false
       | ( Pexp_extension
@@ -2271,7 +2271,7 @@ end = struct
         false
     (* Object fields do not require parens, even with trailing attributes *)
     | Exp {pexp_desc= Pexp_object _; _}, _ -> false
-    | _, {pexp_desc= Pexp_object _; pexp_attributes= []; _}
+    | _, {pexp_desc= Pexp_object _; pexp_attributes= []; pexp_outer_attributes= []; _}
       when Ocaml_version.(compare !ocaml_version Releases.v4_14_0 >= 0) ->
         false
     | ( Exp {pexp_desc= Pexp_construct ({txt= id; _}, _); _}

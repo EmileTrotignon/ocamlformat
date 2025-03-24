@@ -296,7 +296,7 @@ and expression =
      pexp_desc: expression_desc;
      pexp_loc: Location.t;
      pexp_loc_stack: location_stack;
-     pexp_attributes: attributes;  (** [... [\@id1] [\@id2]] *)
+     pexp_ext_attrs: ext_attrs;
     }
 
 and expression_desc =

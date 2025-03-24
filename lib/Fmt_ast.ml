@@ -594,7 +594,7 @@ let rec fmt_extension_aux c ctx ~key (ext, pld) =
                         {pconst_desc= Pconst_string (str, loc, delim); _}
                   ; pexp_loc
                   ; pexp_loc_stack= _
-                  ; pexp_attributes= [] }
+                  ; pexp_ext_attrs= {attrs_before=[]; attrs_after=[]; attrs_extension=_} }
                 , [] )
           ; pstr_loc } ]
     , _ )
@@ -648,7 +648,7 @@ and fmt_attribute c ~key {attr_name; attr_payload; attr_loc} =
                 ( { pexp_desc=
                       Pexp_constant
                         {pconst_desc= Pconst_string (doc, _, None); _}
-                  ; pexp_attributes= []
+                  ; pexp_ext_attrs= {attrs_before=[]; attrs_after=[]; attrs_extension=_}
                   ; _ }
                 , [] )
           ; _ } ] ) ->
@@ -698,7 +698,7 @@ and fmt_attributes_and_docstrings_aux c ~key attrs =
                           Pexp_constant
                             {pconst_desc= Pconst_string (txt, _, None); _}
                       ; pexp_loc= loc
-                      ; pexp_attributes= []
+                      ; pexp_ext_attrs= {attrs_before=[]; attrs_after=[]; attrs_extension=_}
                       ; _ }
                     , [] )
               ; _ } ]
@@ -1653,12 +1653,12 @@ and fmt_function ?(last_arg = false) ?force_closing_paren ~ctx ~ctx0
 and fmt_label_arg ?(box = true) ?eol c (lbl, ({ast= arg; _} as xarg)) =
   match (lbl, arg.pexp_desc) with
   | (Labelled l | Optional l), Pexp_ident {txt= Lident i; loc}
-    when String.equal l.txt i && List.is_empty arg.pexp_attributes ->
+    when String.equal l.txt i && not (Ast.Ext_attrs.has_attrs arg.pexp_ext_attrs) ->
       Cmts.fmt c loc @@ Cmts.fmt c ?eol arg.pexp_loc @@ fmt_label lbl noop
   | ( (Labelled l | Optional l)
     , Pexp_constraint ({pexp_desc= Pexp_ident {txt= Lident i; _}; _}, _) )
     when String.equal l.txt i
-         && List.is_empty arg.pexp_attributes
+         && not (Ast.Ext_attrs.has_attrs arg.pexp_ext_attrs)
          && Ocaml_version.(
               compare c.conf.opr_opts.ocaml_version.v Releases.v4_14_0 >= 0 )
     ->
@@ -1933,8 +1933,9 @@ and fmt_expression c ?(box = true) ?(pro = noop) ?eol ?parens
     ?(indent_wrap = 0) ?ext ({ast= exp; ctx= ctx0} as xexp) =
   protect c (Exp exp)
   @@
-  let {pexp_desc; pexp_loc; pexp_attributes; _} = exp in
-  update_config_maybe_disabled c pexp_loc pexp_attributes
+  let {pexp_desc; pexp_loc; pexp_attributes; pexp_ext; pexp_outer_attributes; _} = exp in
+  let ext = match pexp_ext with Some ext -> Some ext | None -> ext in
+  update_config_maybe_disabled c pexp_loc (pexp_attributes @ pexp_outer_attributes)
   @@ fun c ->
   Cmts.relocate_wrongfully_attached_cmts c.cmts c.source exp ;
   let pro =
@@ -1954,6 +1955,23 @@ and fmt_expression c ?(box = true) ?(pro = noop) ?eol ?parens
   let fmt_args_grouped ?epi e0 a1N =
     fmt_args_grouped c ctx ?epi ((Nolabel, e0) :: a1N)
   in
+  let parens, pexp_attributes, wrap_outer_attributes =
+
+  print_endline "foo";
+    match pexp_outer_attributes, pexp_ext with
+    | _ :: _, Some _ ->
+      print_endline "bar";
+      true, pexp_attributes, fun k ->
+      pro
+      $ hvbox 0
+          (Params.parens_if parens c.conf
+            ( k
+            $ fmt_atrs ) )
+    | _ ->
+      print_endline "baz";
+      parens, pexp_attributes @ pexp_outer_attributes, Fn.id
+    in
+    wrap_outer_attributes @@
   hvbox_if box 0 ~name:"expr"
   @@ fmt_cmts_after
   @@
@@ -2011,7 +2029,7 @@ and fmt_expression c ?(box = true) ?(pro = noop) ?eol ?parens
                             ( ( { pexp_desc=
                                     Pexp_function
                                       (args, typ, (Pfunction_body _ as body))
-                                ; _ } as retn )
+                                ; pexp_ext=None; _ } as retn )
                             , [] )
                       ; pstr_loc= _ } as _pld ) ] )
         ; _ } ) ->
@@ -2684,7 +2702,7 @@ and fmt_expression c ?(box = true) ?(pro = noop) ?eol ?parens
       , PStr
           [ { pstr_desc=
                 Pstr_eval
-                  ( ( {pexp_desc= Pexp_sequence _; pexp_attributes= []; _} as
+                  ( ( {pexp_desc= Pexp_sequence _; pexp_attributes= []; pexp_outer_attributes= []; pexp_ext=None; _} as
                       e1 )
                   , _ )
             ; pstr_loc= _ } ] )
@@ -2760,6 +2778,8 @@ and fmt_expression c ?(box = true) ?(pro = noop) ?eol ?parens
                             | Pexp_pack _ | Pexp_beginend _ | Pexp_letopen _
                               )
                         ; pexp_attributes= []
+                        ; pexp_outer_attributes= []
+                        ; pexp_ext=None
                         ; _ } as e1 )
                     , _ )
               ; pstr_loc= _ } as str ) ] )
@@ -2777,7 +2797,7 @@ and fmt_expression c ?(box = true) ?(pro = noop) ?eol ?parens
       , PStr
           [ ( { pstr_desc=
                   Pstr_eval
-                    ( ( {pexp_desc= Pexp_infix _; pexp_attributes= []; _} as
+                    ( ( {pexp_desc= Pexp_infix _; pexp_attributes= []; pexp_outer_attributes= []; _} as
                         e1 )
                     , _ )
               ; pstr_loc= _ } as str ) ] )
@@ -2956,7 +2976,7 @@ and fmt_let_bindings c ~ctx0 ~parens ~has_attr ~fmt_atrs ~fmt_expr ~loc_in
             [ { pstr_desc=
                   Pstr_eval
                     ( { pexp_desc= Pexp_let _ | Pexp_letmodule _
-                      ; pexp_attributes= []
+                      ; pexp_attributes= []; pexp_outer_attributes= []
                       ; _ }
                     , _ )
               ; pstr_loc= _ } ] ) ->
@@ -4628,7 +4648,7 @@ and fmt_value_binding c ~ctx0 ~rec_flag ?in_ ?epi
     | _, Pfunction_cases _
      |( []
       , Pfunction_body
-          { pexp_attributes= []
+          { pexp_attributes= []; pexp_outer_attributes= []
           ; pexp_desc= Pexp_function ([], None, Pfunction_cases _)
           ; _ } ) ->
         (c.conf.fmt_opts.function_indent.v, true)
