@@ -106,6 +106,7 @@ let parse ?(disable_w50 = false) ?(disable_deprecated = false) parse fragment
 let parse_ast (conf : Conf.t) fg ~ocaml_version ~input_name s =
   let preserve_beginend = Poly.(conf.fmt_opts.exp_grouping.v = `Preserve) in
   Extended_ast.Parse.ast fg ~ocaml_version ~preserve_beginend ~input_name s
+  |> Extended_ast.map fg Add_multiline_beginend.mapper
 
 (** [is_repl_block x] returns whether [x] is a list of REPL phrases and
     outputs of the form:
