@@ -1,0 +1,84 @@
+let _ =
+  all
+    [ all
+        [ all
+            [ all
+                [ f
+                    begin
+                      all
+                        [ all
+                            [ all
+                                [ all
+                                    [ all
+                                        [ all
+                                            [ all
+                                                [ all
+                                                    [ all
+                                                        [ all
+                                                            [ all
+                                                                [ all
+                                                                    [ all
+                                                                        [ all
+                                                                            [ 
+                                                                            identify
+                                                                            ]
+                                                                        ] ]
+                                                                ] ] ] ] ] ]
+                                        ] ] ] ] ]
+                    end ] ] ] ]
+
+let _ = function
+  | [%p
+      function
+      | [%p
+          function
+          | [%p
+              function
+              | [%p
+                  function
+                  | [%p
+                      function
+                      | [%p
+                          function
+                          | [%p
+                              function
+                              | [%p
+                                  function
+                                  | [%p
+                                      function
+                                      | [%p
+                                          function
+                                          | [%p
+                                              function
+                                              | [%p
+                                                  function
+                                                  | [%p
+                                                      function
+                                                      | [%p
+                                                          function
+                                                          | [%p
+                                                              function
+                                                              | [%p
+                                                                  function
+                                                                  | [%p
+                                                                      function
+                                                                      | _ ->
+                                                                          ()]
+                                                                    ->
+                                                                      ()] ->
+                                                                  ()] ->
+                                                              ()] ->
+                                                          ()] ->
+                                                      ()] ->
+                                                  ()] ->
+                                              ()] ->
+                                          ()] ->
+                                      ()] ->
+                                  ()] ->
+                              ()] ->
+                          ()] ->
+                      ()] ->
+                  ()] ->
+              ()] ->
+          ()] ->
+      ()

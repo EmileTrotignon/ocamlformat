@@ -1,0 +1,50 @@
+[@@@ocamlformat "sequence-style=before"]
+
+let foo x y =
+  lazy begin
+    fooooooooooooooooooooooo
+    ; fooooooooooooooooooooooo
+    ;%ext
+      foooooooooooooooooooooooooo
+    ; fooooooooooooooooooooooooo
+  end
+
+let _ =
+  do_
+  ;%ext
+    job_1
+  ; job_2
+  ; job_1
+  ; job_2
+  ; job_1
+  ;%ext
+    job_2
+  ; job_1
+  ; job_2
+  ; job_1
+  ; job_2
+  ; return ()
+
+let _ =
+  do_
+  ; job_1
+  ; job_2
+  ;%ext
+    f
+      begin
+        job_1
+        ; job_2
+        ; job_1
+        ; job_2
+        ; job_1
+        ;%ext
+          job_2
+        ;%ext
+          job_2
+        ; job_1
+        ; job_2
+        ; job_1
+        ; job_2
+      end
+  ;%ext
+    return ()

@@ -1,0 +1,168 @@
+let s =
+  List.fold x
+    ~f:
+      begin fun y -> function
+        | Aconstructor avalue -> afunction avalue
+        | Bconstructor bvalue -> bfunction bvalue
+      end
+
+let f _ = (function x -> x + 1)
+
+let f _ = function x -> x + 1
+
+let f _ = fun _ -> (function x -> x + 1)
+
+let f _ = fun _ -> function x -> x + 1
+
+let f _ = fun _ -> (function x -> x + 1)
+
+let f _ = fun _ -> function x -> x + 1
+
+let f _ = fun _ -> fun x -> x + 1
+
+let f _ = fun _ -> fun x -> x + 1
+
+let f _ = fun _ -> fun x -> x + 1
+
+let f _ = fun _ -> fun x -> x + 1
+
+let _ =
+  let f _ = (function x -> x + 1) in
+  ()
+
+let _ =
+  let f _ = function x -> x + 1 in
+  ()
+
+let _ =
+  let f _ = fun _ -> (function x -> x + 1) in
+  ()
+
+let _ =
+  let f _ = fun _ -> function x -> x + 1 in
+  ()
+
+let _ =
+  let f _ = fun _ -> (function x -> x + 1) in
+  ()
+
+let _ =
+  let f _ = fun _ -> function x -> x + 1 in
+  ()
+
+let _ =
+  let f _ = fun _ -> fun x -> x + 1 in
+  ()
+
+let _ =
+  let f _ = fun _ -> fun x -> x + 1 in
+  ()
+
+let _ =
+  let f _ = fun _ -> fun x -> x + 1 in
+  ()
+
+let _ =
+  let f _ = fun _ -> fun x -> x + 1 in
+  ()
+
+class c =
+  let f _ = (function x -> x + 1) in
+  object end
+
+class c =
+  let f _ = function x -> x + 1 in
+  object end
+
+class c =
+  let f _ = fun _ -> (function x -> x + 1) in
+  object end
+
+class c =
+  let f _ = fun _ -> function x -> x + 1 in
+  object end
+
+class c =
+  let f _ = fun _ -> (function x -> x + 1) in
+  object end
+
+class c =
+  let f _ = fun _ -> function x -> x + 1 in
+  object end
+
+class c =
+  let f _ = fun _ -> fun x -> x + 1 in
+  object end
+
+class c =
+  let f _ = fun _ -> fun x -> x + 1 in
+  object end
+
+class c =
+  let f _ = fun _ -> fun x -> x + 1 in
+  object end
+
+class c =
+  let f _ = fun _ -> fun x -> x + 1 in
+  object end
+
+open struct
+  [@@@ocamlformat "let-binding-deindent-fun=true"]
+
+  let _ =
+    let _ = function
+      | Partial _ -> begin
+        fun {target} ->
+          match target with
+          | Lazy key -> Val_ref.of_key key
+          | Lazy_loaded {v_ref; _} | Dirty {v_ref; _} -> v_ref
+      end
+    in
+    ()
+
+  let _ = function
+    | Partial _ -> begin
+      fun {target} ->
+        match target with
+        | Lazy key -> Val_ref.of_key key
+        | Lazy_loaded {v_ref; _} | Dirty {v_ref; _} -> v_ref
+    end
+end
+
+let _ = call ~f:(fun pair -> (pair : a * b)) ;;
+
+f
+  begin fun _ -> function
+    | true ->
+        let () = () in
+        ()
+    | false -> ()
+  end
+  ()
+;;
+
+f
+  begin fun _ -> function
+    | true ->
+        let () = () in
+        ()
+    (* comment *)
+    | false -> ()
+  end
+  ()
+
+let _ = fun (x : int as 'a) -> (x : int as 'a)
+
+let f = function
+  | Foo -> bar
+  | EArr l ->
+      EArr
+        begin
+          List.map l
+            ~f:
+              begin function
+              | ElementHole -> ElementHole
+              | Element e -> Element (m#expression e)
+              | ElementSpread e -> ElementSpread (m#expression e)
+              end
+        end

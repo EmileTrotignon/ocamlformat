@@ -1,0 +1,72 @@
+let _ =
+  if b
+  then e
+  else begin
+    something loooooooooooooooooooooooooooooooong enough to_trigger a break ;
+    this is more
+  end
+[@@ocamlformat "if-then-else=keyword-first"]
+
+let _ =
+  if b then e
+  else begin
+    something loooooooooooooooooooooooooooooooong enough to_trigger a break ;
+    this is more
+  end
+[@@ocamlformat.typo "if-then-else=keyword-first"]
+
+let _ =
+  if b then e
+  else begin
+    something loooooooooooooooooooooooooooooooong enough to_trigger a break ;
+    this is more
+  end
+[@@ocamlformat 1, "if-then-else=keyword-first"]
+
+let _ =
+  if b then e
+  else begin
+    something loooooooooooooooooooooooooooooooong enough to_trigger a break ;
+    this is more
+  end
+[@@ocamlformat "if-then-else=bad"]
+
+module M = struct
+  [@@@ocamlformat "if-then-else=keyword-first"]
+
+  let _ =
+    if b
+    then e
+    else begin
+      something loooooooooooooooooooooooooooooooong enough to_trigger a break ;
+      this is more
+    end
+  [@@ocamlformat "if-then-else=bad"]
+
+  let _ =
+    if b
+    then e
+    else begin
+      something loooooooooooooooooooooooooooooooong enough to_trigger a break ;
+      this is more
+    end
+
+  let _ =
+    if b
+    then e
+    else begin
+      something loooooooooooooooooooooooooooooooong enough to_trigger a break ;
+      this is more
+    end
+
+  [@@@ocamlformat "if-then-else=compact"]
+
+  let _ =
+    if b then e
+    else begin
+      something loooooooooooooooooooooooooooooooong enough to_trigger a break ;
+      this is more
+    end
+end
+
+[@@@ocamlformat "margin=90"]

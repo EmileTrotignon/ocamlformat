@@ -1,0 +1,6 @@
+let _ =
+  Some
+    begin
+      let open! List in
+      1
+    end

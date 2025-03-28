@@ -73,6 +73,12 @@ let empty_line_between (t : t) p1 p2 =
 let tokens_at t ~filter (l : Location.t) : (Parser.token * Location.t) list =
   tokens_between t ~filter l.loc_start l.loc_end
 
+let is_parens t loc =
+  let tokens = tokens_at t ~filter:(fun _ -> true) loc in
+  List.length tokens >= 3
+  && Stdlib.(tokens |> List.hd |> fst = Parser.LPAREN)
+  && tokens |> List.last_exn |> fst |> Stdlib.(=) Parser.RPAREN
+
 let find_token_before t ~filter pos =
   match find_token t `Last_strictly_less_than pos with
   | None -> None

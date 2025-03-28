@@ -1,0 +1,98 @@
+let _ = match a with A -> (match b with B -> b | C -> c) | D -> D
+
+let _ =
+  match a with
+  | AAAAAAAAAA -> begin
+    match bbbbbbbbbbbbb with
+    | BBbbbbbbbbbbbbb -> bbbbbbbbbbbb
+    | CCCCCCCCCCCCCCcc -> ccccccccccccccccc
+  end
+  | DDDDDDDDDDDDDDd -> DDDDDDDDDDDDDDDDdD
+
+let _ =
+  match a with
+  | AAAAAAAAAA ->
+      let x = 3 in
+      begin match bbbbbbbbbbbbb with
+      | BBbbbbbbbbbbbbb -> bbbbbbbbbbbb
+      | CCCCCCCCCCCCCCcc -> ccccccccccccccccc
+      end
+  | DDDDDDDDDDDDDDd -> DDDDDDDDDDDDDDDDdD
+
+let _ =
+  match x with
+  | _ -> begin
+    match
+      something long enough to_break
+        _________________________________________________________________
+    with
+    | AAAAAAAAAA ->
+        let x = 3 in
+        begin match bbbbbbbbbbbbb with
+        | BBbbbbbbbbbbbbb -> bbbbbbbbbbbb
+        | CCCCCCCCCCCCCCcc -> ccccccccccccccccc
+        end
+    | DDDDDDDDDDDDDDd -> DDDDDDDDDDDDDDDDdD
+  end
+
+let x =
+  let g =
+    match x with
+    | `A -> fun id -> (function A -> () | B -> ())
+    | `B -> fun id -> (function A -> () | _ -> ())
+  in
+  ()
+
+let x =
+  let g =
+    match x with
+    | `A -> (function A -> () | B -> ())
+    | `B -> (function A -> () | _ -> ())
+  in
+  ()
+
+let x =
+  let g = match x with `A -> fun (A | B) -> () | `B -> fun (A | _) -> () in
+  ()
+
+let _ = match x with _ -> b >>= fun () -> c
+
+[@@@ocamlformat "break-infix-before-func=false"]
+
+let foo = match foo with 1 -> bar >>= ( function _ -> () ) | other -> ()
+
+let foo =
+  match foo with
+  | 1 -> bar >>= ( function a -> fooooo | b -> fooooo | _ -> () )
+  | other -> ()
+
+let foo =
+  match foo with
+  | 1 ->
+      bar
+      >>= begin function
+          | a -> fooooo
+          | b -> fooooo
+          | c -> foooooooo foooooooooo fooooooooooooooooooo ()
+          | _ -> ()
+          end
+  | other -> ()
+
+let _ =
+  match a with
+  | a -> begin
+    match a with
+    | a ->
+        let+ a = b in
+        (match a with a -> a)
+  end
+
+let _ =
+  match a with
+  | a -> begin
+    match a with
+    | a ->
+        let+ a = b in
+        (match a with a -> a)
+    | b -> c
+  end

@@ -103,9 +103,34 @@ let parse ?(disable_w50 = false) ?(disable_deprecated = false) parse fragment
   in
   match List.rev !w50 with [] -> t | w50 -> raise (Warning50 w50)
 
+
+  let beginend_mapper ~source =
+    let expr (m : Ast_mapper.mapper) (e:Parsetree.expression) =
+      let is_multiline =
+        e.pexp_loc.loc_start.pos_lnum <> e.pexp_loc.loc_end.pos_lnum
+      in
+      let is_parenze = Source.is_parens source e.pexp_loc in
+      let is_always_parenze = match e.pexp_desc with Pexp_tuple _ | Pexp_coerce _ -> true | _ -> false in
+      let e =
+        match e.pexp_desc with
+        | Pexp_beginend e' when not is_multiline && List.is_empty e.pexp_attributes -> e'
+        | Pexp_beginend ({pexp_desc=Pexp_beginend _ ;_}as e') -> e'
+        | _ -> e
+      in
+      let e = Ast_mapper.default_mapper.expr m e in
+      if is_multiline && is_parenze && not is_always_parenze then {e with pexp_desc= Pexp_beginend e}
+      else e
+    in
+    {Ast_mapper.default_mapper with expr}
 let parse_ast (conf : Conf.t) fg ~ocaml_version ~input_name s =
-  let preserve_beginend = Poly.(conf.fmt_opts.exp_grouping.v = `Preserve) in
+  let tokens =
+    let lexbuf, _ = fresh_lexbuf s in
+    tokens lexbuf
+  in
+  let source = Source.create ~text:s ~tokens in
+  let preserve_beginend = match  conf.fmt_opts.exp_grouping.v with `Auto | `Preserve -> true | `Parens -> false  in
   Extended_ast.Parse.ast fg ~ocaml_version ~preserve_beginend ~input_name s
+  |> if Poly.(conf.fmt_opts.exp_grouping.v = `Auto) then Extended_ast.map fg (beginend_mapper ~source) else Fn.id
 
 (** [is_repl_block x] returns whether [x] is a list of REPL phrases and
     outputs of the form:

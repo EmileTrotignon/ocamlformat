@@ -2969,12 +2969,14 @@ and fmt_beginend c ~loc ?(box = true) ?(pro = noop) ~ctx ~fmt_atrs ~ext
             ~box ?eol ~parens:false ~indent_wrap (sub_exp ~ctx e1)
         $ break 1 0 $ end_ )
   | _ ->
+  let break_end = if Poly.(c.conf.fmt_opts.exp_grouping.v = `Preserve) then force_break else break 1 0 in
+
       hvbox 0
         ( hvbox 0 (pro $ begin_)
         $ break 1 2
         $ fmt_expression c ~box ?eol ~parens:false ~indent_wrap
             (sub_exp ~ctx e)
-        $ force_break $ end_ )
+        $ break_end $ end_ )
 
 and fmt_let_bindings c ~ctx0 ~parens ~has_attr ~fmt_atrs ~fmt_expr ~loc_in
     rec_flag bindings body =

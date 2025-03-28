@@ -76,7 +76,7 @@ type fmt_opts =
   ; doc_comments_padding: int elt
   ; doc_comments_tag_only: [`Fit | `Default] elt
   ; dock_collection_brackets: bool elt
-  ; exp_grouping: [`Parens | `Preserve] elt
+  ; exp_grouping: [`Parens | `Preserve | `Auto] elt
   ; extension_indent: int elt
   ; field_space: [`Tight | `Loose | `Tight_decl] elt
   ; function_indent: int elt

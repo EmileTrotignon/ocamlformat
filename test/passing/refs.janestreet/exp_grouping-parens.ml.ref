@@ -356,13 +356,7 @@ let _ = x y
 let _ = (* foo *) x y
 let _ = [%ext x y]
 let _ = [%ext (* foo *) x y]
-
-let _ =
-  begin [@landmark "parse_constant_dividends"]
-    market_data_items := ()
-  end
-;;
-
+let _ = begin [@landmark "parse_constant_dividends"] market_data_items := () end
 let () = if a then b (* asd *)
 
 let x =
@@ -387,12 +381,7 @@ let x =
   ()
 ;;
 
-let _ =
-  if something_changed then
-    begin [@attr]
-      loop
-    end
-;;
+let _ = if something_changed then begin [@attr] loop end
 
 let _ =
   match x with
@@ -403,10 +392,7 @@ let _ =
 
 let _ =
   match x with
-  | _ ->
-    begin [@foo]
-      y
-    end
+  | _ -> begin [@foo] y end
 ;;
 
 let v = map x (fun x y z -> y)
