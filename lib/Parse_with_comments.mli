@@ -44,6 +44,7 @@ val parse :
 val parse_toplevel :
      ?disable_w50:bool
   -> ?disable_deprecated:bool
+  -> is_first_iter:bool
   -> Conf.t
   -> input_name:string
   -> source:string
@@ -55,6 +56,7 @@ val parse_toplevel :
 
 val parse_ast :
      Conf.t
+  -> is_first_iter:bool
   -> 'a Extended_ast.t
   -> ocaml_version:Ocaml_version.t
   -> input_name:string

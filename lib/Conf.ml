@@ -748,8 +748,9 @@ module Formatting = struct
       ; Decl.Value.make ~name:"preserve" `Preserve
           "$(b,preserve) preserves the original grouping syntax \
            (parentheses or $(i,begin)/$(i,end))."
-           ; Decl.Value.make ~name:"auto" `Auto
-           "$(b,auto) uses parentheses for single line grouping, and $(i,begin)/$(i,end)) for multiline grouping."  ]
+      ; Decl.Value.make ~name:"auto" `Auto
+          "$(b,auto) uses parentheses for single line grouping, and \
+           $(i,begin)/$(i,end)) for multiline grouping." ]
     in
     Decl.choice ~names ~all ~default ~doc ~kind ~allow_inline:false
       (fun conf elt -> update conf ~f:(fun f -> {f with exp_grouping= elt}))

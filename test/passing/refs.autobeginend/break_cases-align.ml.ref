@@ -22,14 +22,12 @@ let f =
     | E -> 4
     | Z
      |P
-     |M -> begin
-      match y with
-      | O -> 5
-      | P when h x -> begin
+     |M ->
+    match y with
+    | O -> 5
+    | P when h x -> (
         function
-        | A -> 6
-      end
-    end
+        | A -> 6 )
 
 let foo =
   List.map
@@ -39,14 +37,12 @@ let foo =
         | E -> 4
         | Z
          |P
-         |M -> begin
-          match y with
-          | O -> 5
-          | P when h x -> begin
+         |M ->
+        match y with
+        | O -> 5
+        | P when h x -> (
             function
-            | A -> 6
-          end
-        end
+            | A -> 6 )
       end ;
   List.map
     ~f:
@@ -88,11 +84,10 @@ let _ =
     match x with
     | None -> false
     | Some looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong
-      -> begin
-      match y with
-      | Some _ -> true
-      | None -> false
-    end
+      ->
+    match y with
+    | Some _ -> true
+    | None -> false
   in
   ()
 

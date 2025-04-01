@@ -31,10 +31,8 @@ let () =
 
 let () =
   begin
-    begin
-      (match%ext x with _ -> ()) ;
-      match%ext x with _ -> ()
-    end
+    (match%ext x with _ -> ()) ;
+    match%ext x with _ -> ()
   end
 
 let () = () ; () ;%ext () ; () ;%ext ()

@@ -25,10 +25,9 @@ let f =
      |M -> begin
         match y with
         | O -> 5
-        | P when h x -> begin
+        | P when h x -> (
             function
-            | A -> 6
-          end
+            | A -> 6 )
       end
 
 let foo =
@@ -42,10 +41,9 @@ let foo =
          |M -> begin
             match y with
             | O -> 5
-            | P when h x -> begin
+            | P when h x -> (
                 function
-                | A -> 6
-              end
+                | A -> 6 )
           end
       end ;
   List.map

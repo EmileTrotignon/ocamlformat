@@ -113,12 +113,8 @@ let f (module Store : Irmin.Generic_key.S with type repo = repo)
 
 let new_specialised_args =
   Variable.Map.mapi
-    begin fun new_inner_var______
-      (definition : Definition.t)
-      :
-      Flambda.specialised_to
-    -> ()
-    end
+    (fun new_inner_var______ (definition : Definition.t) :
+         Flambda.specialised_to -> () )
     foo
 
 let new_specialised_args =

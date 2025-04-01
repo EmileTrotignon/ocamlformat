@@ -17,11 +17,9 @@ let raise fmt =
 
 let raise fmt =
   Fmt.kstr
-    begin fun error_message
-      aaaaaaaaaaaaaaaaaaaaaaaaaaaa
-      bbbbbbbbbbbbbbbbbbbbb
-    -> invalid_arg error_message
-    end
+    (fun error_message aaaaaaaaaaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbb ->
+      invalid_arg error_message
+    )
     fmt
 
 let raise fmt =
@@ -35,27 +33,22 @@ let raise fmt =
 
 let raise fmt =
   Fmt.kstr
-    begin fun error_message
-      aaaaaaaaaaaaaaaaaaaaaaaaaaaa
-      bbbbbbbbbbbbbbbbbbbbb
-    -> invalid_arg error_message
-    end
+    (fun error_message aaaaaaaaaaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbb ->
+      invalid_arg error_message
+    )
     fmt
 
 let contrived =
   List.map
-    ~f:
-      begin fun aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ->
-        f aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-      end
+    ~f:(fun aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ->
+      f aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    )
     l
 
 let contrived =
-  List.map l
-    ~f:
-      begin fun aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ->
-        f aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-      end
+  List.map l ~f:(fun aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ->
+      f aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  )
 
 let x =
   match y with

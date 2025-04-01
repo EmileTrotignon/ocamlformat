@@ -78,11 +78,8 @@ let _ = (c :: l1) @ foo (l2 @ l)
 let _ =
   make_single_trace create_loc message
   :: make_single_trace create_loc create_message
-  :: List.map call_chain
-       ~f:
-         begin fun foooooooooooooooooooooooooooo ->
-           fooooooooooooooooooooooooooooooo foooooooooooo []
-         end
+  :: List.map call_chain ~f:(fun foooooooooooooooooooooooooooo ->
+         fooooooooooooooooooooooooooooooo foooooooooooo [] )
   :: foooooooo :: fooooooooooooooooo
 
 let _ =

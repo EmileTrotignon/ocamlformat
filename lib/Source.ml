@@ -77,7 +77,20 @@ let is_parens t loc =
   let tokens = tokens_at t ~filter:(fun _ -> true) loc in
   List.length tokens >= 3
   && Stdlib.(tokens |> List.hd |> fst = Parser.LPAREN)
-  && tokens |> List.last_exn |> fst |> Stdlib.(=) Parser.RPAREN
+  && tokens |> List.last_exn |> fst |> Stdlib.( = ) Parser.RPAREN
+
+let loc_inside_parens t loc =
+  if not (is_parens t loc) then None
+  else
+    let tokens = tokens_at t ~filter:(fun _ -> true) loc in
+    let loc_start = tokens |> List.tl_exn |> List.hd_exn |> snd in
+    let loc_end = tokens |> List.rev |> List.tl_exn |> List.hd_exn |> snd in
+    let loc : Warnings.loc =
+      { loc_start= loc_start.loc_start
+      ; loc_end= loc_end.loc_end
+      ; loc_ghost= false }
+    in
+    Some loc
 
 let find_token_before t ~filter pos =
   match find_token t `Last_strictly_less_than pos with

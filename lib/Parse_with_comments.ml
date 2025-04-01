@@ -103,34 +103,107 @@ let parse ?(disable_w50 = false) ?(disable_deprecated = false) parse fragment
   in
   match List.rev !w50 with [] -> t | w50 -> raise (Warning50 w50)
 
-
-  let beginend_mapper ~source =
-    let expr (m : Ast_mapper.mapper) (e:Parsetree.expression) =
-      let is_multiline =
-        e.pexp_loc.loc_start.pos_lnum <> e.pexp_loc.loc_end.pos_lnum
-      in
-      let is_parenze = Source.is_parens source e.pexp_loc in
-      let is_always_parenze = match e.pexp_desc with Pexp_tuple _ | Pexp_coerce _ -> true | _ -> false in
-      let e =
-        match e.pexp_desc with
-        | Pexp_beginend e' when not is_multiline && List.is_empty e.pexp_attributes -> e'
-        | Pexp_beginend ({pexp_desc=Pexp_beginend _ ;_}as e') -> e'
-        | _ -> e
-      in
-      let e = Ast_mapper.default_mapper.expr m e in
-      if is_multiline && is_parenze && not is_always_parenze then {e with pexp_desc= Pexp_beginend e}
-      else e
+let beginend_mapper ~source =
+  let rec expr ~skip_remove_beginend ~skip_add_beginend
+      (m : Ast_mapper.mapper) (e : Parsetree.expression) =
+      let lnum_start = e.pexp_loc.loc_start.pos_lnum and lnum_end = e.pexp_loc.loc_end.pos_lnum in
+      let lnum_delta = lnum_end - lnum_start in
+    let is_multiline =
+      lnum_delta <> 0
     in
-    {Ast_mapper.default_mapper with expr}
-let parse_ast (conf : Conf.t) fg ~ocaml_version ~input_name s =
+    let is_parenze = Source.is_parens source e.pexp_loc in
+    let is_two_line_func =
+      let loc_inside_parens = Source.loc_inside_parens source e.pexp_loc in
+      let inner_lnum_delta= match loc_inside_parens with Some inner_loc ->  Some (inner_loc.loc_end.pos_lnum - inner_loc.loc_start.pos_lnum) | None -> None in
+      match (e.pexp_desc, inner_lnum_delta) with
+      | Pexp_function _, _
+        when lnum_delta = 1
+        ->
+          true
+      | Pexp_function _, Some 1
+        when lnum_delta = 2 ->
+          true
+      | _ , Some 0-> true
+      | _ -> false
+    in
+    let is_always_parenze =
+      match e.pexp_desc with
+      | Pexp_tuple _ | Pexp_coerce _ | Pexp_pack _ -> true
+      | _ -> false
+    in
+    let add_beginend =
+      is_multiline && is_parenze && (not is_always_parenze)
+      && (not is_two_line_func) && not skip_add_beginend
+    in
+    let remove_beginend =
+      (not skip_remove_beginend)
+      && (not is_multiline)
+      && List.is_empty e.pexp_attributes
+    in
+    let e =
+      match e.pexp_desc with
+      | Pexp_beginend e' when remove_beginend -> e'
+      (* | Pexp_beginend ({pexp_desc= Pexp_beginend _; _} as e') -> e' *)
+      | _ -> e
+    in
+    let sub_expr =
+      let sub_skip_remove_beginend =
+        match e.pexp_desc with
+        (* we never want to remove a begin end node that has an extension. *)
+        | Pexp_extension
+            ( ext
+            , PStr
+                [ ( { pstr_desc=
+                        Pstr_eval
+                          (({pexp_desc= Pexp_beginend _; _} as e_beginend), _)
+                    ; pstr_loc= _ } as _pld ) ] )
+          when Source.extension_using_sugar ~name:ext
+                 ~payload:e_beginend.pexp_loc ->
+            true
+        | _ -> false
+      in
+      let sub_skip_add_beginend =
+        match e.pexp_desc with
+        (* Prevent adding a begin end node twice in row. *)
+        | _ when add_beginend -> true
+        (* Here, we already removed the begin-end node if we had to, so this
+           case can only be triggered if [remove_beginend] is false. *)
+        | Pexp_beginend _ -> true
+        (* Adding a begin-end node inside an extension node will change which expression the  *)
+        (* | Pexp_extension (_, PStr [{pstr_desc= Pstr_eval _; _}]) -> true *)
+        | _ -> false
+      in
+      { m with
+        expr=
+          expr ~skip_remove_beginend:sub_skip_remove_beginend
+            ~skip_add_beginend:sub_skip_add_beginend }
+    in
+    let e = Ast_mapper.default_mapper.expr sub_expr e in
+    if add_beginend then
+      {e with pexp_desc= Pexp_beginend e; pexp_attributes= []}
+    else e
+  in
+  { Ast_mapper.default_mapper with
+    expr= expr ~skip_remove_beginend:false ~skip_add_beginend:false }
+
+let parse_ast (conf : Conf.t) ~is_first_iter fg ~ocaml_version ~input_name s =
   let tokens =
     let lexbuf, _ = fresh_lexbuf s in
     tokens lexbuf
   in
   let source = Source.create ~text:s ~tokens in
-  let preserve_beginend = match  conf.fmt_opts.exp_grouping.v with `Auto | `Preserve -> true | `Parens -> false  in
+  let preserve_beginend =
+    match conf.fmt_opts.exp_grouping.v with
+    | `Preserve  -> true
+    | `Auto when is_first_iter -> false
+    | `Auto -> true
+    | `Parens  -> false
+  in
   Extended_ast.Parse.ast fg ~ocaml_version ~preserve_beginend ~input_name s
-  |> if Poly.(conf.fmt_opts.exp_grouping.v = `Auto) then Extended_ast.map fg (beginend_mapper ~source) else Fn.id
+  |>
+  if Poly.(conf.fmt_opts.exp_grouping.v = `Auto) && not is_first_iter then
+    Extended_ast.map fg (beginend_mapper ~source)
+  else Fn.id
 
 (** [is_repl_block x] returns whether [x] is a list of REPL phrases and
     outputs of the form:
@@ -142,13 +215,13 @@ let parse_ast (conf : Conf.t) fg ~ocaml_version ~input_name s =
 let is_repl_block x =
   String.length x >= 2 && Char.equal x.[0] '#' && Char.is_whitespace x.[1]
 
-let parse_toplevel ?disable_w50 ?disable_deprecated (conf : Conf.t)
+let parse_toplevel ?disable_w50 ?disable_deprecated ~is_first_iter (conf : Conf.t)
     ~input_name ~source =
   if is_repl_block source && conf.fmt_opts.parse_toplevel_phrases.v then
     Either.Second
-      (parse ?disable_w50 ?disable_deprecated (parse_ast conf)
+      (parse ?disable_w50 ?disable_deprecated (parse_ast ~is_first_iter conf)
          Extended_ast.Repl_file conf ~input_name ~source )
   else
     First
-      (parse ?disable_w50 ?disable_deprecated (parse_ast conf)
+      (parse ?disable_w50 ?disable_deprecated (parse_ast  ~is_first_iter conf)
          Extended_ast.Use_file conf ~input_name ~source )

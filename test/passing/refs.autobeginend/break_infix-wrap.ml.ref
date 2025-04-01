@@ -48,12 +48,11 @@ let _ =
   fooooooooo @@ fooooooooooooooo
   @@ begin
        (fun x -> foooooooooooooo $ fooooooooooooooooooooo)
-       @@ begin fun x ->
-            fooooooooooooooo $ fooooooooooooooooo $ fooooooooooooooooo
-            $ fooooooooooooo
-            $ fooo @@ foooooooooooooooooo
-            $ fooooooooooooo $ foooooooooooooooooooo
-          end
+       @@ fun x ->
+       fooooooooooooooo $ fooooooooooooooooo $ fooooooooooooooooo
+       $ fooooooooooooo
+       $ fooo @@ foooooooooooooooooo
+       $ fooooooooooooo $ foooooooooooooooooooo
      end
 
 let _ = a + (b * c) + d

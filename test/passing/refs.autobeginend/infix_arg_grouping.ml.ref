@@ -166,12 +166,10 @@ let _ =
 let _ =
   List.filter
     begin fun s ->
-      begin
-        (* 3.1. the sid of the authenticated user *)
-        foooooooooooooooooooooooooooooo
-        ||
-        (* 3.2. any sids of the group that authenticated the user *)
-        (* TODO: better to look up the membership closure *)
-        fooooooooooooooooooooooooooo
-      end
+      (* 3.1. the sid of the authenticated user *)
+      foooooooooooooooooooooooooooooo
+      ||
+      (* 3.2. any sids of the group that authenticated the user *)
+      (* TODO: better to look up the membership closure *)
+      fooooooooooooooooooooooooooo
     end

@@ -66,3 +66,5 @@ val loc_of_first_token_at :
 val find_first_token_on_line : t -> int -> (Parser.token * Location.t) option
 
 val is_parens : t -> Warnings.loc -> bool
+
+val loc_inside_parens : t -> Warnings.loc -> Warnings.loc option

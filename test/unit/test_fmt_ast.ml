@@ -11,7 +11,7 @@ let check_updated_test source expected =
   let conf = Ocamlformat_lib.Conf.default in
   let ast ~input_name ~source =
     Ocamlformat_lib.Parse_with_comments.parse
-      (Ocamlformat_lib.Parse_with_comments.parse_ast conf)
+      (Ocamlformat_lib.Parse_with_comments.parse_ast ~is_first_iter:true conf)
       Structure conf ~input_name ~source
   in
   let ast1 = ast ~input_name:"source1" ~source:source1 in

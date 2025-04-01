@@ -249,6 +249,7 @@ let format (type ext std) (ext_fg : ext Extended_ast.t)
   Location.input_name := input_name ;
   (* iterate until formatting stabilizes *)
   let rec print_check ~i ~(conf : Conf.t) ~prev_source ext_t std_t =
+    let is_first_iter = i = 1 in
     let format ~box_debug =
       let open Fmt in
       let cmts_t =
@@ -301,7 +302,7 @@ let format (type ext std) (ext_fg : ext Extended_ast.t)
       in
       let* ext_t_new =
         match
-          parse (parse_ast conf) ~disable_w50:true ext_fg conf ~input_name
+          parse (parse_ast ~is_first_iter conf) ~disable_w50:true ext_fg conf ~input_name
             ~source:fmted
         with
         | exception Sys_error msg -> Error (Error.User_error msg)
@@ -388,7 +389,7 @@ let parse_and_format (type ext std) (ext_fg : ext Extended_ast.t)
   Location.input_name := input_name ;
   let line_endings = conf.fmt_opts.line_endings.v in
   let* ext_parsed =
-    parse_result (parse_ast conf) ~disable_w50:true ext_fg conf ~source
+    parse_result (parse_ast ~is_first_iter:true conf) ~disable_w50:true ext_fg conf ~source
       ~input_name
   in
   let* std_parsed =

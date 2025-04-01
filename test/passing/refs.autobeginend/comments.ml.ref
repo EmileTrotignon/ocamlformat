@@ -455,19 +455,15 @@ let _ =
   begin
     () ;
     (* indentation preserved *)
+    () ;
+    (* indentation preserved *)
     begin
       () ;
       (* indentation preserved *)
       begin
         () ;
-        (* indentation preserved *)
-        begin
-          begin
-            () ;
-            (* indentation not preserved *)
-            ()
-          end
-        end
+        (* indentation not preserved *)
+        ()
       end
     end
   end

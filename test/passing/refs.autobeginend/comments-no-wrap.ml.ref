@@ -452,22 +452,18 @@ let _ =
     () ;
     (* indentation preserved
   *)
+    () ;
+    (* indentation preserved
+   *)
     begin
       () ;
       (* indentation preserved
-   *)
+     *)
       begin
         () ;
-        (* indentation preserved
-     *)
-        begin
-          begin
-            () ;
-            (* indentation not preserved
+        (* indentation not preserved
 *)
-            ()
-          end
-        end
+        ()
       end
     end
   end

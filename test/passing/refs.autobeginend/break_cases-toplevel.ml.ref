@@ -18,10 +18,9 @@ let f =
     | Z | P | M -> begin
       match y with
       | O -> 5
-      | P when h x -> begin
-        function
-        | A -> 6
-      end
+      | P when h x -> (
+          function
+          | A -> 6 )
     end
 
 let foo =
@@ -33,10 +32,9 @@ let foo =
         | Z | P | M -> begin
           match y with
           | O -> 5
-          | P when h x -> begin
-            function
-            | A -> 6
-          end
+          | P when h x -> (
+              function
+              | A -> 6 )
         end
       end ;
   List.map

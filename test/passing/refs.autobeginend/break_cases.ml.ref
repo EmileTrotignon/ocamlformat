@@ -12,9 +12,8 @@ let f =
   fun x g t h y u ->
     match x with
     | E -> 4
-    | Z | P | M -> begin
-      match y with O -> 5 | P when h x -> ( function A -> 6 )
-    end
+    | Z | P | M -> (
+      match y with O -> 5 | P when h x -> ( function A -> 6 ) )
 
 let foo =
   List.map
@@ -22,9 +21,8 @@ let foo =
       begin fun x g t h y u ->
         match x with
         | E -> 4
-        | Z | P | M -> begin
-          match y with O -> 5 | P when h x -> ( function A -> 6 )
-        end
+        | Z | P | M -> (
+          match y with O -> 5 | P when h x -> ( function A -> 6 ) )
       end ;
   List.map
     ~f:
@@ -64,9 +62,8 @@ let _ =
     match x with
     | None -> false
     | Some looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong
-      -> begin
-      match y with Some _ -> true | None -> false
-    end
+      -> (
+      match y with Some _ -> true | None -> false )
   in
   ()
 

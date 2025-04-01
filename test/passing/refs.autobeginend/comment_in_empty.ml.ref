@@ -42,11 +42,9 @@ type t = < .. (* this object type is empty *) >
 
 let x =
   begin
-    begin
-      ( (* Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non
-           risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing
-           nec, ultricies sed, dolor. *) )
-    end
+    ( (* Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non
+         risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing
+         nec, ultricies sed, dolor. *) )
   end
 
 let x =
