@@ -1526,7 +1526,7 @@ let parse_attr {attr_name= {txt; loc= _}; attr_payload; _} =
                 ( { pexp_desc=
                       Pexp_constant
                         {pconst_desc= Pconst_string (str, strloc, None); _}
-                  ; pexp_attributes= []; pexp_outer_attributes= []
+                  ;pexp_ext_attrs= {attrs_before=[]; attrs_after=[]; attrs_extension=_}
                   ; _ }
                 , [] )
           ; _ } ] ->

@@ -193,6 +193,9 @@ module Exp = struct
   let add_attr_before d a =
       {d with pexp_ext_attrs = {d.pexp_ext_attrs with attrs_before = d.pexp_ext_attrs.attrs_before @ [a]}}
 
+  let add_attrs_after d a =
+  {d with pexp_ext_attrs = {d.pexp_ext_attrs with attrs_after = d.pexp_ext_attrs.attrs_after @ [a]}}
+
   let ident ?loc ?ext_attrs a = mk ?loc ?ext_attrs (Pexp_ident a)
   let constant ?loc ?ext_attrs a = mk ?loc ?ext_attrs (Pexp_constant a)
   let let_ ?loc ?ext_attrs ~loc_in a b = mk ?loc ?ext_attrs (Pexp_let (a, b, loc_in))

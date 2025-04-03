@@ -239,4 +239,5 @@ val parenze_mod : module_expr xt -> bool
 
 module Ext_attrs : sig
   val has_attrs : ext_attrs -> bool
+  val all_attrs: ext_attrs -> attributes
 end

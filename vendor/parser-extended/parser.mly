@@ -63,7 +63,7 @@ let pv_of_priv = function
 let mkvarinj s l = mkloc s (make_loc l)
 let mktyp ~loc ?attrs d = Typ.mk ~loc:(make_loc loc) ?attrs d
 let mkpat ~loc d = Pat.mk ~loc:(make_loc loc) d
-let mkexp ?ext ~loc d = Exp.mk ?ext ~loc:(make_loc loc) d
+let mkexp ?ext_attrs ~loc d = Exp.mk ?ext_attrs ~loc:(make_loc loc) d
 let mkmty ~loc ?attrs d = Mty.mk ~loc:(make_loc loc) ?attrs d
 let mksig ~loc d = Sig.mk ~loc:(make_loc loc) d
 let mkmod ~loc ?attrs d = Mod.mk ~loc:(make_loc loc) ?attrs d
@@ -179,26 +179,27 @@ let neg_string f =
    constants if possible, otherwise turn them into the corresponding prefix
    operators [~-], [~-.], etc.. *)
 let mkuminus ~sloc ~oploc name arg =
-  match name, arg.pexp_desc, arg.pexp_attributes with
+  match name, arg.pexp_desc, arg.pexp_ext_attrs with
   | "-",
     Pexp_constant({pconst_desc = Pconst_integer (n,m); pconst_loc=_}),
-    [] ->
+    {attrs_before=[]; attrs_after=[]; attrs_extension=_} ->
       Pexp_constant(mkconst ~loc:sloc (Pconst_integer(neg_string n, m)))
   | ("-" | "-."),
-    Pexp_constant({pconst_desc = Pconst_float (f, m); pconst_loc=_}), [] ->
+    Pexp_constant({pconst_desc = Pconst_float (f, m); pconst_loc=_}),
+    {attrs_before=[]; attrs_after=[]; attrs_extension=_} ->
       Pexp_constant(mkconst ~loc:sloc (Pconst_float(neg_string f, m)))
   | _ ->
       Pexp_prefix(mkoperator ~loc:oploc ("~" ^ name), arg)
 
 let mkuplus ~sloc ~oploc name arg =
   let desc = arg.pexp_desc in
-  match name, desc, arg.pexp_attributes with
+  match name, desc, arg.pexp_ext_attrs with
   | "+",
     Pexp_constant({pconst_desc = Pconst_integer _ as desc; pconst_loc=_}),
-    []
+    {attrs_before=[]; attrs_after=[]; attrs_extension=_}
   | ("+" | "+."),
     Pexp_constant({pconst_desc = Pconst_float _ as desc; pconst_loc=_}),
-    [] ->
+    {attrs_before=[]; attrs_after=[]; attrs_extension=_} ->
       Pexp_constant(mkconst ~loc:sloc desc)
   | _ ->
       Pexp_prefix(mkoperator ~loc:oploc ("~" ^ name), arg)
@@ -353,7 +354,13 @@ let pat_of_label lbl =
 
 let wrap_exp_attrs body (ext, attrs) =
   (* todo: keep exact location for the entire attribute *)
-  {body with pexp_attributes = attrs @ body.pexp_attributes; pexp_ext=ext}
+  { body with
+    pexp_ext_attrs=
+      { body.pexp_ext_attrs with
+        attrs_before= attrs @ body.pexp_ext_attrs.attrs_before;
+        attrs_extension= ext
+      }
+  }
 
 let mkexp_attrs ~loc d attrs =
   wrap_exp_attrs (mkexp ~loc d) attrs
@@ -2345,8 +2352,8 @@ fun_expr:
         in
         mkexp ~loc:$sloc (Pexp_letop{ let_; ands; body; loc_in}) }
   | expr COLONCOLON e = expr
-      { match e.pexp_desc, e.pexp_attributes with
-        | Pexp_cons l, [] -> Exp.cons ~loc:(make_loc $sloc) ($1 :: l)
+      { match e.pexp_desc, e.pexp_ext_attrs with
+        | Pexp_cons l, {attrs_before=[]; attrs_after=[]; attrs_extension=_} -> Exp.cons ~loc:(make_loc $sloc) ($1 :: l)
         | _ -> Exp.cons ~loc:(make_loc $sloc) [$1; e] }
   | mkrhs(label) LESSMINUS expr
       { mkexp ~loc:$sloc (Pexp_setinstvar($1, $3)) }
@@ -2357,7 +2364,7 @@ fun_expr:
   | indexop_expr(qualified_dotop, expr_semi_list, LESSMINUS v=expr {Some v})
     { mk_dotop_indexop_expr ~loc:$sloc $1 }
   | expr attribute
-      { Exp.attr $1 $2 }
+      { Exp.add_attrs_after $1 $2 }
 /* BEGIN AVOID */
   (* Allowed in exprs. Commented-out to reduce diffs with upstream.
   | UNDERSCORE

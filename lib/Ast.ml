@@ -113,6 +113,8 @@ module Ext_attrs = struct
   let has_doc ea =
     List.exists ~f:Attr.is_doc ea.attrs_before
     || List.exists ~f:Attr.is_doc ea.attrs_after
+
+  let all_attrs {attrs_after; attrs_before; attrs_extension=_} = attrs_before @ attrs_after
 end
 
 module Exp = struct
@@ -143,11 +145,9 @@ module Exp = struct
         true
     | _ -> false
 
-  let has_trailing_attributes {pexp_desc; pexp_attributes; _} =
+  let has_trailing_attributes {pexp_desc; pexp_ext_attrs; _} =
     match pexp_desc with
-    | Pexp_function _ | Pexp_ifthenelse _ | Pexp_match _ | Pexp_try _ ->
-        false
-    | _ -> List.exists pexp_attributes ~f:(Fn.non Attr.is_doc)
+    | _ -> List.exists pexp_ext_attrs.attrs_after ~f:(Fn.non Attr.is_doc)
 
   let rec is_trivial exp =
     match exp.pexp_desc with
@@ -238,7 +238,7 @@ let doc_atrs ?(acc = []) atrs =
                               Pexp_constant
                                 {pconst_desc= Pconst_string (doc, _, None); _}
                           ; pexp_loc= loc
-                          ; pexp_attributes= []; pexp_outer_attributes= []
+                          ; pexp_ext_attrs= {attrs_before=[]; attrs_after=[]; attrs_extension=_}
                           ; _ }
                         , [] )
                   ; _ } ]
@@ -701,7 +701,7 @@ let attributes = function
   | Td x -> attrs_of_ext_attrs x.ptype_attributes
   | Cty x -> x.pcty_attributes
   | Pat x -> x.ppat_attributes
-  | Exp x -> x.pexp_attributes @ x.pexp_outer_attributes
+  | Exp x -> attrs_of_ext_attrs x.pexp_ext_attrs
   | Fpe _ | Fpc _ -> []
   | Vc _ -> []
   | Lb x -> attrs_of_ext_attrs x.pvb_attributes
@@ -2053,13 +2053,6 @@ end = struct
             continue e
         | Pexp_cons l -> continue (List.last_exn l)
         | Pexp_ifthenelse (eN, None) -> continue (List.last_exn eN).if_body
-        | Pexp_extension
-            ( ext
-            , PStr
-                [ { pstr_desc= Pstr_eval (({pexp_attributes= []; pexp_outer_attributes= []; _} as e), _)
-                  ; _ } ] )
-          when Source.extension_using_sugar ~name:ext ~payload:e.pexp_loc ->
-            continue e
         | Pexp_let (_, e, _)
          |Pexp_letop {body= e; _}
          |Pexp_letexception (_, e)
@@ -2226,7 +2219,7 @@ end = struct
       | _ -> false
     in
     let exp_in_sequence lhs rhs exp =
-      match (lhs.pexp_desc, exp.pexp_attributes @ exp.pexp_outer_attributes) with
+      match (lhs.pexp_desc, Ext_attrs.all_attrs exp.pexp_ext_attrs ) with
       | (Pexp_match _ | Pexp_try _), _ :: _ when lhs == exp -> true
       | _, _ :: _ -> false
       | ( Pexp_extension
@@ -2257,8 +2250,8 @@ end = struct
      |Cl {pcl_desc= Pcl_let ({pvbs_bindings; _}, _, _); _}, _
       when parenze_exp_in_bindings pvbs_bindings exp ->
         true
-    | _, {pexp_desc= Pexp_infix _; pexp_attributes= _ :: _; _}
-      when ctx_sensitive_to_trailing_attributes ctx ->
+    | _, {pexp_desc= Pexp_infix _; pexp_ext_attrs; _}
+      when Ext_attrs.has_attrs pexp_ext_attrs &&  ctx_sensitive_to_trailing_attributes ctx ->
         true
     | ( Str
           { pstr_desc=
@@ -2271,15 +2264,15 @@ end = struct
         false
     (* Object fields do not require parens, even with trailing attributes *)
     | Exp {pexp_desc= Pexp_object _; _}, _ -> false
-    | _, {pexp_desc= Pexp_object _; pexp_attributes= []; pexp_outer_attributes= []; _}
+    | _, {pexp_desc= Pexp_object _;pexp_ext_attrs= {attrs_before=[]; attrs_after=[]; attrs_extension=_}; _}
       when Ocaml_version.(compare !ocaml_version Releases.v4_14_0 >= 0) ->
         false
     | ( Exp {pexp_desc= Pexp_construct ({txt= id; _}, _); _}
-      , {pexp_attributes= _ :: _; _} )
-      when Std_longident.is_infix id ->
+      , {pexp_ext_attrs; _} )
+      when Ext_attrs.has_attrs pexp_ext_attrs && Std_longident.is_infix id ->
         true
     | Exp _, e when Exp.is_symbol e || Exp.is_monadic_binding e -> true
-    | Exp {pexp_desc= Pexp_cons _; _}, {pexp_attributes= _ :: _; _} -> true
+    | Exp {pexp_desc= Pexp_cons _; _}, {pexp_ext_attrs; _} when Ext_attrs.has_attrs pexp_ext_attrs -> true
     | Exp {pexp_desc= Pexp_extension _; _}, {pexp_desc= Pexp_tuple _; _} ->
         false
     | Pld _, {pexp_desc= Pexp_tuple _; _} -> false
@@ -2304,8 +2297,8 @@ end = struct
       when e == exp ->
         true
     | ( Exp {pexp_desc= Pexp_apply (e, _ :: _); _}
-      , {pexp_desc= Pexp_prefix _; pexp_attributes= _ :: _; _} )
-      when e == exp ->
+      , {pexp_desc= Pexp_prefix _; pexp_ext_attrs; _} )
+      when Ext_attrs.has_attrs pexp_ext_attrs &&  e == exp ->
         true
     | ( Exp {pexp_desc= Pexp_indexop_access {pia_lhs= lhs; _}; _}
       , {pexp_desc= Pexp_construct _ | Pexp_cons _; _} )
@@ -2425,9 +2418,9 @@ end = struct
       | Pexp_sequence (lhs, rhs) -> exp_in_sequence lhs rhs exp
       | Pexp_apply (_, args)
         when List.exists args ~f:(fun (_, e0) ->
-                 match (e0.pexp_desc, e0.pexp_attributes) with
-                 | Pexp_list _, _ :: _ when e0 == exp -> true
-                 | Pexp_array _, _ :: _ when e0 == exp -> true
+                 match (e0.pexp_desc, e0.pexp_ext_attrs) with
+                 | Pexp_list _, ea when Ext_attrs.has_attrs ea && e0 == exp -> true
+                 | Pexp_array _, ea when Ext_attrs.has_attrs ea && e0 == exp -> true
                  | _ -> false ) ->
           true
       | _ -> (

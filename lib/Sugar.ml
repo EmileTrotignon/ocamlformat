@@ -73,10 +73,10 @@ let sequence cmts xexp =
                         ; _ } as exp )
                     , _ )
               ; pstr_loc } ] )
-      when not Ast.Ext_attrs.has_attrs pexp_ext_attrs
+      when not (Ast.Ext_attrs.has_attrs pexp_ext_attrs)
            && Source.extension_using_sugar ~name:ext ~payload:e1.pexp_loc ->
         let ctx = Exp exp in
-        if (not allow_attribute) && not (List.is_empty exp.pexp_attributes)
+        if (not allow_attribute) && Ext_attrs.has_attrs ( exp.pexp_ext_attrs)
         then [(None, xexp)]
         else (
           Cmts.relocate cmts ~src:pstr_loc ~before:e1.pexp_loc
@@ -94,7 +94,7 @@ let sequence cmts xexp =
             in
             List.append l1 l2 )
     | Pexp_sequence (e1, e2) ->
-        if (not allow_attribute) && not (List.is_empty exp.pexp_attributes)
+        if (not allow_attribute) &&  (Ext_attrs.has_attrs exp.pexp_ext_attrs)
         then [(None, xexp)]
         else (
           Cmts.relocate cmts ~src:pexp_loc ~before:e1.pexp_loc

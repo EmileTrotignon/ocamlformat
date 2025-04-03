@@ -134,8 +134,8 @@ let make_mapper ~ignore_doc_comments ~normalize_doc =
           ; pexp_ext_attrs= attrs2
           ; _ } ) ->
         m.expr m
-          (Exp.sequence ~loc:loc1 ~attrs:attrs1
-             (Exp.sequence ~loc:loc2 ~attrs:attrs2 exp1 exp2)
+          (Exp.sequence ~loc:loc1 ~ext_attrs:attrs1
+             (Exp.sequence ~loc:loc2 ~ext_attrs:attrs2 exp1 exp2)
              exp3 )
     | _ -> Ast_mapper.default_mapper.expr m exp
   in
