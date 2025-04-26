@@ -50,9 +50,9 @@ let [%foo? Bar x | Baz x] : [%foo? #bar] = [%foo? { x }]
 
 [%%foo: module M : [%baz]]
 let [%foo: include S with type t = t] :
-  [%foo:
-    val x : t
-    val y : t] =
+    [%foo:
+      val x : t
+      val y : t] =
   [%foo: type t = t]
 let int_with_custom_modifier =
   1234567890_1234567890_1234567890_1234567890_1234567890z
@@ -1145,7 +1145,8 @@ let rec eq_sel : type a b c. (a, b) ty_sel -> (a, c) ty_sel -> (b, c) eq option
 
 (* Auxiliary function to get the type of a case from its selector *)
 let rec get_case : type a b e.
-  (b, a) ty_sel -> (string * (e, b) ty_case) list -> string * (a, e) ty option =
+    (b, a) ty_sel -> (string * (e, b) ty_case) list -> string * (a, e) ty option
+    =
  fun sel cases ->
   match cases with
   | (name, TCnoarg sel') :: rem -> begin
@@ -1253,8 +1254,8 @@ let ty_abc =
     | `C -> "C", None
   (* Define inj in advance to be able to write the type annotation easily *)
   and inj : type c.
-    (int -> string -> noarg -> unit, c) ty_sel * c ->
-    [ `A of int | `B of string | `C ] = function
+      (int -> string -> noarg -> unit, c) ty_sel * c ->
+      [ `A of int | `B of string | `C ] = function
     | Thd, v -> `A v
     | Ttl Thd, v -> `B v
     | Ttl (Ttl Thd), Noarg -> `C
@@ -1389,8 +1390,8 @@ let ty_abc : (([ `A of int | `B of string | `C ] as 'a), 'e) ty =
           "C", TCnoarg (Ttl (Ttl Thd));
         ]
       method inj : type c.
-        (int -> string -> noarg -> unit, c) ty_sel * c ->
-        [ `A of int | `B of string | `C ] =
+          (int -> string -> noarg -> unit, c) ty_sel * c ->
+          [ `A of int | `B of string | `C ] =
         function
         | Thd, v -> `A v
         | Ttl Thd, v -> `B v
@@ -1414,7 +1415,7 @@ let ty_list : type a e. (a, e) ty -> (a vlist, e) ty =
            | `Cons p -> "Cons", Some (Tdyn (tcons, p))
          method cases = [ "Nil", TCnoarg Thd; "Cons", TCarg (Ttl Thd, tcons) ]
          method inj : type c.
-           (noarg -> a * a vlist -> unit, c) ty_sel * c -> a vlist =
+             (noarg -> a * a vlist -> unit, c) ty_sel * c -> a vlist =
            function
            | Thd, Noarg -> `Nil
            | Ttl Thd, v -> `Cons v
@@ -1512,7 +1513,7 @@ type (_, _) tree =
   | Tfork : ('x, 'a) tree * ('y, 'a) tree -> (('x, 'y) fk, 'a) tree
 let tree1 = Tfork (Tfork (Ttip, Tnode 4), Tfork (Tnode 4, Tnode 3))
 let rec find : type sh.
-  ('a -> 'a -> bool) -> 'a -> (sh, 'a) tree -> (sh, 'a) path list =
+    ('a -> 'a -> bool) -> 'a -> (sh, 'a) tree -> (sh, 'a) path list =
  fun eq n t ->
   match t with
   | Ttip -> []
@@ -1570,7 +1571,7 @@ let rec sameNat : type a b. a nat -> b nat -> (a, b) equal option =
 (* Extra: associativity of addition *)
 
 let rec plus_func : type a b m n.
-  (a, b, m) plus -> (a, b, n) plus -> (m, n) equal =
+    (a, b, m) plus -> (a, b, n) plus -> (m, n) equal =
  fun p1 p2 ->
   match p1, p2 with
   | PlusZ _, PlusZ _ -> Eq
@@ -1579,11 +1580,11 @@ let rec plus_func : type a b m n.
     Eq
 
 let rec plus_assoc : type a b c ab bc m n.
-  (a, b, ab) plus ->
-  (ab, c, m) plus ->
-  (b, c, bc) plus ->
-  (a, bc, n) plus ->
-  (m, n) equal =
+    (a, b, ab) plus ->
+    (ab, c, m) plus ->
+    (b, c, bc) plus ->
+    (a, bc, n) plus ->
+    (m, n) equal =
  fun p1 p2 p3 p4 ->
   match p1, p4 with
   | PlusZ b, PlusZ bc ->
@@ -1677,8 +1678,10 @@ let rec elem : type h. int -> h avl -> bool =
   | Node (_, l, y, r) -> x = y || if x < y then elem x l else elem x r
 
 let rec rotr : type n.
-  n succ succ avl -> int -> n avl -> (n succ succ avl, n succ succ succ avl) sum
-    =
+    n succ succ avl ->
+    int ->
+    n avl ->
+    (n succ succ avl, n succ succ succ avl) sum =
  fun tL y tR ->
   match tL with
   | Node (Same, a, x, b) -> Inr (Node (Less, a, x, Node (More, b, y, tR)))
@@ -1690,8 +1693,10 @@ let rec rotr : type n.
   | Node (Less, a, x, Node (More, b, z, c)) ->
     Inl (Node (Same, Node (Same, a, x, b), z, Node (Less, c, y, tR)))
 let rec rotl : type n.
-  n avl -> int -> n succ succ avl -> (n succ succ avl, n succ succ succ avl) sum
-    =
+    n avl ->
+    int ->
+    n succ succ avl ->
+    (n succ succ avl, n succ succ succ avl) sum =
  fun tL u tR ->
   match tR with
   | Node (Same, a, x, b) -> Inr (Node (More, Node (Less, tL, u, a), x, b))
@@ -2179,7 +2184,7 @@ type closed = rnil
 type 'a rlam = ((pexp, closed, 'a) lam, (pval, closed, 'a) lam) sum
 
 let rec rule : type a b.
-  (pval, closed, (a, b) tarr) lam -> (pval, closed, a) lam -> b rlam =
+    (pval, closed, (a, b) tarr) lam -> (pval, closed, a) lam -> b rlam =
  fun v1 v2 ->
   match v1, v2 with
   | Lam (x, body), v -> begin
@@ -2329,7 +2334,7 @@ type (_, _, _) binop =
   | Add : (int, int, int) binop
 
 let eval (type a) (type b) (type c) (bop : (a, b, c) binop) (x : a constant)
-  (y : b constant) : c constant =
+    (y : b constant) : c constant =
   match bop, x, y with
   | Eq, Bool x, Bool y -> Bool (if x then y else not y)
   | Leq, Int x, Int y -> Bool (x <= y)
@@ -2533,17 +2538,17 @@ type ('a, 'result, 'visit_action) context =
   | Global : ('a, 'a, 'a visit_action) context
 
 let vexpr (type visit_action) :
-  (_, _, visit_action) context -> _ -> visit_action = function
+    (_, _, visit_action) context -> _ -> visit_action = function
   | Local -> fun _ -> raise Exit
   | Global -> fun _ -> raise Exit
 
 let vexpr (type visit_action) :
-  ('a, 'result, visit_action) context -> 'a -> visit_action = function
+    ('a, 'result, visit_action) context -> 'a -> visit_action = function
   | Local -> fun _ -> raise Exit
   | Global -> fun _ -> raise Exit
 
 let vexpr (type result) (type visit_action) :
-  (unit, result, visit_action) context -> unit -> visit_action = function
+    (unit, result, visit_action) context -> unit -> visit_action = function
   | Local -> fun _ -> raise Exit
   | Global -> fun _ -> raise Exit
 module A = struct
@@ -2767,7 +2772,7 @@ let rec check : type n. n succ fin -> n succ term -> n term option =
   | Leaf -> Some Leaf
   | Fork (t1, t2) ->
     bind (check x t1) (fun t1 ->
-      bind (check x t2) (fun t2 -> Some (Fork (t1, t2))))
+        bind (check x t2) (fun t2 -> Some (Fork (t1, t2))))
 
 let subst_var x t' y =
   match thick x y with
@@ -3413,7 +3418,7 @@ let subst_lambda ~subst_rec ~free ~subst : _ lambda -> _ = function
     let used = free t in
     let used_expr =
       Subst.fold subst ~init:[] ~f:(fun ~key ~data acc ->
-        if Names.mem s used then data :: acc else acc)
+          if Names.mem s used then data :: acc else acc)
     in
     if List.exists used_expr ~f:(fun t -> Names.mem s (free t)) then (
       let name = s ^ Int.to_string (next_id ()) in
@@ -3630,7 +3635,7 @@ class ['a] lambda_ops (ops : ('a, 'a) #ops Lazy.t) =
         let used = !!free t in
         let used_expr =
           Subst.fold sub ~init:[] ~f:(fun ~key ~data acc ->
-            if Names.mem s used then data :: acc else acc)
+              if Names.mem s used then data :: acc else acc)
         in
         if List.exists used_expr ~f:(fun t -> Names.mem s (!!free t)) then (
           let name = s ^ Int.to_string (next_id ()) in
@@ -3858,7 +3863,7 @@ let lambda_ops (ops : ('a, 'a) #ops Lazy.t) =
         let used = !!free t in
         let used_expr =
           Subst.fold sub ~init:[] ~f:(fun ~key ~data acc ->
-            if Names.mem s used then data :: acc else acc)
+              if Names.mem s used then data :: acc else acc)
         in
         if List.exists used_expr ~f:(fun t -> Names.mem s (!!free t)) then (
           let name = s ^ Int.to_string (next_id ()) in
@@ -4049,12 +4054,12 @@ end = struct
   let _ = fun (_ : ('a, 'perms) t) -> ()
 
   let t_of_sexp :
-    'a 'perms. (sexp -> 'a) -> (sexp -> 'perms) -> sexp -> ('a, 'perms) t =
+      'a 'perms. (sexp -> 'a) -> (sexp -> 'perms) -> sexp -> ('a, 'perms) t =
     let _tp_loc = "core_array.ml.Permissioned.t" in
     fun _of_a -> fun _of_perms -> fun t -> (array_of_sexp _of_a) t
   let _ = t_of_sexp
   let sexp_of_t :
-    'a 'perms. ('a -> sexp) -> ('perms -> sexp) -> ('a, 'perms) t -> sexp =
+      'a 'perms. ('a -> sexp) -> ('perms -> sexp) -> ('a, 'perms) t -> sexp =
    fun _of_a -> fun _of_perms -> fun v -> (sexp_of_array _of_a) v
   let _ = sexp_of_t
   module Int = struct
@@ -5569,9 +5574,9 @@ class c (v : int) =
     method v0 = v
     inherit
       (fun v ->
-        object
-          method v : string = v
-        end)
+         object
+           method v : string = v
+         end)
         "42"
   end
 ;;
@@ -7817,8 +7822,17 @@ type v =
   | G
 
 let f : type a b c d e f g.
-  a t * b t * c t * d t * e t * f t * g t * v * (a, b, c, d) u * (e, f, g, g) u ->
-  int = function
+    a t
+    * b t
+    * c t
+    * d t
+    * e t
+    * f t
+    * g t
+    * v
+    * (a, b, c, d) u
+    * (e, f, g, g) u ->
+    int = function
   | A, A, A, A, A, A, A, _, U, U -> 1
   | _, _, _, _, _, _, _, G, _, _ -> 1
 (*| _ -> _ *)

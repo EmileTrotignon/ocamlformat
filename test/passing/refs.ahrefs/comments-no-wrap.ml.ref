@@ -255,8 +255,8 @@ let rec fooooooooooo = function
     foo
 
 let%map
-  (* __________________________________________________________________________________________ *)
-  _ =
+    (* __________________________________________________________________________________________ *)
+    _ =
   ()
 
 type t =
@@ -282,16 +282,16 @@ class i =
 
 let _ =
   try_with (fun () ->
-    (* comment before *)
-    match get () with
-    | None -> do_something ()
-    | Some _ -> () (* do nothing *))
+      (* comment before *)
+      match get () with
+      | None -> do_something ()
+      | Some _ -> () (* do nothing *))
 
 let _ =
   try_with (fun () ->
-    (* comment before *)
-    a;
-    b (* after b *))
+      (* comment before *)
+      a;
+      b (* after b *))
 
 let _ =
   match x with

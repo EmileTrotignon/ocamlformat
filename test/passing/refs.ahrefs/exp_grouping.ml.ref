@@ -382,14 +382,14 @@ let _ =
 
 let v =
   map x begin fun x y z ->
-    y
-  end
+      y
+    end
 
 let v =
   map x
     begin fun x arggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg ->
-    y
-  end
+      y
+    end
 
 let v =
   map x
@@ -397,14 +397,14 @@ let v =
       x
       arggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg
     ->
-    y
-  end
+      y
+    end
 
 let v =
   map x
     (fun x yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy z ->
-    print y;
-    z)
+      print y;
+      z)
 
 let v =
   map x
@@ -414,26 +414,26 @@ let v =
       gggggggggggggggggggg
       ggggggggggggggg
     ->
-    y
-  end
+      y
+    end
 
 let v =
   map x
     (fun x yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy z ->
-    print y;
-    z)
+      print y;
+      z)
 
 let v =
   map x begin fun x y z ->
-    ya f;
-    a f b
-  end
+      ya f;
+      a f b
+    end
 
 let v =
   map x begin%ext1 fun%ext2 x y z ->
-    ya f;
-    a f b
-  end
+      ya f;
+      a f b
+    end
 
 let _ =
   lazy begin
@@ -620,33 +620,33 @@ let _ =
 let () =
   fooooo
   |>>>>> List.iter begin fun a ->
-           let x =
-             some_really_really_really_long_name_that_doesn't_fit_on_the_line
-             $ y
-           in
-           fooooooooooo x
-         end
+             let x =
+               some_really_really_really_long_name_that_doesn't_fit_on_the_line
+               $ y
+             in
+             fooooooooooo x
+           end
 
 let () =
   fooooo
   |>>>>> List.iter
            begin fun aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ->
-           let x =
-             some_really_really_really_long_name_that_doesn't_fit_on_the_line
-             $ y
-           in
-           fooooooooooo x
-         end
+             let x =
+               some_really_really_really_long_name_that_doesn't_fit_on_the_line
+               $ y
+             in
+             fooooooooooo x
+           end
 
 let () =
   fooooo
   |>>>>> List.iter begin fun a ->
-           let x =
-             some_really_really_really_long_name_that_doesn't_fit_on_the_line
-             $ y
-           in
-           fooooooooooo x
-         end
+             let x =
+               some_really_really_really_long_name_that_doesn't_fit_on_the_line
+               $ y
+             in
+             fooooooooooo x
+           end
 
 let () =
   fooooo
@@ -658,9 +658,9 @@ let () =
              aaaaaaaaaaa
              aaaaaaaaaaaaaaaaaaaaaaaaaaaaa
            ->
-           let x =
-             some_really_really_really_long_name_that_doesn't_fit_on_the_line
-             $ y
-           in
-           fooooooooooo x
-         end
+             let x =
+               some_really_really_really_long_name_that_doesn't_fit_on_the_line
+               $ y
+             in
+             fooooooooooo x
+           end

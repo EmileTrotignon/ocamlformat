@@ -353,16 +353,16 @@ let _ : M.(foo) * M.(bar) = ()
 let _ : M.([ `Foo of foo ]) = ()
 let _ : M.N.(foo) = ()
 let _ :
-  M.(
-    foooooooooooooooooooooooooooooooooooooooo
-    * foooooooooooooooooooooooooooooooooooooooo) =
+    M.(
+      foooooooooooooooooooooooooooooooooooooooo
+      * foooooooooooooooooooooooooooooooooooooooo) =
   ()
 let _ :
-  M.(
-    [ `Foo of
-      foooooooooooooooooooooooooooooooooooooooo
-      * foooooooooooooooooooooooooooooooooooooooo
-    ]) =
+    M.(
+      [ `Foo of
+        foooooooooooooooooooooooooooooooooooooooo
+        * foooooooooooooooooooooooooooooooooooooooo
+      ]) =
   ()
 
 let _ : M.((foo[@attr])) = ()

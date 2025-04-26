@@ -40,15 +40,15 @@ let f : 'a. 'a ty -> 'a = fun y -> g y
 let f (A _ | B | C) = ()
 
 let f
-  ( AAAAAAAAAAAAAAAAAAAAAAAAAAAAa _ | BBBBBBBBBBBBBBBBBBBBBbb
-  | CCCCCCCCCCCCCCCCCCCCCCccccc ) =
+    ( AAAAAAAAAAAAAAAAAAAAAAAAAAAAa _ | BBBBBBBBBBBBBBBBBBBBBbb
+    | CCCCCCCCCCCCCCCCCCCCCCccccc ) =
   ()
 
 let f
-  ( AAAAAAAAAAAAAAAAAAAAAAAAAAAAa
-      ( EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEe | FFFFFFFFFFFFFFFFFFFFFFFFFFf
-      | GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGggggggggg )
-  | BBBBBBBBBBBBBBBBBBBBBbb | CCCCCCCCCCCCCCCCCCCCCCccccc ) =
+    ( AAAAAAAAAAAAAAAAAAAAAAAAAAAAa
+        ( EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEe | FFFFFFFFFFFFFFFFFFFFFFFFFFf
+        | GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGggggggggg )
+    | BBBBBBBBBBBBBBBBBBBBBbb | CCCCCCCCCCCCCCCCCCCCCCccccc ) =
   ()
 
 let f (AAA (EEEEEEE | FFFFF | GGGGG) | BBBBBB | CCCCCCC) = ()
@@ -105,12 +105,12 @@ module Let_and_sparse = struct
 end
 
 let f aaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbbbbbb cccccccccccccccccccccccc
-  dddddddddddddddddd eeeeeeeeeeeeee =
+    dddddddddddddddddd eeeeeeeeeeeeee =
   ()
 
 let _ =
  fun aaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbbbbbb cccccccccccccccccccccccc
-   dddddddddddddddddd eeeeeeeeeeeeee ->
+     dddddddddddddddddd eeeeeeeeeeeeee ->
   ()
 
 let _ =

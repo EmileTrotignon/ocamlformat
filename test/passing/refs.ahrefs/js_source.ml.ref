@@ -8,7 +8,7 @@ include struct
   let%test_module "as" =
     (module struct
       let%expect_test
-        "xx xx xxxxxx xxxxxxx xxxxxx xxxxxx xxxxxxxx xx xxxxx xxx xx xxxxx" =
+          "xx xx xxxxxx xxxxxxx xxxxxx xxxxxx xxxxxxxx xx xxxxx xxx xx xxxxx" =
         ()
     end)
 end
@@ -22,18 +22,18 @@ else aaaaaaaaaaaa qqqqqqqqqqq
 include Base.Fn
 
 let ssmap :
-  (module MapT
-     with type key = string
-      and type data = string
-      and type map = SSMap.map) =
+    (module MapT
+       with type key = string
+        and type data = string
+        and type map = SSMap.map) =
   ()
 
 let ssmap :
-  (module MapT
-     with type key = string
-      and type data = string
-      and type map = SSMap.map) ->
-  unit =
+    (module MapT
+       with type key = string
+        and type data = string
+        and type map = SSMap.map) ->
+    unit =
   ()
 
 let _ =
@@ -54,7 +54,7 @@ let _ =
 
 let _ =
   List.map rows ~f:(fun row ->
-    Or_error.try_with (fun () -> fffffffffffffffffffffffff row))
+      Or_error.try_with (fun () -> fffffffffffffffffffffffff row))
 
 module type T = sig
   (** @raise if not found. *)
@@ -183,7 +183,7 @@ type t =
 
 type t = {
   field : ty;
-    (* Here is some verbatim formatted text:
+      (* Here is some verbatim formatted text:
      {v
        starting at column 7
      v}*)
@@ -236,7 +236,7 @@ let _ =
   match x with
   | _
     when f ~f:((function _ -> .)
-           [@ocaml.warning (* ....................................... *) "-4"])
+             [@ocaml.warning (* ....................................... *) "-4"])
     ->
     y
 
@@ -275,23 +275,23 @@ let[@a
 
 let x =
   foo (`A b) ~f:(fun thing ->
-    something that reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaally needs
-      wrapping)
+      something that reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaally needs
+        wrapping)
 
 let x =
   foo (`A `b) ~f:(fun thing ->
-    something that reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaally needs
-      wrapping)
+      something that reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaally needs
+        wrapping)
 
 let x =
   foo [ A; B ] ~f:(fun thing ->
-    something that reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaally needs
-      wrapping)
+      something that reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaally needs
+        wrapping)
 
 let x =
   foo [ [ A ]; B ] ~f:(fun thing ->
-    something that reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaally needs
-      wrapping)
+      something that reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaally needs
+        wrapping)
 
 let x =
   f
@@ -302,30 +302,30 @@ let x =
 let x =
   some_fun________________________________
     some_arg______________________________ (fun param ->
-    do_something ();
-    do_something_else ();
-    return_this_value)
+      do_something ();
+      do_something_else ();
+      return_this_value)
 
 let x =
   some_fun________________________________
     some_arg______________________________ ~f:(fun param ->
-    do_something ();
-    do_something_else ();
-    return_this_value)
+      do_something ();
+      do_something_else ();
+      return_this_value)
 
 let x =
   some_value
   |> some_fun (fun x ->
-       do_something ();
-       do_something_else ();
-       return_this_value)
+         do_something ();
+         do_something_else ();
+         return_this_value)
 
 let x =
   some_value
   ^ some_fun (fun x ->
-      do_something ();
-      do_something_else ();
-      return_this_value)
+        do_something ();
+        do_something_else ();
+        return_this_value)
 
 let bind t ~f =
   unfold_step
@@ -402,14 +402,14 @@ type t = {
   break_separators : [ `Before | `After ];
   break_sequences : bool;
   break_string_literals : [ `Auto | `Never ];
-    (** How to potentially break string literals into new lines. *)
+      (** How to potentially break string literals into new lines. *)
   break_struct : bool;
   cases_exp_indent : int;
   cases_matching_exp_indent : [ `Normal | `Compact ];
 }
 
 let rec collect_files ~enable_outside_detected_project ~root ~segs ~ignores
-  ~enables ~files =
+    ~enables ~files =
   match segs with
   | [] | [ "" ] -> ignores, enables, files, None
 
@@ -418,27 +418,27 @@ let _ =
     fooooooooooooooooooooooooooooooooooooooo
     fooooooooooooooooooooooooooooooooooooooo
     ~f:(fun (type a) foooooooooooooooooooooooooooooooooo : 'a ->
-    match fooooooooooooooooooooooooooooooooooooooo with
-    | Fooooooooooooooooooooooooooooooooooooooo -> x
-    | Fooooooooooooooooooooooooooooooooooooooo -> x)
+      match fooooooooooooooooooooooooooooooooooooooo with
+      | Fooooooooooooooooooooooooooooooooooooooo -> x
+      | Fooooooooooooooooooooooooooooooooooooooo -> x)
 
 let _ =
   foo
   |> List.map ~f:(fun x ->
-       do_something ();
-       do_something ();
-       do_something ();
-       do_something ();
-       do_something_else ())
+         do_something ();
+         do_something ();
+         do_something ();
+         do_something ();
+         do_something_else ())
 
 let _ =
   foo
   |> List.map ~f:(fun x ->
-       do_something ();
-       do_something ();
-       do_something ();
-       do_something ();
-       do_something_else ())
+         do_something ();
+         do_something ();
+         do_something ();
+         do_something ();
+         do_something_else ())
   |> bar
 
 let _ =
@@ -523,11 +523,11 @@ let _ =
 
 type action =
   | In_out of [ `Impl | `Intf ] input * string option
-    (** Format input file (or [-] for stdin) of given kind to output file,
+      (** Format input file (or [-] for stdin) of given kind to output file,
       or stdout if None. *)
   (* foo *)
   | Inplace of [ `Impl | `Intf ] input list
-    (** Format in-place, overwriting input file(s). *)
+      (** Format in-place, overwriting input file(s). *)
 
 let%test_module "semantics" =
   (module (
@@ -574,16 +574,16 @@ let _ =
 let _ =
   Foooooooooooooooooooo.foooooooooooooooooooo foooooooooooooooooooo
     foooooooooooooooooooo (fun x ->
-    match foo with
-    | Foooooooooooooooooooo -> foooooooooooooooooooo
-    | Foooooooooooooooooooo -> foooooooooooooooooooo)
+      match foo with
+      | Foooooooooooooooooooo -> foooooooooooooooooooo
+      | Foooooooooooooooooooo -> foooooooooooooooooooo)
 
 let _ =
   Foooooooooooooooooooo.foooooooooooooooooooo foooooooooooooooooooo
     foooooooooooooooooooo ~x:(fun x ->
-    match foo with
-    | Foooooooooooooooooooo -> foooooooooooooooooooo
-    | Foooooooooooooooooooo -> foooooooooooooooooooo)
+      match foo with
+      | Foooooooooooooooooooo -> foooooooooooooooooooo
+      | Foooooooooooooooooooo -> foooooooooooooooooooo)
 
 let _ =
   let x = x in
@@ -679,7 +679,7 @@ end
 type t = {
   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx :
     YYYYYYYYYYYYYYYYYYYYY.t;
-    (* ____________________________________ *)
+      (* ____________________________________ *)
 }
 
 (*{v
@@ -693,10 +693,10 @@ v}*)
 
 type t = {
   xxxxxxxxxxxxxxxxxxx : yyy;
-     [@zzzzzzzzzzzzzzzzzzz
-       (* ________________________________
+      [@zzzzzzzzzzzzzzzzzzz
+        (* ________________________________
                                 ___ *)
-       _______]
+        _______]
 }
 
 let _ =
@@ -755,9 +755,9 @@ let _ =
   fooooooooooooooooooooooooooooooo
   |> fooooooooooooooooooooooooooooooo ~fooooooooooooooooooooooooooooooo
        ~fooooooooooooooooooooooooooooooo:(fun foo ->
-       match bar with
-       | Some _ -> foo
-       | None -> baz)
+         match bar with
+         | Some _ -> foo
+         | None -> baz)
 
 let _ =
   fooooooooooooooooooooooooooooooo
@@ -768,30 +768,30 @@ let _ =
   fooooooooooooooooooooooooooooooo
   |> fooooooooooooooooooooooooooooooo ~fooooooooooooooooooooooooooooooo
        (fun foo ->
-       match bar with
-       | Some _ -> foo
-       | None -> baz)
+         match bar with
+         | Some _ -> foo
+         | None -> baz)
 
 let _ =
   fooooooooooooooooooooooooooooooo
   |> fooooooooooooooooooooooooooooooo ~fooooooooooooooooooooooooooooooo
        ~fooooooooooooooooooooooooooooooo (fun foo ->
-       match bar with
-       | Some _ -> foo
-       | None -> baz)
+         match bar with
+         | Some _ -> foo
+         | None -> baz)
 
 let _ =
   fooooooooooooooooooooooooooooooo
   |> fooooooooooooooooooooooooooooooofooooooooooooooooooooooooooooooofoooooooooo
        (fun foo ->
-       match bar with
-       | Some _ -> foo
-       | None -> baz)
+         match bar with
+         | Some _ -> foo
+         | None -> baz)
 
 let _ =
   fooooooooooooooooooooooooooooooo
   |> foooooooooooooooooooooooooooo ~fooooooooooooooooooooooooooooooo (function
-       | foo -> bar)
+         | foo -> bar)
 
 let _ =
   fooooooooooooooooooooooooooooooo

@@ -1,9 +1,9 @@
 let foooooooo = function
-  | fooooooooooooooooooooooo -> foooooooooooooooooooooooooo
+    | fooooooooooooooooooooooo -> foooooooooooooooooooooooooo
 
 let foooooooo = function
-  | fooooooooooooooooooooooo -> foooooooooooooooooooooooooo
-  | fooooooooooooooooooooooo -> foooooooooooooooooooooooooo
+    | fooooooooooooooooooooooo -> foooooooooooooooooooooooooo
+    | fooooooooooooooooooooooo -> foooooooooooooooooooooooooo
 
 let foo =
   fooooooooo foooooooo ~foooooooo:(function
@@ -43,5 +43,5 @@ let _ =
 
 let _ =
   my_func ~hello ~world ~f:(fun%my_ppx x ->
-    let x = 1 + 2 in
-    x)
+      let x = 1 + 2 in
+      x)

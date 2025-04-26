@@ -10,7 +10,6 @@ exp-grouping=preserve
 leading-nested-match-parens=true
 let-and=sparse
 m=80
-max-indent=2
 module-item-spacing=preserve
 nested-match=align
 parens-ite=true

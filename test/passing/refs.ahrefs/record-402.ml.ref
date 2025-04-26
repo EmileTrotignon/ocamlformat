@@ -92,7 +92,7 @@ let { x = (x : t) } = x
 type t = {
   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx :
     YYYYYYYYYYYYYYYYYYYYY.t;
-    (* ____________________________________ *)
+      (* ____________________________________ *)
 }
 
 let _ =
@@ -106,12 +106,12 @@ let _ =
   ()
 
 let foo
-  ({
-     foooooooooooooooooooooo;
-     invalidation_trace;
-     access_trace;
-     must_be_valid_reason;
-   } [@warning "+missing-record-field-pattern"]) =
+    ({
+       foooooooooooooooooooooo;
+       invalidation_trace;
+       access_trace;
+       must_be_valid_reason;
+     } [@warning "+missing-record-field-pattern"]) =
   ()
 
 let x = (A B).a

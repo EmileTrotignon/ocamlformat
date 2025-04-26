@@ -47,9 +47,9 @@ let x =
 
 type t = {
   a : int option;
-    (* aaaaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbbb cccccccccccccccccccccccccccc ddddddddddddddddd eeeee *)
+      (* aaaaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbbb cccccccccccccccccccccccccccc ddddddddddddddddd eeeee *)
   b : float;
-    (* aaaaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbbb cccccccccccccccccccccccccccc ddddddddddddddddd eeeee *)
+      (* aaaaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbbb cccccccccccccccccccccccccccc ddddddddddddddddd eeeee *)
 }
 
 type t =
@@ -60,13 +60,13 @@ type t =
   | Struct of {
       name : string;
       elts : t vector (* possibly cyclic, name unique *);
-         [@compare.ignore] [@equal.ignore] [@sexp_drop_if fun _ -> true]
+          [@compare.ignore] [@equal.ignore] [@sexp_drop_if fun _ -> true]
       elts : t vector;
-         (* possibly cyclic, name unique *)
-         (* mooooooooooooooooooooooooooooooooooore comments *)
-         [@compare.ignore]
-         [@equal.ignore]
-         [@sexp_drop_if fun _ -> true]
+          (* possibly cyclic, name unique *)
+          (* mooooooooooooooooooooooooooooooooooore comments *)
+          [@compare.ignore]
+          [@equal.ignore]
+          [@sexp_drop_if fun _ -> true]
       packed : bool;
     }
   | Opaque of { name : string }
