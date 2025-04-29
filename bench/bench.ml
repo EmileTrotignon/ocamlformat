@@ -36,13 +36,12 @@ let tests =
     (fun {name; input_name; kind; source; conf; action} ->
       Test.make
         ~name:(Format.sprintf "%s (%s)" name input_name)
-        ( Staged.stage
-        @@ fun () ->
-        match action with
-        | `Format ->
-            ignore
-              (Translation_unit.parse_and_format kind ~input_name ~source
-                 conf ) ) )
+        ( Staged.stage @@ fun () ->
+          match action with
+          | `Format ->
+              ignore
+                (Translation_unit.parse_and_format kind ~input_name ~source
+                   conf ) ) )
     inputs
 
 let benchmark () =
@@ -102,11 +101,13 @@ let json_of_ols_results ?name (results : Bechamel.Analyze.OLS.t results) :
              |> Seq.map (fun (metric_name, ols) ->
                     (metric_name, json_of_ols ols) )
              |> List.of_seq
-             |> fun bindings -> `Assoc bindings
+               |> fun bindings
+             -> `Assoc bindings
            in
            `Assoc [("name", `String test_name); ("metrics", metrics)] )
     |> List.of_seq
-    |> fun items -> `List items
+      |> fun items
+    -> `List items
   in
   let bindings = [("results", results)] in
   let bindings =

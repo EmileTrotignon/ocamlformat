@@ -69,8 +69,8 @@ let () =
 let _ =
   foo
     (bar (fun x ->
-         (* special: "fun _ ->" at EOL *)
-         baz))
+      (* special: "fun _ ->" at EOL *)
+      baz))
 
 (* assume no more arguments to "bar" *)
 let _ = foo ~a_long_field_name:(check (fun bar -> baz))
@@ -80,8 +80,8 @@ let _ =
     (bar
        (quux
           (fnord (fun x ->
-               (* any depth *)
-               baz))))
+            (* any depth *)
+            baz))))
 
 (* We also wanted to tweak the operator indentation, making operators like <=
    not special cases in contexts like this:  *)
@@ -115,7 +115,7 @@ let _ =
 let _ =
   let entries =
     List.filter (Lazy.force transferstati) ~f:(fun ts ->
-        Pcre.pmatch ~pat ts.RQ.description)
+      Pcre.pmatch ~pat ts.RQ.description)
   in
   x
 
@@ -126,8 +126,8 @@ let _ =
        ~f:
          (f
             (g (fun x ->
-                 let name, path = String.lsplit2_exn ~on:'|' x in
-                 String.strip name, String.strip path)))
+              let name, path = String.lsplit2_exn ~on:'|' x in
+              String.strip name, String.strip path)))
 
 (* open paren ending line like begin *)
 let _ =

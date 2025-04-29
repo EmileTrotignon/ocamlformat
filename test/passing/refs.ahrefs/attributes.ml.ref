@@ -153,7 +153,9 @@ let ("" [@test]) = ()
 
 let _ = f x ~f:(fun[@test] x -> x)
 
-let _ = f x ~f:(function[@test] x -> x)
+let _ =
+  f x ~f:(function[@test]
+    | x -> x)
 
 let _ =
   f x ~f:(function[@test]
@@ -446,9 +448,10 @@ let _ =
   match x with
   | _
     when f
-           ~f:(function[@ocaml.warning
-                         (* ....................................... *)
-                         "-4"] _ -> .) ->
+         ~f:(function[@ocaml.warning
+                       (* ....................................... *)
+                       "-4"]
+           | _ -> .) ->
     y
 
 let[@a
@@ -477,7 +480,8 @@ let[@a
                          (* ....................................... *)
                          let x = a
                          and y = b in
-                         x + y] _ -> .) ->
+                         x + y]
+             | _ -> .) ->
     y
     [@attr
       (* ... *)
@@ -504,10 +508,10 @@ let () =
   let () =
     S.ntyp Cbor_type.Reserved
     @@ S.tok begin[@warning "-4"] fun ev ->
-           match ev with
-           | Cbor_event.Reserved int -> Some int
-           | _ -> None
-         end
+         match ev with
+         | Cbor_event.Reserved int -> Some int
+         | _ -> None
+     end
   in
   ()
 
@@ -515,9 +519,9 @@ let () =
   let () =
     S.ntyp Cbor_type.Reserved
     @@ (S.tok (fun ev ->
-            match ev with
-            | Cbor_event.Reserved int -> Some int
-            | _ -> None)
+         match ev with
+         | Cbor_event.Reserved int -> Some int
+         | _ -> None)
        [@warning "-4"])
   in
   ()

@@ -10,7 +10,7 @@ let () =
   [%foo fun[@foo] x -> ()];
   [%foo
     function[@foo]
-    | x -> ()];
+      | x -> ()];
   [%foo try[@foo] () with _ -> ()];
   [%foo if[@foo] () then () else ()];
   [%foo

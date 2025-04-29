@@ -74,12 +74,12 @@ let x =
     match x with
     | `A ->
       (function
-      | A -> ()
-      | B -> ())
+        | A -> ()
+        | B -> ())
     | `B ->
       (function
-      | A -> ()
-      | _ -> ())
+        | A -> ()
+        | _ -> ())
   in
   ()
 

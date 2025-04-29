@@ -51,8 +51,7 @@ let start () =
   ( match
       let input, output = Unix.open_process_args prog argv in
       let pid = Unix.process_pid (input, output) in
-      Ocf.pick_client ~pid input output supported_versions
-      >>| fun client ->
+      Ocf.pick_client ~pid input output supported_versions >>| fun client ->
       let close =
         match client with
         | `V1 _ ->
@@ -101,17 +100,14 @@ let config c =
   get_client () >>= fun cl -> log "[ocf] Config\n%!" ; Ocf.config c cl
 
 let format x =
-  get_client ()
-  >>= fun cl ->
+  get_client () >>= fun cl ->
   log "[ocf] Format '%s'\n%!" x ;
   Ocf.format x cl
 
 let halt () =
-  get_client ()
-  >>= fun cl ->
+  get_client () >>= fun cl ->
   log "[ocf] Halt\n%!" ;
-  Ocf.halt cl
-  >>| fun () ->
+  Ocf.halt cl >>| fun () ->
   close_client () ;
   state := Uninitialized
 

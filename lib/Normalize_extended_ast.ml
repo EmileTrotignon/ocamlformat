@@ -227,15 +227,17 @@ let diff ~f x y =
   (*= [symmetric_diff x y] returns a sequence of changes between [x] and [y]:
       - [First k] means [k] is in [x] but not [y]
       - [Second k] means [k] is in [y] but not [x] *)
-  Set.symmetric_diff (f x) (f y)
-  |> Sequence.to_list
-  (*= - [First _] is reported as a comment dropped
+    Set.symmetric_diff (f x) (f y)
+    |> Sequence.to_list
+    (*= - [First _] is reported as a comment dropped
       - [Second _] is reported as a comment added *)
-  |> List.map
-       ~f:
-         (Either.value_map ~first:Normalized_cmt.dropped
-            ~second:Normalized_cmt.added )
-  |> function [] -> Ok () | errors -> Error errors
+    |> List.map
+         ~f:
+           (Either.value_map ~first:Normalized_cmt.dropped
+              ~second:Normalized_cmt.added )
+    |> function
+  | [] -> Ok ()
+  | errors -> Error errors
 
 let diff_cmts (conf : Conf.t) x y =
   let normalize = normalize_cmt conf in

@@ -95,10 +95,10 @@ let run_format conf x =
 
 let run_format_with_args {Rpc.path; config} conf x =
   let open Result in
-  Option.value_map path ~default:(Ok conf) ~f:run_path
-  >>= fun conf ->
+  Option.value_map path ~default:(Ok conf) ~f:run_path >>= fun conf ->
   Option.value_map config ~default:(Ok conf) ~f:(fun c -> run_config conf c)
-  >>= fun conf -> run_format conf x
+    >>= fun conf
+  -> run_format conf x
 
 let handle_format_error e output = output stdout (`Error e)
 

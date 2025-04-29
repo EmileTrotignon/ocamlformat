@@ -16,11 +16,16 @@ let ( and+ ) t1 t2 =
 
 let _ = ( let* ) x (fun y -> z)
 
-let _ = ( let* ) x (function y -> z)
+let _ =
+  ( let* ) x (function
+    | y -> z)
 
 let _ = f (( let* ) x (fun y -> z))
 
-let _ = f (( let* ) x (function y -> z))
+let _ =
+  f
+    (( let* ) x (function
+      | y -> z))
 
 let _ = ( let+ ) [@attr]
 

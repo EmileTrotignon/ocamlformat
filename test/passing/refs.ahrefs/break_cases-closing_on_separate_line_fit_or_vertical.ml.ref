@@ -19,28 +19,28 @@ let f =
     | O -> 5
     | P when h x ->
       (function
-      | A -> 6
-      )
+        | A -> 6
+        )
 
 let foo =
   List.map ~f:(fun x g t h y u ->
-      match x with
-      | E -> 4
-      | Z | P | M ->
-      match y with
-      | O -> 5
-      | P when h x ->
-        (function
+    match x with
+    | E -> 4
+    | Z | P | M ->
+    match y with
+    | O -> 5
+    | P when h x ->
+      (function
         | A -> 6
         )
-  );
+    );
   List.map ~f:(fun x g t h y u ->
-      fooooooooooooo foooooooo;
-      ( match k with
-      | foooo -> foooooooo
-      );
-      fooooooooooooooo fooooooooooooo
-  )
+    fooooooooooooo foooooooo;
+    ( match k with
+    | foooo -> foooooooo
+    );
+    fooooooooooooooo fooooooooooooo
+    )
 ;;
 
 match x with
@@ -266,15 +266,17 @@ let _ =
 
 let _ = function
   | _ ->
-    x >>= ( function
-    | `Halt -> return x )
+    x >>= (function
+      | `Halt -> return x
+      )
   | _ -> ()
 
 let _ =
   let _ = function
     | _ ->
-      x >>= ( function
-      | `Halt -> return x )
+      x >>= (function
+        | `Halt -> return x
+        )
     | _ -> ()
   in
   ()
@@ -282,8 +284,9 @@ let _ =
 class c =
   let _ = function
     | _ ->
-      x >>= ( function
-      | `Halt -> return x )
+      x >>= (function
+        | `Halt -> return x
+        )
     | _ -> ()
   in
   object end

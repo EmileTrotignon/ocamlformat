@@ -797,8 +797,7 @@ let _ =
 let _ =
   match () with
   | _ -> (
-      f
-      >>= function
+      f >>= function
       | `Fooooooooooooooooooooooooooooooooooooooo ->
           1
       | `Baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaar ->
@@ -816,8 +815,7 @@ let _ =
       >>= foo
 
 let exists t key =
-  S.Tree.kind t.tree (path key)
-  >|= function
+  S.Tree.kind t.tree (path key) >|= function
   | Some `Contents ->
       Ok (Some `Value)
   | Some `Node ->

@@ -89,6 +89,7 @@ type fmt_opts =
   ; indicate_nested_or_patterns: [`Space | `Unsafe_no] elt
   ; infix_precedence: [`Indent | `Parens] elt
   ; leading_nested_match_parens: bool elt
+  ; legacy_function_decl: bool elt
   ; let_and: [`Compact | `Sparse] elt
   ; let_binding_indent: int elt
   ; let_binding_deindent_fun: bool elt

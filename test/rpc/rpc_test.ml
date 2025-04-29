@@ -53,8 +53,7 @@ let start ?versions () =
         | Some v -> List.map Version.to_string v
         | None -> List.map Version.to_string [V2; V1]
       in
-      Ocf.pick_client ~pid input output versions
-      >>| fun client ->
+      Ocf.pick_client ~pid input output versions >>| fun client ->
       let close =
         match client with
         | `V1 _ ->
@@ -103,17 +102,14 @@ let config c =
   get_client () >>= fun cl -> log "[ocf] Config\n%!" ; Ocf.config c cl
 
 let format ?(format_args = empty_args) ?versions x =
-  get_client ?versions ()
-  >>= fun cl ->
+  get_client ?versions () >>= fun cl ->
   log "[ocf] Format '%s'\n%!" x ;
   Ocf.format ~format_args x cl
 
 let halt () =
-  get_client ()
-  >>= fun cl ->
+  get_client () >>= fun cl ->
   log "[ocf] Halt\n%!" ;
-  Ocf.halt cl
-  >>| fun () ->
+  Ocf.halt cl >>| fun () ->
   close_client () ;
   state := Uninitialized
 

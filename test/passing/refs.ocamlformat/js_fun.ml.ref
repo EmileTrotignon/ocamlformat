@@ -11,8 +11,7 @@ let _ = [f (fun x -> x); f (fun x -> x); f (fun x -> x)]
 let _ = [f (fun x -> x); f (fun x -> x); f (fun x -> x)]
 
 let _ =
-  x
-  >>= fun x ->
+  x >>= fun x ->
   (try x with _ -> ()) >>= fun x -> try x with _ -> () >>= fun x -> x
 
 let () = expr >>| function x -> 3 | y -> 4

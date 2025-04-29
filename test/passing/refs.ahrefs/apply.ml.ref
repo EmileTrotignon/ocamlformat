@@ -40,8 +40,8 @@ let whatever a_function_name long_list_one some_other_thing =
 
 let whatever_labelled a_function_name long_list_one some_other_thing =
   ListLabels.map long_list_one ~f:(fun long_list_one_elt ->
-      do_something_with_a_function_and_some_things a_function_name
-        long_list_one_elt some_other_thing)
+    do_something_with_a_function_and_some_things a_function_name
+      long_list_one_elt some_other_thing)
 
 let eradicate_meta_class_is_nullsafe =
   register ~id:"ERADICATE_META_CLASS_IS_NULLSAFE"
@@ -71,14 +71,14 @@ let whatever a_function_name long_list_one some_other_thing =
     (fun long_list_one_elt ->
       do_something_with_a_function_and_some_things a_function_name
         long_list_one_elt some_other_thing
-    )
+      )
     long_list_one
 
 let whatever_labelled a_function_name long_list_one some_other_thing =
   ListLabels.map long_list_one ~f:(fun long_list_one_elt ->
-      do_something_with_a_function_and_some_things a_function_name
-        long_list_one_elt some_other_thing
-  )
+    do_something_with_a_function_and_some_things a_function_name
+      long_list_one_elt some_other_thing
+    )
 ;;
 
 (a - b) ();;

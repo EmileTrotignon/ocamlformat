@@ -39,10 +39,8 @@ let is_attr (type a) (fg : a list item) (x : a) =
 
 let is_state_attr fg ~state x =
   let open Option.Monad_infix in
-  is_attr fg x
-  >>= fun (attr, loc) ->
-  Conf.parse_state_attr attr
-  >>= fun new_state ->
+  is_attr fg x >>= fun (attr, loc) ->
+  Conf.parse_state_attr attr >>= fun new_state ->
   match (state, new_state) with
   | `Enable, `Disable -> Some (`Disable, loc)
   | `Disable, `Enable -> Some (`Enable, loc)
@@ -54,8 +52,7 @@ let last_loc (type a) (fg : a list item) (l : a list) =
   | Structure -> List.last l >>| fun x -> x.pstr_loc
   | Signature -> List.last l >>| fun x -> x.psig_loc
   | Use_file -> (
-      List.last l
-      >>= function
+      List.last l >>= function
       | Ptop_def x -> List.last x >>| fun x -> x.pstr_loc
       | Ptop_dir x -> Some x.pdir_loc )
 

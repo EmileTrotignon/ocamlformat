@@ -81,6 +81,7 @@ let conventional_profile from =
   ; indicate_nested_or_patterns= elt `Unsafe_no
   ; infix_precedence= elt `Indent
   ; leading_nested_match_parens= elt false
+  ; legacy_function_decl= elt true
   ; let_and= elt `Compact
   ; let_binding_indent= elt 2
   ; let_binding_deindent_fun= elt true
@@ -150,6 +151,7 @@ let ocamlformat_profile from =
   ; indicate_nested_or_patterns= elt `Space
   ; infix_precedence= elt `Indent
   ; leading_nested_match_parens= elt false
+  ; legacy_function_decl= elt true
   ; let_and= elt `Compact
   ; let_binding_indent= elt 2
   ; let_binding_deindent_fun= elt true
@@ -218,6 +220,7 @@ let janestreet_profile from =
   ; indicate_nested_or_patterns= elt `Unsafe_no
   ; infix_precedence= elt `Parens
   ; leading_nested_match_parens= elt true
+  ; legacy_function_decl= elt true
   ; let_and= elt `Sparse
   ; let_binding_indent= elt 2
   ; let_binding_deindent_fun= elt false
@@ -922,6 +925,14 @@ module Formatting = struct
         update conf ~f:(fun f -> {f with leading_nested_match_parens= elt}) )
       (fun conf -> conf.fmt_opts.leading_nested_match_parens)
 
+  let legacy_function_decl =
+    let doc = "Use legacy formatting for function declarations." in
+    let names = ["legacy-function-decl"] in
+    Decl.flag ~names ~default ~doc ~kind ~allow_inline:true
+      (fun conf elt ->
+        update conf ~f:(fun f -> {f with legacy_function_decl= elt}) )
+      (fun conf -> conf.fmt_opts.legacy_function_decl)
+
   let let_and =
     let doc = "Style of let_and." in
     let names = ["let-and"] in
@@ -1334,6 +1345,7 @@ module Formatting = struct
       ; elt indicate_nested_or_patterns
       ; elt infix_precedence
       ; elt leading_nested_match_parens
+      ; elt legacy_function_decl
       ; elt let_and
       ; elt let_binding_indent
       ; elt let_binding_deindent_fun

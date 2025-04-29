@@ -13,7 +13,7 @@ let _ =
   try (* after try *) x with _ -> 1
 
 let should_inline : Llvm.llvalue -> bool =
- fun llv ->
+  fun llv ->
   match Llvm.use_begin llv with
   | Some use ->
     (match Llvm.use_succ use with

@@ -18,7 +18,7 @@ val f : compare:[%compare: 'a] -> sexp_of:[%sexp_of: 'a] -> t
 
 let invariant t =
   Invariant.invariant [%here] t [%sexp_of: t] (fun () ->
-      assert (check_t_invariant t))
+    assert (check_t_invariant t))
 ;;
 
 [%e?
@@ -114,7 +114,9 @@ let _ =
 let _ = function%ext
   | x -> x
 
-let _ = f (function%ext x -> x)
+let _ =
+  f (function%ext
+    | x -> x)
 
 let _ =
   f
@@ -125,19 +127,19 @@ let _ =
 let _ =
   [%ext
     function
-    | x -> x]
-
-let _ =
-  f
-    [%ext
-      function
       | x -> x]
 
 let _ =
   f
     [%ext
       function
-      | x -> x]
+        | x -> x]
+
+let _ =
+  f
+    [%ext
+      function
+        | x -> x]
     x
 
 let _ = f ([%ext e] [@attr]) x
@@ -181,8 +183,8 @@ let value =
   f
     [%any_extension
       function
-      | 0 -> false
-      | _ -> true]
+        | 0 -> false
+        | _ -> true]
 
 let value = [%any_extension fun x -> y] x
 
@@ -471,28 +473,32 @@ let _ = function%ext
 let _ =
   [%ext
     function
-    | x -> x]
-let _ = f (function%ext x -> x)
+      | x -> x]
+let _ =
+  f (function%ext
+    | x -> x)
 let _ =
   f
     [%ext
       function
-      | x -> x]
-let _ =
- (function%ext
- | x -> x)
- [@attr]
+        | x -> x]
+let _ = (function%ext
+  | x -> x)
+  [@attr]
 let _ =
   [%ext
     function
-    | x -> x]
+      | x -> x]
   [@attr]
-let _ = f ((function%ext x -> x) [@attr])
+let _ =
+  f ((function%ext
+    | x -> x)
+    [@attr])
 let _ =
   f
     ([%ext
        function
-       | x -> x]
+         | x -> x]
     [@attr])
 
 let _ = new%ext x

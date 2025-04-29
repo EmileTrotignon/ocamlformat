@@ -13,25 +13,23 @@ user_error
 hvbox 1
   (str "\""
   $ list_pn lines (fun ?prev curr ?next ->
-        let drop = function
-          | ' ' -> true
-          | _ -> false
-        in
-        let line =
-          if Option.is_none prev then curr else String.lstrip ~drop curr
-        in
-        fmt_line line
-        $ opt next (fun next ->
-              let spc =
-                match String.lfindi next ~f:(fun _ c -> not (drop c)) with
-                | Some 0 -> ""
-                | Some i -> escape_string (String.sub next 0 i)
-                | None -> escape_string next
-              in
-              fmt "\\n"
-              $ fmt_if_k
-                  (not (String.is_empty next))
-                  (str spc $ pre_break 0 "\\" 0)))
+      let drop = function
+        | ' ' -> true
+        | _ -> false
+      in
+      let line =
+        if Option.is_none prev then curr else String.lstrip ~drop curr
+      in
+      fmt_line line
+      $ opt next (fun next ->
+          let spc =
+            match String.lfindi next ~f:(fun _ c -> not (drop c)) with
+            | Some 0 -> ""
+            | Some i -> escape_string (String.sub next 0 i)
+            | None -> escape_string next
+          in
+          fmt "\\n"
+          $ fmt_if_k (not (String.is_empty next)) (str spc $ pre_break 0 "\\" 0)))
   $ str "\""
   $ Option.call ~f:epi)
 ;;
@@ -64,13 +62,13 @@ hvbox 0
   $ wrap "(" ")"
       (str txt
       $ opt mt (fun _ ->
-            fmt "@ : "
-            $ Option.call ~f:pro_t
-            $ psp_t
-            $ fmt "@;<1 2>"
-            $ bdy_t
-            $ esp_t
-            $ Option.call ~f:epi_t))
+          fmt "@ : "
+          $ Option.call ~f:pro_t
+          $ psp_t
+          $ fmt "@;<1 2>"
+          $ bdy_t
+          $ esp_t
+          $ Option.call ~f:epi_t))
   $ fmt " ->@ "
   $ Option.call ~f:pro_e
   $ psp_e
@@ -129,9 +127,11 @@ let () =
   >|=
   (* Keep going... *)
   another_action
-  |> fun t ->
-  (* And finally do this *)
-  final_action t
+  |> fun
+    t
+  ->
+    (* And finally do this *)
+    final_action t
 
 let () =
   (* Open the repo *)
@@ -141,7 +141,10 @@ let () =
   (* Keep going... *)
   >|= another_action
   (* And finally do this *)
-  |> fun t -> final_action t
+  |> fun
+    t
+  ->
+    final_action t
 
 let _ =
   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -156,10 +159,11 @@ let _ =
   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 let _ =
-  List.filter (fun s ->
-      (* 3.1. the sid of the authenticated user *)
-      foooooooooooooooooooooooooooooo
-      ||
-      (* 3.2. any sids of the group that authenticated the user *)
-      (* TODO: better to look up the membership closure *)
-      fooooooooooooooooooooooooooo)
+  List.filter
+    (fun s ->
+    (* 3.1. the sid of the authenticated user *)
+    foooooooooooooooooooooooooooooo
+    ||
+    (* 3.2. any sids of the group that authenticated the user *)
+    (* TODO: better to look up the membership closure *)
+    fooooooooooooooooooooooooooo)

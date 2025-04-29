@@ -16,3 +16,4 @@ parens-ite=true
 parens-tuple=multi-line-only
 parse-docstrings=false
 type-decl=sparse
+legacy-function-decl=false

@@ -43,9 +43,9 @@ let _ =
   fooooooooo @@ fooooooooooooooo
   @@ (fun x -> foooooooooooooo $ fooooooooooooooooooooo)
   @@ fun x ->
-  fooooooooooooooo $ fooooooooooooooooo $ fooooooooooooooooo $ fooooooooooooo
-  $ fooo @@ foooooooooooooooooo
-  $ fooooooooooooo $ foooooooooooooooooooo
+    fooooooooooooooo $ fooooooooooooooooo $ fooooooooooooooooo $ fooooooooooooo
+    $ fooo @@ foooooooooooooooooo
+    $ fooooooooooooo $ foooooooooooooooooooo
 
 let _ = a + (b * c) + d
 

@@ -268,8 +268,7 @@ let _ =
 
 let _ = function
   | _ -> (
-      x
-      >>= function
+      x >>= function
       | `Halt -> return x
     )
   | _ -> ()
@@ -277,8 +276,7 @@ let _ = function
 let _ =
   let _ = function
     | _ -> (
-        x
-        >>= function
+        x >>= function
         | `Halt -> return x
       )
     | _ -> ()
@@ -288,8 +286,7 @@ let _ =
 class c =
   let _ = function
     | _ -> (
-        x
-        >>= function
+        x >>= function
         | `Halt -> return x
       )
     | _ -> ()

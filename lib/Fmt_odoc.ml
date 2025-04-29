@@ -84,9 +84,9 @@ let split_on_whitespaces =
 (** Escape special characters and normalize whitespaces *)
 let str_normalized ?(escape = escape_all) ~wrap s =
   if wrap then
-    split_on_whitespaces s
-    |> List.filter ~f:(Fn.non String.is_empty)
-    |> fun s -> list s space_break (fun s -> escape s |> str)
+    split_on_whitespaces s |> List.filter ~f:(Fn.non String.is_empty)
+      |> fun s
+    -> list s space_break (fun s -> escape s |> str)
   else str (escape s)
 
 let rec drop_leading_spaces = function

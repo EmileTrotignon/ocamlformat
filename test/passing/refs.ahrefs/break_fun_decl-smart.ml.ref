@@ -109,8 +109,10 @@ class type ffffffffffffffffffff = object
 end
 
 let _ =
- fun (module Store : Irmin.Generic_key.S with type repo = repo)
-     (module Store : Irmin.Generic_key.S with type repo = repo) ->
+  fun
+    (module Store : Irmin.Generic_key.S with type repo = repo)
+    (module Store : Irmin.Generic_key.S with type repo = repo)
+  ->
   body
 
 let _ =
@@ -118,7 +120,8 @@ let _ =
     (fun
       (module Store : Irmin.Generic_key.S with type repo = repo)
       (module Store : Irmin.Generic_key.S with type repo = repo)
-    -> body)
+    ->
+    body)
 
 let f
     (module Store : Irmin.Generic_key.S with type repo = repo)
@@ -129,36 +132,32 @@ let f
 
 let new_specialised_args =
   Variable.Map.mapi
-    (fun new_inner_var______ (definition : Definition.t) :
-         Flambda.specialised_to -> ())
+    (fun
+      new_inner_var______ (definition : Definition.t) : Flambda.specialised_to
+    ->
+      ())
     foo
 
 let new_specialised_args =
   Variable.Map.mapi
     (fun
-      new_inner_var______
-      (definition : Definition.t)
-      :
-      Flambda.specialised_to
-    -> ())
+      new_inner_var______ (definition : Definition.t) : Flambda.specialised_to
+    ->
+    ())
 
 (* With a label it is actually consistent *)
 
 let new_specialised_args =
   Variable.Map.mapi
     ~a:(fun
-        new_inner_var______
-        (definition : Definition.t)
-        :
-        Flambda.specialised_to
-      -> ())
+      new_inner_var______ (definition : Definition.t) : Flambda.specialised_to
+    ->
+      ())
     foo
 
 let new_specialised_args =
   Variable.Map.mapi
-    ~a:(fun
-        new_inner_var______
-        (definition : Definition.t)
-        :
-        Flambda.specialised_to
-      -> ())
+  ~a:(fun
+    new_inner_var______ (definition : Definition.t) : Flambda.specialised_to
+  ->
+    ())

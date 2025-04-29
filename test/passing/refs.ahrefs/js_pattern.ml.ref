@@ -5,7 +5,8 @@ let f x =
   match x with
   | _ -> 0
 
-let f = function
+let f =
+  function
   | _ -> 0
 
 let f x =

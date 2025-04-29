@@ -39,8 +39,7 @@ module Make (IO : IO.S) = struct
 
     let read_input ic =
       let open IO in
-      read ic
-      >>= function
+      read ic >>= function
       | None -> return `Halt
       | Some (Atom "Halt") -> return `Halt
       | Some (List [Atom "Version"; Atom v]) -> return (`Version v)
@@ -66,8 +65,7 @@ module Make (IO : IO.S) = struct
     let read_input ic =
       let open Csexp in
       let open IO in
-      read ic
-      >>= function
+      read ic >>= function
       | None -> return `Halt
       | Some (List [Atom "Format"; Atom x]) -> return (`Format x)
       | Some (List [Atom "Config"; List l]) ->
@@ -113,8 +111,7 @@ module Make (IO : IO.S) = struct
             | List [Atom name; Atom value] -> Some (name, value) | _ -> None )
           csexpl
       in
-      read ic
-      >>= function
+      read ic >>= function
       | None -> return `Halt
       | Some (List (Atom "Format" :: Atom x :: l)) ->
           let extract args csexp =

@@ -117,7 +117,8 @@ module type T = sig
   and B : sig end
 end
 
-let f = (* comment *) function
+(* comment *)
+let f = function
   | x -> x
 
 let foo x = (* comment *) (y : z)
@@ -282,16 +283,16 @@ class i =
 
 let _ =
   try_with (fun () ->
-      (* comment before *)
-      match get () with
-      | None -> do_something ()
-      | Some _ -> () (* do nothing *))
+    (* comment before *)
+    match get () with
+    | None -> do_something ()
+    | Some _ -> () (* do nothing *))
 
 let _ =
   try_with (fun () ->
-      (* comment before *)
-      a;
-      b (* after b *))
+    (* comment before *)
+    a;
+    b (* after b *))
 
 let _ =
   match x with

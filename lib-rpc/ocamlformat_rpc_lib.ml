@@ -33,8 +33,8 @@ module Make (IO : IO) = struct
 
       let query command t =
         let open IO in
-        Protocol.V1.output t.output command
-        >>= fun () -> Protocol.V1.read_input t.input
+        Protocol.V1.output t.output command >>= fun () ->
+        Protocol.V1.read_input t.input
 
       let halt t =
         let open IO in
@@ -45,8 +45,7 @@ module Make (IO : IO) = struct
 
       let config c t =
         let open IO in
-        query (`Config c) t
-        >>= function
+        query (`Config c) t >>= function
         | `Config _ -> return (Ok ())
         | `Error msg -> return (Error (`Msg msg))
         | _ ->
@@ -55,8 +54,7 @@ module Make (IO : IO) = struct
 
       let format x t =
         let open IO in
-        query (`Format x) t
-        >>= function
+        query (`Format x) t >>= function
         | `Format x -> return (Ok x)
         | `Error msg -> return (Error (`Msg msg))
         | _ -> return (Error (`Msg "failing to format input: unknown error"))
@@ -73,8 +71,8 @@ module Make (IO : IO) = struct
 
       let query command t =
         let open IO in
-        Protocol.V2.output t.output command
-        >>= fun () -> Protocol.V2.read_input t.input
+        Protocol.V2.output t.output command >>= fun () ->
+        Protocol.V2.read_input t.input
 
       let halt t =
         let open IO in
@@ -85,8 +83,7 @@ module Make (IO : IO) = struct
 
       let format ~format_args x t =
         let open IO in
-        query (`Format (x, format_args)) t
-        >>= function
+        query (`Format (x, format_args)) t >>= function
         | `Format (x, _args) -> return (Ok x)
         | `Error msg -> return (Error (`Msg msg))
         | _ -> return (Error (`Msg "failing to format input: unknown error"))
@@ -106,10 +103,8 @@ module Make (IO : IO) = struct
     let rec aux = function
       | [] -> return (Error (`Msg "Version negociation failed"))
       | latest :: others -> (
-          Protocol.Init.output oc (`Version latest)
-          >>= fun () ->
-          Protocol.Init.read_input ic
-          >>= function
+          Protocol.Init.output oc (`Version latest) >>= fun () ->
+          Protocol.Init.read_input ic >>= function
           | `Version v when v = latest -> return (get_client ~pid ic oc v)
           | `Version v -> (
             match others with

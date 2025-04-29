@@ -109,8 +109,13 @@ let f aaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbbbbbb cccccccccccccccccccccccc
   ()
 
 let _ =
-  fun aaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbbbbbb cccccccccccccccccccccccc
-      dddddddddddddddddd eeeeeeeeeeeeee ->
+  fun
+    aaaaaaaaaaaaaaaaaaaa
+    bbbbbbbbbbbbbbbbbbbbbbbbb
+    cccccccccccccccccccccccc
+    dddddddddddddddddd
+    eeeeeeeeeeeeee
+  ->
   ()
 
 let _ =

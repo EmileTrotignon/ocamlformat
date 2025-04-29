@@ -54,7 +54,7 @@ let _ =
 
 let _ =
   List.map rows ~f:(fun row ->
-      Or_error.try_with (fun () -> fffffffffffffffffffffffff row))
+    Or_error.try_with (fun () -> fffffffffffffffffffffffff row))
 
 module type T = sig
   (** @raise if not found. *)
@@ -235,8 +235,9 @@ let foo () =
 let _ =
   match x with
   | _
-    when f ~f:((function _ -> .)
-             [@ocaml.warning (* ....................................... *) "-4"])
+    when f ~f:((function
+           | _ -> .)
+           [@ocaml.warning (* ....................................... *) "-4"])
     ->
     y
 
@@ -261,7 +262,8 @@ let[@a
                (* ....................................... *)
                "foooooooooooooooooooooooooooo \
                 fooooooooooooooooooooooooooooooooooooo"])
-           ~f:((function _ -> .)
+           ~f:((function
+             | _ -> .)
              [@ocaml.warning
                (* ....................................... *)
                let x = a
@@ -275,23 +277,23 @@ let[@a
 
 let x =
   foo (`A b) ~f:(fun thing ->
-      something that reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaally needs
-        wrapping)
+    something that reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaally needs
+      wrapping)
 
 let x =
   foo (`A `b) ~f:(fun thing ->
-      something that reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaally needs
-        wrapping)
+    something that reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaally needs
+      wrapping)
 
 let x =
   foo [ A; B ] ~f:(fun thing ->
-      something that reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaally needs
-        wrapping)
+    something that reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaally needs
+      wrapping)
 
 let x =
   foo [ [ A ]; B ] ~f:(fun thing ->
-      something that reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaally needs
-        wrapping)
+    something that reaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaally needs
+      wrapping)
 
 let x =
   f
@@ -301,31 +303,35 @@ let x =
 
 let x =
   some_fun________________________________
-    some_arg______________________________ (fun param ->
-      do_something ();
-      do_something_else ();
-      return_this_value)
+    some_arg______________________________
+    (fun param ->
+    do_something ();
+    do_something_else ();
+    return_this_value)
 
 let x =
   some_fun________________________________
-    some_arg______________________________ ~f:(fun param ->
-      do_something ();
-      do_something_else ();
-      return_this_value)
+    some_arg______________________________
+  ~f:(fun
+    param
+  ->
+    do_something ();
+    do_something_else ();
+    return_this_value)
 
 let x =
   some_value
   |> some_fun (fun x ->
-         do_something ();
-         do_something_else ();
-         return_this_value)
+       do_something ();
+       do_something_else ();
+       return_this_value)
 
 let x =
   some_value
   ^ some_fun (fun x ->
-        do_something ();
-        do_something_else ();
-        return_this_value)
+      do_something ();
+      do_something_else ();
+      return_this_value)
 
 let bind t ~f =
   unfold_step
@@ -349,11 +355,12 @@ let bind t ~f =
 
 let () =
   very_long_function_name
-    ~very_long_argument_label:(fun
-        very_long_argument_name_one
-        very_long_argument_name_two
-        very_long_argument_name_three
-      -> ())
+  ~very_long_argument_label:(fun
+    very_long_argument_name_one
+    very_long_argument_name_two
+    very_long_argument_name_three
+  ->
+    ())
 
 let () =
   (one_mississippi, two_mississippi, three_mississippi, four_mississippi
@@ -373,7 +380,8 @@ let _ =
 let _ =
   aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
     ~bbbbbbbbbbbbbbbbbbbbbbbbbbbb:(fun
-        (_ : (ccccccccccccc * ddddddddddddddddddddddddddddd) eeee) ->
+      (_ : (ccccccccccccc * ddddddddddddddddddddddddddddd) eeee)
+    ->
       FFFFFFFFF gg)
     ~h
 
@@ -417,28 +425,30 @@ let _ =
   fooooooooooooooooooooooooooooooooooooooo
     fooooooooooooooooooooooooooooooooooooooo
     fooooooooooooooooooooooooooooooooooooooo
-    ~f:(fun (type a) foooooooooooooooooooooooooooooooooo : 'a ->
-      match fooooooooooooooooooooooooooooooooooooooo with
-      | Fooooooooooooooooooooooooooooooooooooooo -> x
-      | Fooooooooooooooooooooooooooooooooooooooo -> x)
+  ~f:(fun
+    (type a) foooooooooooooooooooooooooooooooooo : 'a
+  ->
+    match fooooooooooooooooooooooooooooooooooooooo with
+    | Fooooooooooooooooooooooooooooooooooooooo -> x
+    | Fooooooooooooooooooooooooooooooooooooooo -> x)
 
 let _ =
   foo
   |> List.map ~f:(fun x ->
-         do_something ();
-         do_something ();
-         do_something ();
-         do_something ();
-         do_something_else ())
+       do_something ();
+       do_something ();
+       do_something ();
+       do_something ();
+       do_something_else ())
 
 let _ =
   foo
   |> List.map ~f:(fun x ->
-         do_something ();
-         do_something ();
-         do_something ();
-         do_something ();
-         do_something_else ())
+       do_something ();
+       do_something ();
+       do_something ();
+       do_something ();
+       do_something_else ())
   |> bar
 
 let _ =
@@ -446,7 +456,10 @@ let _ =
   |> List.map fooooooooooo fooooooooooo fooooooooooo fooooooooooo fooooooooooo
        fooooooooooo fooooooooooo fooooooooooo
 
-let _ = foo |> List.map (function A -> do_something ())
+let _ =
+  foo
+  |> List.map (function
+       | A -> do_something ())
 
 let _ =
   foo
@@ -561,39 +574,50 @@ let (Foooooooooooooooooo
 
 let _ =
   Foooooooooooooooooooo.foooooooooooooooooooo foooooooooooooooooooo
-    foooooooooooooooooooo (fun x -> function
+    foooooooooooooooooooo
+    (fun x -> function
     | Foooooooooooooooooooo -> foooooooooooooooooooo
     | Foooooooooooooooooooo -> foooooooooooooooooooo)
 
 let _ =
   Foooooooooooooooooooo.foooooooooooooooooooo foooooooooooooooooooo
-    foooooooooooooooooooo ~x:(fun x -> function
+    foooooooooooooooooooo
+  ~x:(fun
+    x
+  ->
+  function
     | Foooooooooooooooooooo -> foooooooooooooooooooo
     | Foooooooooooooooooooo -> foooooooooooooooooooo)
 
 let _ =
   Foooooooooooooooooooo.foooooooooooooooooooo foooooooooooooooooooo
-    foooooooooooooooooooo (fun x ->
-      match foo with
-      | Foooooooooooooooooooo -> foooooooooooooooooooo
-      | Foooooooooooooooooooo -> foooooooooooooooooooo)
+    foooooooooooooooooooo
+    (fun x ->
+    match foo with
+    | Foooooooooooooooooooo -> foooooooooooooooooooo
+    | Foooooooooooooooooooo -> foooooooooooooooooooo)
 
 let _ =
   Foooooooooooooooooooo.foooooooooooooooooooo foooooooooooooooooooo
-    foooooooooooooooooooo ~x:(fun x ->
-      match foo with
-      | Foooooooooooooooooooo -> foooooooooooooooooooo
-      | Foooooooooooooooooooo -> foooooooooooooooooooo)
+    foooooooooooooooooooo
+  ~x:(fun
+    x
+  ->
+    match foo with
+    | Foooooooooooooooooooo -> foooooooooooooooooooo
+    | Foooooooooooooooooooo -> foooooooooooooooooooo)
 
 let _ =
   let x = x in
-  fun foooooooooooooooooo
+  fun
     foooooooooooooooooo
     foooooooooooooooooo
     foooooooooooooooooo
     foooooooooooooooooo
     foooooooooooooooooo
-  -> ()
+    foooooooooooooooooo
+  ->
+    ()
 
 module type For_let_syntax_local =
   For_let_syntax_gen
@@ -624,11 +648,11 @@ type input = {
 }
 
 let x =
- fun[@foo] x ->
+  fun[@foo] x ->
   fun[@foo] y ->
-   object
-     method x = y
-   end
+    object
+      method x = y
+    end
 
 class x =
   fun [@foo] x ->
@@ -645,10 +669,12 @@ module M =
 
 let _ =
   Some
-    (fun fooooooooooooooooooooooooooooooo
+    (fun
       fooooooooooooooooooooooooooooooo
       fooooooooooooooooooooooooooooooo
-    -> foo)
+      fooooooooooooooooooooooooooooooo
+    ->
+      foo)
 
 type t = {
   xxxxxx :
@@ -743,7 +769,10 @@ let _ =
 let _ =
   fooooooooooooooooooooooooooooooo
   |> fooooooooooooooooooooooooooooooo ~fooooooooooooooooooooooooooooooo
-       ~fooooooooooooooooooooooooooooooo:(fun foo -> bar)
+     ~fooooooooooooooooooooooooooooooo:(fun
+       foo
+     ->
+       bar)
 
 let _ =
   fooooooooooooooooooooooooooooooo
@@ -754,44 +783,48 @@ let _ =
 let _ =
   fooooooooooooooooooooooooooooooo
   |> fooooooooooooooooooooooooooooooo ~fooooooooooooooooooooooooooooooo
-       ~fooooooooooooooooooooooooooooooo:(fun foo ->
-         match bar with
-         | Some _ -> foo
-         | None -> baz)
-
-let _ =
-  fooooooooooooooooooooooooooooooo
-  |> fooooooooooooooooooooooooooooooo ~fooooooooooooooooooooooooooooooo
-       (fun foo -> bar)
+     ~fooooooooooooooooooooooooooooooo:(fun
+       foo
+     ->
+       match bar with
+       | Some _ -> foo
+       | None -> baz)
 
 let _ =
   fooooooooooooooooooooooooooooooo
   |> fooooooooooooooooooooooooooooooo ~fooooooooooooooooooooooooooooooo
        (fun foo ->
-         match bar with
-         | Some _ -> foo
-         | None -> baz)
+       bar)
 
 let _ =
   fooooooooooooooooooooooooooooooo
   |> fooooooooooooooooooooooooooooooo ~fooooooooooooooooooooooooooooooo
-       ~fooooooooooooooooooooooooooooooo (fun foo ->
-         match bar with
-         | Some _ -> foo
-         | None -> baz)
+       (fun foo ->
+       match bar with
+       | Some _ -> foo
+       | None -> baz)
+
+let _ =
+  fooooooooooooooooooooooooooooooo
+  |> fooooooooooooooooooooooooooooooo ~fooooooooooooooooooooooooooooooo
+       ~fooooooooooooooooooooooooooooooo
+       (fun foo ->
+       match bar with
+       | Some _ -> foo
+       | None -> baz)
 
 let _ =
   fooooooooooooooooooooooooooooooo
   |> fooooooooooooooooooooooooooooooofooooooooooooooooooooooooooooooofoooooooooo
        (fun foo ->
-         match bar with
-         | Some _ -> foo
-         | None -> baz)
+       match bar with
+       | Some _ -> foo
+       | None -> baz)
 
 let _ =
   fooooooooooooooooooooooooooooooo
   |> foooooooooooooooooooooooooooo ~fooooooooooooooooooooooooooooooo (function
-         | foo -> bar)
+       | foo -> bar)
 
 let _ =
   fooooooooooooooooooooooooooooooo
@@ -836,24 +869,24 @@ let _ =
 let _ =
   match () with
   | _ ->
-    f >>= ( function
-    | `Fooooooooooooooooooooooooooooooooooooooo -> 1
-    | `Baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaar -> 2 )
+    f >>= (function
+      | `Fooooooooooooooooooooooooooooooooooooooo -> 1
+      | `Baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaar -> 2)
 
 let _ =
   match () with
   | _ ->
     f
-    >>= ( function
-    | `Fooooooooooooooooooooooooooooooooooooooo -> 1
-    | `Baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaar -> 2 )
+    >>= (function
+      | `Fooooooooooooooooooooooooooooooooooooooo -> 1
+      | `Baaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaar -> 2)
     >>= foo
 
 let exists t key =
   S.Tree.kind t.tree (path key) >|= function
-  | Some `Contents -> Ok (Some `Value)
-  | Some `Node -> Ok (Some `Dictionary)
-  | None -> Ok None
+    | Some `Contents -> Ok (Some `Value)
+    | Some `Node -> Ok (Some `Dictionary)
+    | None -> Ok None
 
 let _ = if x then 42 (* dummy *) else y
 let _ = if x then 42 (* dummy *) else if y then z else w
@@ -867,7 +900,8 @@ let _ =
   match ids_queue with
   | Some q ->
     (* this is more efficient than a linear scan of [ids] *)
-    fun id -> not (Ident.HashQueue.mem q id)
+    fun id ->
+    not (Ident.HashQueue.mem q id)
   | None -> fun id -> not (List.mem ~equal:Ident.equal ids id)
 
 type callbacks = {
